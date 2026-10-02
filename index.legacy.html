@@ -1,0 +1,2560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elkins &amp; Elkins Medical Atlas</title>
+<style>
+  :root{
+    --paper:#f2e3c4;
+    --paper2:#e7d2aa;
+    --ink:#2b2118;
+    --accent:#7a2f24;
+    --accent2:#294c42;
+    --line:#8a6b45;
+    --soft:#fff8ea;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size:18px;
+    background:
+      radial-gradient(circle at top, rgba(255,255,255,.25), transparent 35%),
+      linear-gradient(180deg,#c7a976,#9e7e54);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .wrap{
+    width:min(1380px, calc(100% - 32px));
+    margin:24px auto;
+    background:var(--paper);
+    border:2px solid #6f5132;
+    box-shadow:0 12px 35px rgba(0,0,0,.28);
+    border-radius:18px;
+    overflow:hidden;
+  }
+  header{
+    padding:30px 28px 22px;
+    text-align:center;
+    background:linear-gradient(180deg,var(--paper2),var(--paper));
+    border-bottom:1px solid var(--line);
+  }
+  h1{margin:0;font-size:clamp(34px,4vw,54px)}
+  .subtitle{margin-top:6px;opacity:.72}
+  main{padding:28px}
+  .home{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+    padding:22px 0;
+  }
+  .home .primary-home{
+    grid-column:1 / -1;
+  }
+  .home-btn{
+    min-height:180px;
+    background:#f8edd5;
+    border:1px solid #a98558;
+    color:var(--ink);
+    border-radius:16px;
+    padding:28px;
+    text-align:center;
+    font:inherit;
+    cursor:pointer;
+    box-shadow:0 8px 16px rgba(70,40,20,.12);
+  }
+  .home-btn strong{display:block;font-size:28px;margin-bottom:8px}
+  .home-btn span{opacity:.75}
+  .home-btn:hover{transform:translateY(-2px)}
+  .home-btn.primary-home{
+    min-height:230px;
+    background:linear-gradient(180deg,#e8d1ae,#dcc095);
+    border:2px solid #7d5a35;
+    padding:36px 28px;
+  }
+  .home-btn.primary-home strong{
+    font-size:44px;
+    letter-spacing:.3px;
+  }
+  .home-btn.primary-home span{
+    font-size:18px;
+    opacity:.8;
+  }
+  button{
+    font:inherit;
+    cursor:pointer;
+    border:0;
+    border-radius:12px;
+    transition:.18s ease;
+  }
+  button:hover{transform:translateY(-1px)}
+  .case-grid,.lex-grid,.surgery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:12px;
+    margin-top:16px;
+  }
+  .case,.lex-card{
+    background:#f9edd5;
+    border:1px solid #b28f63;
+    padding:16px;
+    text-align:left;
+    color:var(--ink);
+    border-radius:12px;
+  }
+  .case strong,.lex-card strong{display:block;font-size:20px;margin-bottom:6px}
+  .muted{opacity:.7;font-size:15px}
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    margin-bottom:14px;flex-wrap:wrap;
+  }
+  .urgency{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-left:8px;
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+    border:1px solid rgba(0,0,0,.12);
+  }
+  .urgency-light{background:#e6eedc;color:#365027;}
+  .urgency-serious{background:#f3e3bd;color:#76591e;}
+  .urgency-critical{background:#edd1cb;color:#7a2f24;}
+  .compact-toggle{
+    background:#d8c19d;
+    color:var(--ink);
+    border:1px solid #9d7a4b;
+    padding:9px 12px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:bold;
+  }
+  .compact-toggle.on{
+    background:var(--accent2);
+    color:#fff;
+    border-color:var(--accent2);
+  }
+  .compact-med{
+    padding:9px 11px;
+    margin-top:8px;
+    border-radius:8px;
+    border:1px solid rgba(0,0,0,.10);
+  }
+  .compact-med strong{display:block;margin-bottom:3px}
+  .compact-inline{
+    font-size:14px;
+    line-height:1.4;
+  }
+  .quick-note{
+    background:#efe2c4;
+    border:1px dashed #9e7b4e;
+    border-radius:10px;
+    padding:10px 12px;
+    margin:10px 0 14px;
+    font-size:14px;
+  }
+  .badge{
+    display:inline-block;
+    background:#d9c19a;
+    border:1px solid #9d7a4b;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:13px;
+  }
+  .progress{
+    height:8px;background:#d7c19e;border-radius:99px;overflow:hidden;margin:10px 0 18px;
+  }
+  .progress > div{height:100%;background:var(--accent2);width:0%}
+  .section{
+    background:#fbf1dc;
+    border-left:5px solid var(--accent2);
+    padding:14px 16px;
+    margin:12px 0;
+    border-radius:8px;
+  }
+  .section.say{border-left-color:var(--accent)}
+  .section h3{margin:0 0 8px}
+  .rp-lines{
+    margin:-4px 0 14px 10px;
+    padding:8px 12px;
+    border-left:2px solid rgba(122,47,36,.45);
+    background:rgba(255,248,234,.42);
+    border-radius:0 8px 8px 0;
+  }
+  .rp-line{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    margin:5px 0;
+    font-style:italic;
+    line-height:1.35;
+  }
+  .rp-arrow{
+    flex:0 0 auto;
+    color:var(--accent);
+    font-weight:bold;
+    font-style:normal;
+  }
+  ul{margin:8px 0 0;padding-left:20px}
+  li{margin:5px 0}
+  .choices{
+    display:grid;
+    gap:10px;
+    margin-top:14px;
+  }
+  .choice{
+    padding:16px 18px;
+    background:#ead9b8;
+    border:1px solid #a88354;
+    text-align:left;
+    color:var(--ink);
+  }
+  .choice:hover{background:#e2cc9f}
+  .nav{
+    display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap;
+  }
+  .secondary{
+    background:#d8c19d;
+    padding:14px 20px;
+    color:var(--ink);
+    border:1px solid #9d7a4b;
+  }
+  .next{
+    background:var(--accent2);
+    color:#fff;
+    padding:14px 20px;
+  }
+  .danger{
+    background:transparent;
+    color:#713027;
+    text-decoration:underline;
+    padding:8px 4px;
+  }
+  .hidden{display:none}
+  .med{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 14px;
+    font-size:15px;
+  }
+  .med strong{display:block}
+  .search{
+    width:100%;
+    padding:16px 18px;
+    border:1px solid #a98658;
+    border-radius:10px;
+    background:#fff8e9;
+    color:var(--ink);
+    font:inherit;
+    margin:8px 0 4px;
+  }
+  .lex-card small{display:block;margin-top:8px;line-height:1.35}
+  .lex-tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:12px 0 14px;
+  }
+  .lex-tab{
+    padding:10px 14px;
+    background:#e6d2ad;
+    border:1px solid #a98658;
+    color:var(--ink);
+    font-weight:bold;
+  }
+  .lex-tab.active{
+    background:var(--accent2);
+    border-color:var(--accent2);
+    color:#fff;
+  }
+  .reference-card{
+    background:#f9edd5;
+    border:1px solid #b28f63;
+    padding:18px;
+    border-radius:12px;
+  }
+  .reference-card strong{
+    display:block;
+    font-size:20px;
+    margin-bottom:6px;
+  }
+  .reference-card small{
+    display:block;
+    margin-top:7px;
+    line-height:1.4;
+  }
+  .material-panel{
+    background:#efe2c4;
+    border:1px solid #b28f63;
+    border-radius:10px;
+    padding:14px 16px;
+    margin:10px 0 14px;
+  }
+  .material-panel h3{margin:0 0 8px}
+  .material-panel ul{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px 20px;
+    margin:0;
+  }
+  .material-btn{
+    background:#e5cfaa;
+    border:1px solid #9d7a4b;
+    color:var(--ink);
+    padding:9px 12px;
+    font-weight:bold;
+  }
+
+  .cat-badge{
+    display:inline-block;
+    margin-top:8px;
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:12px;
+    border:1px solid rgba(0,0,0,.12);
+    background:rgba(255,255,255,.45);
+  }
+
+  .cat-pain{background:#f3dfd7;border-color:#be8a7d;}
+  .cat-anesthetic{background:#e7deef;border-color:#aa97bc;}
+  .cat-antiseptic{background:#dcebe5;border-color:#8eb19d;}
+  .cat-topical{background:#f6ead2;border-color:#c6ab74;}
+  .cat-fever{background:#eee5cf;border-color:#b8a06b;}
+  .cat-stimulant{background:#e3e9f5;border-color:#93a4c9;}
+  .cat-other{background:#efe6da;border-color:#b8a088;}
+
+  .med-item{
+    padding:10px 12px;
+    border-top:1px solid #cfb78f;
+    border-radius:8px;
+    margin-top:10px;
+  }
+  footer{
+    text-align:center;
+    padding:18px;
+    font-size:12px;
+    opacity:.65;
+  }
+  @media(min-width:1400px){
+    .wrap{width:min(1500px, calc(100% - 48px));}
+    main{padding:34px;}
+    .case-grid,.lex-grid,.surgery-grid{gap:16px;}
+    .section{font-size:1.03em;}
+    .choice{font-size:1.02em;}
+    body.compact-header header{padding:12px 18px 8px;}
+  }
+
+  @media(max-width:800px){
+    .anatomy-layout{grid-template-columns:1fr}
+    .anatomy-stage{height:680px;min-height:500px}
+  }
+
+  @media(max-width:640px){
+    body{font-size:16px}
+    main{padding:12px}
+    .home{grid-template-columns:1fr}
+    .home .primary-home{grid-column:auto}
+    .wrap{margin:8px auto;width:calc(100% - 12px);border-radius:12px}
+    .med{grid-template-columns:1fr}
+    .nav button{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="siteHeader">
+    <h1>Elkins &amp; Elkins Medical Atlas</h1>
+    <div class="subtitle">Practical Medicine, Surgery &amp; Field Notes - 1889</div>
+<div class="byline">Compiled by Dr. Everett Elkins &amp; Dr. Effie Elkins</div>
+  </header>
+
+  <main>
+    <section id="home">
+      <div class="home">
+        <button class="home-btn primary-home" onclick="showCases()">
+          <strong>Intervention</strong>
+          <span>Prise en charge principale, guidée étape par étape</span>
+        </button>
+        <button class="case" style="grid-column:1 / -1;background:#ead8cf;border-color:#9d655b;text-align:center" onclick="start('unknown')">
+          <strong>⚠ Patient inconscient / cause inconnue</strong>
+          <span class="muted">Commencer par l'état vital avant de chercher ce qui s'est passé</span>
+        </button>
+        <button class="home-btn" onclick="showLexique()">
+          <strong>Lexique</strong>
+          <span>Produits, antidouleurs, antiseptiques, anesthésiques et soins</span>
+        </button>
+        <button class="home-btn" onclick="showSurgery()">
+          <strong>Chirurgie lourde</strong>
+          <span>Opérations lourdes, rares et de dernier recours</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="cases" class="hidden">
+      <div class="topbar">
+        <h2 style="margin:0">Quelle intervention ?</h2>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+      <div class="case-grid">
+        <button class="case" style="background:#ead8cf;border-color:#9d655b" onclick="start('unknown')">
+          <strong>⚠ Inconscient / cause inconnue</strong>
+          <span class="muted">Respiration, saignement, réveil, puis recherche de la cause</span>
+        </button>
+        <button class="case" onclick="start('gunshot')">
+          <strong>🔫 Blessure par balle</strong>
+          <span class="muted">Projectile, saignement, plaie d’entrée/sortie</span>
+        </button>
+        <button class="case" onclick="start('knife')">
+          <strong>🔪 Blessure au couteau</strong>
+          <span class="muted">Plaie ouverte, profondeur, hémorragie</span>
+        </button>
+        <button class="case" onclick="start('fight')">
+          <strong>👊 Bagarre / coups</strong>
+          <span class="muted">Ecchymoses, coupures, tête, côtes</span>
+        </button>
+        <button class="case" onclick="start('horse')">
+          <strong>🐎 Chute de cheval</strong>
+          <span class="muted">Fracture, luxation, commotion</span>
+        </button>
+        <button class="case" onclick="start('fracture')">
+          <strong>🦴 Fracture / luxation</strong>
+          <span class="muted">Déformation, douleur, immobilisation</span>
+        </button>
+        <button class="case" onclick="start('minor')">
+          <strong>🩹 Petit bobo / soin léger</strong>
+          <span class="muted">Éraflure, petit bleu, coupure légère</span>
+        </button>
+        <button class="case" onclick="start('drowning')">
+          <strong>🌊 Noyade / asphyxie</strong>
+          <span class="muted">Inconscience, respiration absente ou difficile</span>
+        </button>
+        <button class="case" onclick="start('head')">
+          <strong>🧠 Traumatisme crânien</strong>
+          <span class="muted">Chute, coup à la tête, confusion, perte de connaissance</span>
+        </button>
+        <button class="case" onclick="start('burn')">
+          <strong>🔥 Brûlure</strong>
+          <span class="muted">Chaleur, feu, vapeur, peau lésée</span>
+        </button>
+        <button class="case" onclick="start('poison')">
+          <strong>☠️ Intoxication / opiacés</strong>
+          <span class="muted">Laudanum, opium, somnolence, respiration lente</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="lexique" class="hidden">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0">Lexique médical RP</h2>
+          <div class="muted" style="margin-top:4px">Références rapides pour la scène</div>
+        </div>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+
+      <div class="lex-tabs">
+        <button type="button" class="lex-tab active" data-lex-tab="meds">Médicaments</button>
+        <button type="button" class="lex-tab" data-lex-tab="equipment">Matériel</button>
+        <button type="button" class="lex-tab" data-lex-tab="symptoms">Symptômes</button>
+        
+      </div>
+
+      <input id="lexSearch" class="search" placeholder="Rechercher dans le lexique..." oninput="filterLexique()" />
+
+      <div id="lexHelpful" class="section">
+        <h3>À ne pas confondre</h3>
+        <ul>
+          <li><b>Laudanum</b> : liquide, voie orale, en gouttes.</li>
+          <li><b>Morphine</b> : solution injectable, voie hypodermique.</li>
+          <li><b>Chloroforme / éther</b> : liquides volatils, voie inhalée.</li>
+          <li><b>Phénol / acide carbolique</b> : solution antiseptique liquide, application locale.</li>
+          <li><b>Arnica</b> : teinture liquide ou pommade, application locale sur peau intacte.</li>
+        </ul>
+      </div>
+
+      <div id="lexGrid" class="lex-grid"></div>
+    </section>
+
+    <section id="surgery" class="hidden">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0">Chirurgie lourde</h2>
+          <div class="muted" style="margin-top:5px">Actes rares, graves ou de dernier recours</div>
+        </div>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+      <div class="surgery-grid">
+        <button class="case" onclick="openSurgery('amputation')">
+          <strong>🪚 Amputation</strong>
+          <span class="muted">Membre irrécupérable, gangrène ou destruction majeure</span>
+        </button>
+        <button class="case" onclick="openSurgery('major_bleeding')">
+          <strong>🩸 Hémorragie majeure</strong>
+          <span class="muted">Vaisseau important, saignement impossible à contrôler simplement</span>
+        </button>
+        <button class="case" onclick="openSurgery('deep_bullet')">
+          <strong>🔩 Projectile profondément logé</strong>
+          <span class="muted">Balle inaccessible par une extraction simple</span>
+        </button>
+        <button class="case" onclick="openSurgery('abdominal')">
+          <strong>🫀 Plaie abdominale grave</strong>
+          <span class="muted">Atteinte profonde nécessitant une exploration chirurgicale RP</span>
+        </button>
+        <button class="case" onclick="openSurgery('trepanation')">
+          <strong>🧠 Trépanation</strong>
+          <span class="muted">Traumatisme crânien exceptionnel avec signes très inquiétants</span>
+        </button>
+        <button class="case" onclick="openSurgery('infected_wound')">
+          <strong>🦠 Plaie gravement infectée</strong>
+          <span class="muted">Tissus abîmés, infection profonde, nettoyage chirurgical</span>
+        </button>
+      </div>
+      <div class="section" style="margin-top:16px">
+        <h3>Quand utiliser cette section ?</h3>
+        <ul>
+          <li>Quand une intervention classique ne suffit plus.</li>
+          <li>Quand le patient risque de perdre un membre ou sa vie.</li>
+          <li>Quand tu veux jouer une vraie scène d'opération courte et exceptionnelle.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="surgeryFlow" class="hidden"></section>
+
+    <section id="flow" class="hidden"></section>
+  </main>
+
+  <footer>
+    Outil de soutien RP historique (1889). Les techniques décrites servent au jeu de rôle et ne sont pas des gestes de secours modernes.
+  </footer>
+</div>
+
+<script>
+const lexique = [
+  {
+    name:"Laudanum",
+    category:"Antidouleur",
+    tags:"douleur antidouleur opium liquide oral boire gouttes",
+    type:"Antidouleur / sédatif",
+    form:"Liquide opiacé, teinture d’opium dans l’alcool",
+    composition:"Teinture d’opium dans de l’alcool, généralement aromatisée selon la préparation.",
+    admin:"Voie orale, en gouttes ou petite quantité diluée",
+    use:"Douleur, agitation selon la scène",
+    icon:"🥄"
+  },
+  {
+    name:"Morphine",
+    category:"Antidouleur",
+    tags:"douleur antidouleur injection seringue hypodermique",
+    type:"Antidouleur puissant",
+    form:"Solution liquide injectable à base de sel de morphine",
+    composition:"Sel de morphine dissous dans une solution destinée à l’injection hypodermique.",
+    admin:"Injection hypodermique à l’aide d’une seringue",
+    use:"Douleur importante",
+    icon:"💉"
+  },
+  {
+    name:"Chloroforme",
+    category:"Anesthésique",
+    tags:"endormir anesthésie anesthésique inhalation",
+    type:"Anesthésique",
+    form:"Liquide volatil",
+    composition:"Chloroforme liquide pur ou préparation anesthésique à base de chloroforme.",
+    admin:"Voie inhalée, versé sur un linge, une compresse ou un masque simple",
+    use:"Intervention importante nécessitant une anesthésie",
+    icon:"🌫️"
+  },
+  {
+    name:"Éther",
+    category:"Anesthésique",
+    tags:"endormir anesthésie anesthésique inhalation",
+    type:"Anesthésique",
+    form:"Liquide volatil",
+    composition:"Éther éthylique volatil utilisé comme anesthésique inhalé.",
+    admin:"Voie inhalée, sur linge, compresse ou dispositif d’anesthésie simple",
+    use:"Alternative anesthésique",
+    icon:"🌫️"
+  },
+  {
+    name:"Phénol / acide carbolique",
+    category:"Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)",
+    tags:"antiseptique désinfecter nettoyer plaie",
+    type:"Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)",
+    form:"Solution liquide diluée",
+    composition:"Acide carbolique dilué dans une solution adaptée à l’usage antiseptique.",
+    admin:"Application locale sur la peau, la plaie, les compresses ou le matériel",
+    use:"Nettoyage et antisepsie",
+    icon:"🧴"
+  },
+  {
+    name:"Alcool",
+    category:"Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)",
+    tags:"antiseptique nettoyer désinfecter",
+    type:"Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)",
+    form:"Liquide",
+    composition:"Éthanol ou alcool fort utilisé comme nettoyant / antiseptique de fortune.",
+    admin:"Application locale",
+    use:"Nettoyage simple du matériel ou d’une zone",
+    icon:"🧴"
+  },
+  {
+    name:"Préparation à l’arnica",
+    category:"Soin local",
+    tags:"arnica baume pommade teinture bobo bleu ecchymose contusion peau léger",
+    type:"Soin local pour contusions",
+    form:"Teinture alcoolique ou préparation grasse",
+    composition:"Fleurs d’arnica macérées dans l’alcool ; pour une pommade RP, la préparation peut être incorporée à une base grasse/cireuse.",
+    admin:"Application locale sur peau intacte, en friction légère",
+    use:"Bleus, bosses, contusions et douleurs superficielles sans plaie ouverte",
+    icon:"🌼"
+  },
+  {
+    name:"Onguent protecteur",
+    category:"Soin local",
+    tags:"onguent pommade brûlure peau baume",
+    type:"Soin local",
+    form:"Pommade / onguent",
+    composition:"Base grasse, cireuse ou huileuse ; la composition pouvait varier selon la pharmacie.",
+    admin:"Application locale en fine couche",
+    use:"Irritations, petites brûlures, protection cutanée",
+    icon:"🫙"
+  },
+  {
+    name:"Méthode de Silvester",
+    category:"Technique",
+    tags:"réanimation respiration artificielle inconscient ne respire pas silvester historique",
+    type:"Respiration artificielle historique",
+    form:"Manœuvre manuelle",
+    admin:"Patient sur le dos : élévation des bras puis compression douce du thorax",
+    use:"Asphyxie / absence apparente de respiration dans un contexte RP 1889",
+    icon:"🫁"
+  },
+  {
+    name:"Ammoniaque / sels odorants",
+    category:"Stimulant",
+    tags:"inconscient malaise réveiller stimulation sels odorants ammoniaque respiration",
+    type:"Stimulant d’époque",
+    form:"Vapeurs / sels odorants",
+    composition:"Préparation libérant des vapeurs ammoniacales irritantes.",
+    admin:"Présentés brièvement sous le nez, sans contact direct",
+    use:"Tentative de stimulation d’un patient évanoui qui respire encore",
+    icon:"👃"
+  },
+  {
+    name:"Carron oil / huile pour brûlures",
+    category:"Soin local",
+    tags:"brûlure huile carron oil linseed lime water onguent peau",
+    type:"Soin historique des brûlures",
+    form:"Mélange huileux / lotion",
+    composition:"Mélange traditionnel à base d’huile de lin et d’eau de chaux.",
+    admin:"Application locale sur la brûlure, puis pansement",
+    use:"Soin RP historiquement plausible pour brûlures au XIXe siècle",
+    icon:"🔥"
+  },
+  {
+    name:"Atropine",
+    category:"Stimulant",
+    tags:"opium laudanum intoxication antidote atropine injection historique",
+    type:"Stimulant / traitement historique de l’empoisonnement à l’opium",
+    form:"Préparation médicinale",
+    composition:"Alcaloïde issu de plantes de la famille des Solanacées, préparé sous forme médicinale.",
+    admin:"Administration médicale ; à réserver au RP de docteur",
+    use:"Option historique documentée contre l’empoisonnement à l’opium",
+    icon:"⚕️"
+  },
+  {
+    name:"Suture",
+    category:"Technique",
+    tags:"suture points aiguille fil refermer plaie couture",
+    type:"Technique de fermeture de plaie",
+    form:"Aiguille courbe ou droite + fil de suture",
+    composition:"Matériel : aiguille, fil, pince, ciseaux, compresses et antiseptique.",
+    admin:"Rapprocher les bords de la plaie puis poser des points séparés.",
+    use:"Plaie propre, suffisamment profonde pour nécessiter une fermeture, sans contre-indication évidente dans la scène.",
+    icon:"🪡"
+  },
+  {
+    name:"Quinine",
+    category:"Fièvre / maladie",
+    tags:"fièvre poudre boire oral",
+    type:"Médicament contre certaines fièvres",
+    form:"Poudre ou sels/cristaux de quinine selon la préparation",
+    composition:"Alcaloïde extrait du quinquina, souvent préparé sous forme de sels ou de poudre.",
+    admin:"Voie orale, poudre ou sels dissous / mélangés à une préparation",
+    use:"Fièvres selon le contexte RP",
+    icon:"🥄"
+  }
+];
+
+
+const equipmentLexicon = [
+  {name:"Aiguille et fil de suture", tags:"suture couture fermeture plaie", desc:"Matériel servant à rapprocher et maintenir les bords d'une plaie propre.", use:"Suture simple après nettoyage et contrôle du saignement."},
+  {name:"Attelle", tags:"fracture immobiliser membre bois", desc:"Support rigide placé le long d'un membre pour limiter les mouvements.", use:"Fracture ou traumatisme nécessitant une immobilisation."},
+  {name:"Bandage", tags:"pansement maintenir compression", desc:"Bande de tissu servant à maintenir une compresse, soutenir un membre ou exercer une pression.", use:"Plaies, contusions, soutien et immobilisation légère."},
+  {name:"Compresses / linge propre", tags:"sang plaie compression nettoyer", desc:"Carrés ou morceaux de tissu propres utilisés contre une plaie.", use:"Compression, nettoyage, protection et pansement."},
+  {name:"Forceps / pince", tags:"pince balle projectile corps étranger", desc:"Instrument permettant de saisir un objet ou un tissu avec davantage de précision.", use:"Projectile accessible, corps étranger ou manipulation pendant une petite chirurgie RP."},
+  {name:"Scalpel / bistouri", tags:"lame incision chirurgie ouvrir", desc:"Petite lame chirurgicale destinée aux incisions précises.", use:"Intervention chirurgicale, drainage ou ouverture contrôlée."},
+  {name:"Scie chirurgicale", tags:"amputation os chirurgie lourde", desc:"Instrument de chirurgie lourde destiné à la section de l'os.", use:"Amputation uniquement dans une scène exceptionnelle."},
+  {name:"Seringue hypodermique", tags:"injection morphine aiguille", desc:"Seringue équipée d'une aiguille permettant d'injecter un produit sous la peau.", use:"Notamment pour la morphine en solution injectable."},
+  {name:"Trépan", tags:"crane trépanation chirurgie", desc:"Instrument destiné à pratiquer une ouverture limitée dans l'os du crâne.", use:"Trépanation exceptionnelle dans la section Chirurgie lourde."}
+];
+
+const symptomLexicon = [
+  {name:"Confusion", tags:"tête commotion intoxication conscience", desc:"Le patient répond mal, se trompe ou paraît désorienté.", rp:"Faire simple : vérifier respiration, traumatisme crânien, fièvre ou toxique selon le contexte."},
+  {name:"Essoufflement", tags:"respiration thorax poumon", desc:"Respiration difficile, rapide ou courte.", rp:"Priorité à la respiration, surtout après blessure thoracique ou noyade."},
+  {name:"Pâleur", tags:"hémorragie choc sang faiblesse", desc:"Teint anormalement pâle, souvent accompagné de faiblesse ou de froid.", rp:"Peut renforcer la suspicion d'une perte de sang ou d'un collapsus dans la scène."},
+  {name:"Pouls faible", tags:"hémorragie collapsus choc", desc:"Pouls difficile à sentir ou paraissant très faible.", rp:"Signe inquiétant à associer à l'état général, à la pâleur et aux pertes de sang."},
+  {name:"Pupilles serrées", tags:"opium morphine intoxication overdose", desc:"Pupilles très petites.", rp:"Dans le manuel, associé à la surdose d'opium ou de morphine avec somnolence et respiration lente."},
+  {name:"Rougeur, chaleur, pus", tags:"infection plaie fièvre", desc:"Aspect local pouvant accompagner une plaie infectée.", rp:"Le manuel associe ces signes au drainage, nettoyage et débridement."},
+  {name:"Sang craché", tags:"thorax poumon balle respiration", desc:"Présence de sang lorsque le patient tousse ou crache.", rp:"Signe sérieux dans une blessure thoracique."},
+  {name:"Somnolence inhabituelle", tags:"tête commotion opium conscience", desc:"Difficulté inhabituelle à rester éveillé.", rp:"À surveiller après traumatisme crânien ou lors d'une intoxication."},
+  {name:"Ventre dur", tags:"abdomen balle douleur interne", desc:"Abdomen paraissant anormalement tendu ou rigide.", rp:"Le manuel le cite parmi les signes à rechercher après une balle dans l'abdomen."},
+  {name:"Vomissements", tags:"tête abdomen intoxication", desc:"Rejets digestifs après un traumatisme ou une maladie.", rp:"À prendre particulièrement au sérieux après un choc à la tête ou une blessure abdominale."}
+];
+
+
+let lexTab = "meds";
+let materialPanelOpen = false;
+
+const interventionMaterials = {
+  unknown:["Compresses / linge propre","Bandages","Couverture","Sels odorants si le patient respire"],
+  gunshot:["Compresses / linge propre","Bandages","Phénol / acide carbolique dilué","Forceps si projectile accessible","Aiguille et fil de suture si fermeture","Seringue si morphine"],
+  knife:["Compresses / linge propre","Bandages","Phénol / acide carbolique dilué","Aiguille et fil de suture si nécessaire","Seringue si morphine"],
+  fight:["Compresses","Bandage léger","Préparation à l'arnica sur peau intacte","Antiseptique si coupure"],
+  horse:["Compresses","Bandages","Attelle si suspicion de fracture","Arnica si contusion sur peau intacte","Seringue si morphine"],
+  fracture:["Attelle","Bandages","Tissu rembourré","Seringue si morphine"],
+  minor:["Compresses","Petit bandage","Arnica ou onguent sur peau intacte","Antiseptique si petite plaie"],
+  drowning:["Couverture / linge sec","Espace dégagé pour respiration artificielle"],
+  head:["Compresses","Bandage","Antiseptique si plaie","Couverture"],
+  burn:["Compresses / linge propre","Pansement protecteur","Eau fraîche si disponible","Antalgique selon douleur"],
+  poison:["Couverture","Sels odorants si indiqué","Matériel de surveillance et respiration artificielle"]
+};
+
+const surgeryMaterials = {
+  amputation:["Chloroforme ou éther","Scalpel / bistouri","Scie chirurgicale","Forceps","Fils de ligature","Aiguille et fil de suture","Nombreuses compresses et bandages"],
+  major_bleeding:["Nombreuses compresses","Forceps","Fils de ligature","Aiguille et fil de suture","Bandage épais"],
+  deep_bullet:["Chloroforme ou éther","Scalpel / bistouri","Forceps","Compresses","Antiseptique","Aiguille et fil de suture"],
+  abdominal:["Chloroforme ou éther","Scalpel / bistouri","Forceps","Compresses","Fils de ligature","Aiguille et fil de suture","Pansement large"],
+  trepanation:["Chloroforme ou éther","Trépan","Scalpel / bistouri","Forceps","Compresses","Aiguille et fil de suture"],
+  infected_wound:["Scalpel / bistouri","Forceps","Compresses","Phénol / acide carbolique dilué","Bandages"]
+};
+
+const flows = {
+  unknown: {
+    title:"Patient inconscient / cause inconnue",
+    urgency:"critical",
+    steps:[
+      {
+        title:"Respire-t-il ?",
+        do:["Appeler le patient et vérifier s'il réagit.","Observer la poitrine et écouter la respiration.","Regarder immédiatement s'il y a un saignement massif."],
+        choices:[
+          {label:"Oui, il respire", set:{unknownBreathing:"yes"}},
+          {label:"Respiration faible / irrégulière", set:{unknownBreathing:"weak"}},
+          {label:"Il ne semble pas respirer", set:{unknownBreathing:"no"}},
+          {label:"Impossible à savoir immédiatement", set:{unknownBreathing:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser",
+        dynamicUnknownBreathing:true
+      },
+      {
+        title:"Y a-t-il un gros saignement ?",
+        choices:[
+          {label:"Oui, saignement important", set:{unknownBleeding:"major"}},
+          {label:"Petit saignement seulement", set:{unknownBleeding:"minor"}},
+          {label:"Pas de saignement visible", set:{unknownBleeding:"none"}},
+          {label:"Impossible à déterminer", set:{unknownBleeding:"unknown"}}
+        ]
+      },
+      {
+        title:"Contrôler ce qui est visible",
+        dynamicUnknownBleeding:true
+      },
+      {
+        title:"Le patient revient-il à lui ?",
+        choices:[
+          {label:"Oui, il se réveille", set:{unknownWake:"awake"}},
+          {label:"Il reste confus", set:{unknownWake:"confused"}},
+          {label:"Il reste inconscient", set:{unknownWake:"unconscious"}},
+          {label:"Impossible à évaluer", set:{unknownWake:"unknown"}}
+        ]
+      },
+      {
+        title:"Chercher la cause",
+        dynamicUnknownCause:true
+      }
+    ]
+  },
+
+  gunshot: {
+    title:"Blessure par balle",
+    urgency:"serious",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Vérifier s’il répond.","Observer la respiration.","Repérer un saignement majeur avant toute discussion."],
+        say:["« Vous m’entendez ? »","« Ouvrez les yeux si vous m’entendez. »"],
+        choices:[
+          {label:"Conscient", set:{conscious:"awake"}},
+          {label:"Confus / répond mal", set:{conscious:"confused"}},
+          {label:"Inconscient mais respire", set:{conscious:"unconscious_breathing"}},
+          {label:"Inconscient et ne semble pas respirer", set:{conscious:"not_breathing"}},
+          {label:"Impossible à déterminer pour l’instant", set:{conscious:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser / réanimer si besoin",
+        dynamicConscious:true
+      },
+      {
+        title:"Où est la blessure ?",
+        choices:[
+          {label:"Bras / épaule", set:{gunArea:"arm"}},
+          {label:"Jambe", set:{gunArea:"leg"}},
+          {label:"Thorax / poitrine", set:{gunArea:"chest"}},
+          {label:"Abdomen", set:{gunArea:"abdomen"}},
+          {label:"Tête / cou", set:{gunArea:"head"}},
+          {label:"Impossible à déterminer", set:{gunArea:"unknown"}}
+        ]
+      },
+      {
+        title:"Contrôler le saignement",
+        do:["Dégager les vêtements autour de la blessure.","Comprimer avec un linge ou une compresse propre.","Maintenir la pression et surveiller la pâleur."],
+        say:["« Ne bougez pas, je vais comprimer la plaie. »","« Continuez de me parler si vous pouvez. »","« Dites-moi si vous vous sentez faible ou étourdi. »"],
+        material:["Compresses","Linge propre","Bandage"]
+      },
+      {
+        title:"Examiner la plaie",
+        do:["Nettoyer autour de la blessure.","Chercher une plaie de sortie.","Ne pas fouiller inutilement."],
+        say:["« Je vais regarder si la balle est ressortie. »","« Ça va piquer un peu pendant le nettoyage. »","« Ne bougez pas pendant que j’examine la plaie. »"],
+        choices:[
+          {label:"La balle est ressortie", set:{bullet:"out"}},
+          {label:"La balle semble encore présente", set:{bullet:"in"}},
+          {label:"Impossible à déterminer", set:{bullet:"unknown"}},
+          {label:"Je n’ai pas encore pu vérifier", set:{bullet:"unchecked"}}
+        ]
+      },
+      {
+        title:"Soulager la douleur",
+        do:["Choisir un antalgique seulement si la scène le justifie (laudanum, liquide oral en gouttes ; ou morphine, solution injectable hypodermique, selon l’intensité).","Surveiller le patient après administration."],
+        say:["« Je vais vous donner quelque chose pour calmer la douleur. »","« Dites-moi si ça devient plus supportable. »","« Restez tranquille le temps que ça agisse. »"],
+        med:[
+          ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur importante"],
+          ["Laudanum","Liquide opiacé (teinture d’opium)","Voie orale, en gouttes ou petite quantité diluée","Douleur modérée à forte"]
+        ]
+      },
+      {
+        title:"Traiter la blessure",
+        dynamic:true
+      },
+      {
+        title:"La plaie peut-elle être suturée ?",
+        choices:[
+          {label:"Oui, plaie propre et nette", set:{needsSuture:true}},
+          {label:"Non, petite plaie / fermeture inutile", set:{needsSuture:false}},
+          {label:"Plaie sale, irrégulière ou trop profonde", set:{needsSuture:"avoid"}}
+        ]
+      },
+      {
+        title:"Suture / fermeture",
+        dynamicSuture:true
+      },
+      {
+        title:"Pansement",
+        do:["Nettoyer autour de la zone.","Poser une compresse propre.","Maintenir avec un bandage sans trop serrer."],
+        say:["« Je vais protéger la plaie maintenant. »"],
+        material:["Compresses","Bandage"]
+      },
+      {
+        title:"Consignes de fin",
+        do:["Mettre le membre au repos si nécessaire.","Conseiller de garder le pansement propre.","Prévoir une surveillance de la fièvre et de la douleur."],
+        say:["« Gardez cette zone au repos. »","« Si la fièvre monte ou si la douleur augmente, revenez me voir. »","« Ne retirez pas le pansement inutilement. »"]
+      }
+    ]
+  },
+
+  knife: {
+    title:"Blessure au couteau",
+    urgency:"serious",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Vérifier s’il répond.","Observer respiration et saignement.","Ne pas attendre d’avoir toutes les informations si le patient est inconscient."],
+        choices:[
+          {label:"Conscient", set:{conscious:"awake"}},
+          {label:"Confus / répond mal", set:{conscious:"confused"}},
+          {label:"Inconscient mais respire", set:{conscious:"unconscious_breathing"}},
+          {label:"Inconscient et ne semble pas respirer", set:{conscious:"not_breathing"}},
+          {label:"Impossible à déterminer pour l’instant", set:{conscious:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser / réanimer si besoin",
+        dynamicConscious:true
+      },
+      {
+        title:"Où est la plaie ?",
+        choices:[
+          {label:"Bras / jambe", set:{knifeArea:"limb"}},
+          {label:"Thorax / poitrine", set:{knifeArea:"chest"}},
+          {label:"Abdomen", set:{knifeArea:"abdomen"}},
+          {label:"Dos", set:{knifeArea:"back"}},
+          {label:"Impossible à déterminer", set:{knifeArea:"unknown"}}
+        ]
+      },
+      {
+        title:"Évaluer la plaie",
+        do:["Observer la profondeur et le saignement.","Vérifier si la respiration ou les mouvements aggravent fortement la douleur."],
+        say:["« Où avez-vous le plus mal ? »","« Je vais regarder la blessure. »"],
+        choices:[
+          {label:"Plaie superficielle / membre", set:{knifeSeverity:"simple"}},
+          {label:"Plaie profonde / thorax / abdomen", set:{knifeSeverity:"deep"}},
+          {label:"Impossible à évaluer", set:{knifeSeverity:"unknown"}}
+        ]
+      },
+      {
+        title:"Contrôler le saignement",
+        do:["Comprimer avec un linge propre.","Maintenir une pression constante.","Éviter de manipuler inutilement une plaie profonde."],
+        say:["« Je vais comprimer, ça risque d’être douloureux. »"],
+        material:["Compresses","Bandage","Linge propre"]
+      },
+      {
+        title:"Nettoyer",
+        do:["Nettoyer autour de la plaie.","Retirer uniquement les saletés facilement accessibles.","Préparer la zone pour la fermeture si nécessaire."],
+        say:["« Je nettoie avant de refermer. »"]
+      },
+      {
+        title:"Soulager",
+        med:[
+          ["Laudanum","Liquide opiacé","À boire / gouttes par voie orale","Douleur"],
+          ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur importante"]
+        ],
+        say:["« Je vais calmer la douleur avant de continuer. »"]
+      },
+      {
+        title:"La plaie peut-elle être suturée ?",
+        choices:[
+          {label:"Oui, plaie propre et nette", set:{needsSuture:true}},
+          {label:"Non, petite plaie / fermeture inutile", set:{needsSuture:false}},
+          {label:"Plaie profonde, sale ou irrégulière", set:{needsSuture:"avoid"}}
+        ]
+      },
+      {
+        title:"Suture / fermeture",
+        dynamicSuture:true
+      },
+      {
+        title:"Pansement et repos",
+        do:["Poser une compresse propre.","Maintenir avec un bandage.","Prévoir du repos et une surveillance."],
+        say:["« Gardez ce pansement propre et sec. »"]
+      }
+    ]
+  },
+
+  fight: {
+    title:"Bagarre / coups",
+    urgency:"light",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Vérifier s’il répond.","Regarder la respiration et les saignements visibles."],
+        choices:[
+          {label:"Conscient", set:{conscious:"awake"}},
+          {label:"Confus / répond mal", set:{conscious:"confused"}},
+          {label:"Inconscient mais respire", set:{conscious:"unconscious_breathing"}},
+          {label:"Inconscient et ne semble pas respirer", set:{conscious:"not_breathing"}},
+          {label:"Impossible à déterminer pour l’instant", set:{conscious:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser si nécessaire",
+        dynamicConscious:true
+      },
+      {
+        title:"Qu'est-ce qui gêne le plus ?",
+        choices:[
+          {label:"Bleu / bosse / douleur légère", set:{fightIssue:"bruise"}},
+          {label:"Petite coupure / éraflure", set:{fightIssue:"cut"}},
+          {label:"Douleur aux côtes", set:{fightIssue:"ribs"}},
+          {label:"Mal à la tête / étourdissement", set:{fightIssue:"head"}},
+          {label:"Douleur diffuse sans blessure visible", set:{fightIssue:"general"}},
+          {label:"Impossible à savoir", set:{fightIssue:"unknown"}}
+        ]
+      },
+      {
+        title:"Soins adaptés",
+        dynamicFightCare:true
+      },
+      {
+        title:"Vérification finale",
+        do:["Vérifier que le patient est bien conscient.","Demander si la douleur augmente ou diminue.","Conseiller repos et retour si de nouveaux symptômes apparaissent."],
+        say:["« Ça devrait aller. Reposez-vous un moment. »","« Si la douleur augmente ou si vous vous sentez étourdi, revenez me voir. »"]
+      }
+    ]
+  },
+
+  horse: {
+    title:"Chute de cheval",
+    urgency:"light",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Vérifier s’il répond.","Observer sa respiration.","Regarder rapidement s’il y a un saignement important."],
+        choices:[
+          {label:"Conscient", set:{conscious:"awake"}},
+          {label:"Confus / répond mal", set:{conscious:"confused"}},
+          {label:"Inconscient mais respire", set:{conscious:"unconscious_breathing"}},
+          {label:"Inconscient et ne semble pas respirer", set:{conscious:"not_breathing"}},
+          {label:"Impossible à déterminer pour l’instant", set:{conscious:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser si nécessaire",
+        dynamicConscious:true
+      },
+      {
+        title:"Où a-t-il mal ?",
+        say:["« Dites-moi où vous avez le plus mal. »"],
+        choices:[
+          {label:"Bras / épaule", set:{horseArea:"arm"}},
+          {label:"Jambe / cheville", set:{horseArea:"leg"}},
+          {label:"Dos / nuque", set:{horseArea:"back"}},
+          {label:"Côtes / poitrine", set:{horseArea:"ribs"}},
+          {label:"Tête", set:{horseArea:"head"}},
+          {label:"Douleurs un peu partout", set:{horseArea:"general"}},
+          {label:"Presque aucune douleur", set:{horseArea:"none"}}
+        ]
+      },
+      {
+        title:"Quelle intensité ?",
+        choices:[
+          {label:"Légère - gênante mais supportable", set:{horsePain:"mild"}},
+          {label:"Modérée - mouvements douloureux", set:{horsePain:"moderate"}},
+          {label:"Forte - difficile de bouger", set:{horsePain:"severe"}}
+        ]
+      },
+      {
+        title:"Que vois-tu ?",
+        choices:[
+          {label:"Rien de particulier / simple douleur", set:{horseVisible:"none"}},
+          {label:"Bleu / bosse / contusion", set:{horseVisible:"bruise"}},
+          {label:"Petite éraflure / coupure", set:{horseVisible:"wound"}},
+          {label:"Gonflement important", set:{horseVisible:"swelling"}},
+          {label:"Membre déformé / position anormale", set:{horseVisible:"deformity"}}
+        ]
+      },
+      {
+        title:"Peut-il bouger ?",
+        dynamicMovementQuestion:true
+      },
+      {
+        title:"Soins adaptés",
+        dynamicHorseCare:true
+      },
+      {
+        title:"Antidouleur si nécessaire",
+        dynamicHorsePain:true
+      },
+      {
+        title:"Contrôle avant de le laisser repartir",
+        dynamicHorseFinish:true
+      }
+    ]
+  },
+
+  fracture: {
+    title:"Fracture / luxation",
+    urgency:"serious",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Vérifier conscience et respiration.","Si le patient ne répond pas, commencer par le stabiliser."],
+        choices:[
+          {label:"Conscient", set:{conscious:"awake"}},
+          {label:"Confus / répond mal", set:{conscious:"confused"}},
+          {label:"Inconscient mais respire", set:{conscious:"unconscious_breathing"}},
+          {label:"Inconscient et ne semble pas respirer", set:{conscious:"not_breathing"}},
+          {label:"Impossible à déterminer pour l’instant", set:{conscious:"unknown"}}
+        ]
+      },
+      {
+        title:"Stabiliser / réanimer si besoin",
+        dynamicConscious:true
+      },
+      {
+        title:"Niveau de douleur",
+        choices:[
+          {label:"Légère", set:{fracturePain:"mild"}},
+          {label:"Modérée", set:{fracturePain:"moderate"}},
+          {label:"Forte", set:{fracturePain:"severe"}},
+          {label:"Impossible à évaluer", set:{fracturePain:"unknown"}}
+        ]
+      },
+      {
+        title:"Examiner le membre",
+        do:["Observer déformation, gonflement et douleur.","Vérifier sensation et mouvement des doigts ou orteils."],
+        say:["« Essayez de bouger doucement vos doigts. »","« Vous sentez ma main ici ? »"]
+      },
+      {
+        title:"Immobiliser",
+        do:["Maintenir le membre dans une position stable.","Poser une attelle rembourrée.","Bandage sans serrer excessivement."],
+        say:["« Je vais immobiliser le membre. »"],
+        material:["Attelle","Bandages","Tissu rembourré"]
+      },
+      {
+        title:"Soulager la douleur",
+        med:[
+          ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur importante"],
+          ["Laudanum","Liquide opiacé, teinture d’opium","Voie orale, en gouttes, seulement si le patient est conscient et peut avaler","Douleur modérée"]
+        ]
+      },
+      {
+        title:"Consignes",
+        do:["Éviter l’appui sur le membre.","Surveiller couleur, chaleur et sensibilité des extrémités.","Prévoir du repos."],
+        say:["« Ne prenez pas appui dessus. »","« Si vos doigts deviennent froids ou insensibles, prévenez-moi. »"]
+      }
+    ]
+  },
+
+  minor: {
+    title:"Petit bobo / soin léger",
+    urgency:"light",
+    steps:[
+      {
+        title:"Regarder la zone",
+        do:["Vérifier qu’il ne s’agit pas d’une plaie profonde.","Nettoyer doucement si la peau est éraflée."],
+        say:["« Rien de très grave, je vais nettoyer ça. »"]
+      },
+      {
+        title:"Appliquer un soin",
+        do:["Sur peau intacte ou peu irritée, appliquer une petite quantité de baume ou d’onguent.","Éviter les produits gras directement dans une plaie ouverte."],
+        med:[
+          ["Préparation à l’arnica","Teinture alcoolique ou pommade","Application locale sur peau intacte","Bosse, bleu, contusion légère"],
+          ["Onguent protecteur","Pommade","Application locale","Petite irritation ou peau échauffée"]
+        ],
+        say:["« Je vais mettre un peu de préparation à l’arnica, ça devrait vous soulager. »"]
+      },
+      {
+        title:"Faut-il refermer ?",
+        choices:[
+          {label:"Non, éraflure ou petite coupure", set:{needsSuture:false}},
+          {label:"Oui, petite plaie nette mais ouverte", set:{needsSuture:true}}
+        ]
+      },
+      {
+        title:"Suture / fermeture",
+        dynamicSuture:true
+      },
+      {
+        title:"Fin",
+        do:["Laisser la zone propre.","Mettre un petit bandage si nécessaire.","Revenir si la douleur ou le gonflement augmente."],
+        say:["« Gardez ça propre et évitez de trop y toucher. »"]
+      }
+    ]
+  },
+
+  drowning: {
+    title:"Noyade / asphyxie",
+    urgency:"critical",
+    steps:[
+      {
+        title:"Sortir du danger",
+        do:["Mettre le patient hors de l’eau, de la fumée ou de la source d’asphyxie.","L’allonger et dégager le cou et la poitrine.","Vérifier immédiatement s’il respire."],
+        choices:[
+          {label:"Il respire", set:{breathing:"yes"}},
+          {label:"Respiration faible / irrégulière", set:{breathing:"weak"}},
+          {label:"Il ne semble pas respirer", set:{breathing:"no"}}
+        ]
+      },
+      {
+        title:"Faire reprendre la respiration",
+        dynamicBreathing:true
+      },
+      {
+        title:"Réchauffer et surveiller",
+        do:["Retirer les vêtements trempés si possible.","Sécher et couvrir le patient.","Le garder allongé et au chaud.","Surveiller respiration et état de conscience."],
+        say:["« Restez allongé. On va vous réchauffer. »","« Respirez doucement et ne cherchez pas à vous relever. »"]
+      },
+      {
+        title:"Après le réveil",
+        do:["Faire parler le patient seulement lorsqu’il est assez conscient.","Vérifier douleur thoracique, toux, confusion et faiblesse.","Le laisser récupérer avant tout déplacement."],
+        say:["« Vous m’entendez bien ? Dites-moi votre nom. »","« Est-ce que votre poitrine vous fait mal quand vous respirez ? »"]
+      }
+    ]
+  },
+
+  head: {
+    title:"Traumatisme crânien",
+    urgency:"serious",
+    steps:[
+      {
+        title:"État de conscience",
+        do:["Ne pas relever le patient immédiatement.","Vérifier respiration et saignement visible.","Observer s’il répond normalement."],
+        choices:[
+          {label:"Conscient et cohérent", set:{headState:"awake"}},
+          {label:"Confus / étourdi", set:{headState:"confused"}},
+          {label:"Inconscient mais respire", set:{headState:"unconscious"}},
+          {label:"Ne semble pas respirer", set:{headState:"not_breathing"}}
+        ]
+      },
+      {
+        title:"Stabiliser",
+        dynamicHead:true
+      },
+      {
+        title:"Examiner la tête",
+        do:["Chercher bosse, coupure ou saignement.","Demander où se situe la douleur si le patient peut répondre.","Éviter de manipuler inutilement le cou après une grosse chute."],
+        say:["« Ne tournez pas la tête pour le moment. »","« Vous voyez trouble ? Vous avez envie de vomir ? »"]
+      },
+      {
+        title:"Surveiller la commotion",
+        do:["Surveiller confusion, vomissements, somnolence inhabituelle et aggravation de la douleur.","Garder le patient au repos.","Reposer régulièrement des questions simples."],
+        say:["« Comment vous appelez-vous ? »","« Vous vous souvenez de ce qui s’est passé ? »"]
+      },
+      {
+        title:"Petit soin local",
+        do:["Nettoyer une coupure superficielle.","Poser un pansement si nécessaire.","Pour une bosse sans plaie ouverte, utiliser un soin local léger si souhaité en RP."],
+        med:[
+          ["Baume apaisant","Baume / pommade","Application locale sur peau intacte","Bosse ou contusion légère"]
+        ]
+      }
+    ]
+  },
+
+  burn: {
+    title:"Brûlure",
+    urgency:"serious",
+    steps:[
+      {
+        title:"Éloigner la source",
+        do:["Éloigner le patient du feu, de la vapeur ou de la source chaude.","Retirer délicatement ce qui n’est pas collé à la peau.","Observer l’étendue de la brûlure."],
+        choices:[
+          {label:"Petite brûlure localisée", set:{burnSeverity:"minor"}},
+          {label:"Brûlure étendue / cloques importantes", set:{burnSeverity:"major"}},
+          {label:"Visage / fumée inhalée", set:{burnSeverity:"airway"}},
+          {label:"Impossible à évaluer", set:{burnSeverity:"unknown"}}
+        ]
+      },
+      {
+        title:"Premiers soins",
+        dynamicBurn:true
+      },
+      {
+        title:"Protéger la zone",
+        do:["Couvrir avec un linge ou pansement propre.","Éviter de percer volontairement les cloques.","Garder le patient au repos."],
+        say:["« Je vais couvrir la brûlure pour la protéger. »"]
+      },
+      {
+        title:"Soulager",
+        med:[
+          ["Laudanum","Liquide opiacé","À boire / gouttes par voie orale","Douleur"],
+          ["Morphine","Solution injectable","Injection hypodermique","Douleur très importante"],
+          ["Carron oil / huile pour brûlures","Mélange huileux historique","Application locale puis pansement","Option de soin historique XIXe siècle"]
+        ],
+        say:["« Je vais vous donner quelque chose contre la douleur. »"]
+      },
+      {
+        title:"Surveillance",
+        do:["Surveiller fièvre, faiblesse, aggravation de la douleur et aspect de la peau.","Pour une brûlure importante, prévoir repos et surveillance prolongée."],
+        say:["« Si la douleur augmente ou si vous vous sentez fiévreux, revenez immédiatement. »"]
+      }
+    ]
+  },
+
+  poison: {
+    title:"Intoxication / opiacés",
+    urgency:"critical",
+    steps:[
+      {
+        title:"État du patient",
+        do:["Chercher ce qui a été pris si quelqu’un le sait.","Vérifier respiration et état de conscience.","Ne pas attendre une réponse du patient s’il est trop somnolent."],
+        choices:[
+          {label:"Conscient mais très somnolent", set:{poisonState:"sleepy"}},
+          {label:"Inconscient mais respire", set:{poisonState:"unconscious"}},
+          {label:"Respiration très faible / absente", set:{poisonState:"not_breathing"}}
+        ]
+      },
+      {
+        title:"Maintenir éveillé / respirer",
+        dynamicPoison:true
+      },
+      {
+        title:"Identifier le produit",
+        do:["Chercher une fiole, ordonnance ou témoignage.","Demander laudanum, opium, morphine ou autre produit si le patient peut répondre.","Estimer grossièrement quand le produit a été pris."],
+        say:["« Qu’avez-vous pris ? »","« Combien ? Et depuis combien de temps ? »"]
+      },
+      {
+        title:"Traitement historique RP",
+        do:["Continuer à surveiller constamment la respiration.","Dans un cadre RP médical historique, l’atropine peut être présentée comme un traitement connu de certains empoisonnements à l’opium.","Ne pas transformer cette étape en dosage réel : rester descriptif et RP."],
+        med:[
+          ["Atropine","Préparation médicinale","Administration par le docteur selon le contexte RP","Traitement historique documenté de l’empoisonnement à l’opium"],
+          ["Sels odorants / ammoniaque","Vapeurs / sels","Présentés brièvement sous le nez","Stimulation si le patient respire encore"]
+        ],
+        say:["« Restez éveillé. Continuez de me regarder. »","« Je vais tenter de soutenir votre respiration et de vous stimuler. »"]
+      },
+      {
+        title:"Surveillance prolongée",
+        do:["Ne pas laisser le patient seul.","Surveiller continuellement respiration et niveau de conscience.","Garder le patient au chaud et au repos."],
+        say:["« Vous restez ici sous surveillance. Ne vous rendormez pas pour le moment. »"]
+      }
+    ]
+  }
+};
+
+const surgeries = {
+  amputation:{
+    title:"Amputation",
+    duration:"4 à 7 min RP",
+    intro:"Dernier recours lorsque le membre est considéré comme irrécupérable dans la scène.",
+    steps:[
+      {
+        title:"Confirmer la décision",
+        do:["Vérifier qu'une solution plus simple n'est plus crédible.","Préparer assistants, pansements et matériel.","Informer le patient s'il est conscient."],
+        say:["« Je n'ai plus de moyen raisonnable de sauver ce membre. »","« Je vais devoir l'enlever pour vous donner une chance. »"]
+      },
+      {
+        title:"Préparer et anesthésier",
+        do:["Installer le patient.","Préparer le matériel et de nombreux linges propres.","Mettre en place une anesthésie adaptée à la scène."],
+        say:["« Je vais vous endormir avant de commencer. »","« Respirez calmement, je vous surveille. »"],
+        meds:[
+          ["Chloroforme","Liquide volatil","Voie inhalée, sur linge ou compresse","Anesthésie générale historique"],
+          ["Éther","Liquide volatil","Voie inhalée","Alternative anesthésique"]
+        ]
+      },
+      {
+        title:"Opérer",
+        do:["Jouer l'acte de manière descriptive et brève.","Faire comprendre que le chirurgien travaille vite.","Prévoir un assistant chargé du contrôle du saignement."],
+        say:["« Tenez-le bien. Je commence. »","« Gardez la pression ici pendant que je travaille. »"]
+      },
+      {
+        title:"Contrôler le saignement",
+        do:["Décrire la ligature ou le contrôle des vaisseaux importants.","Vérifier que le saignement ralentit nettement.","Maintenir le patient au chaud."],
+        say:["« Le saignement ralentit. Continuez à maintenir ici. »","« Encore un instant, je termine les ligatures. »"]
+      },
+      {
+        title:"Fermer et panser",
+        do:["Refermer de façon plausible en RP.","Poser un pansement épais.","Prévoir surveillance prolongée."],
+        say:["« C'est terminé. Je vais maintenant fermer et protéger la plaie. »","« Gardez-le au chaud et surveillez sa respiration. »"]
+      }
+    ]
+  },
+
+  major_bleeding:{
+    title:"Hémorragie majeure",
+    duration:"4 à 7 min RP",
+    intro:"Quand une compression simple ne suffit pas et qu'un vaisseau important semble atteint.",
+    steps:[
+      {
+        title:"Stabiliser",
+        do:["Allonger le patient.","Comprimer fortement la zone.","Préparer plusieurs compresses et assistants si disponibles."],
+        say:["« Ne relâchez pas la pression. »","« Restez avec moi, regardez-moi. »"]
+      },
+      {
+        title:"Soulager si possible",
+        do:["Évaluer l'état de conscience avant tout produit oral.","Préparer un antalgique si la scène le permet."],
+        say:["« Je vais essayer de calmer la douleur pendant que je travaille. »"],
+        meds:[
+          ["Morphine","Solution injectable","Injection hypodermique","Douleur forte"],
+          ["Laudanum","Liquide opiacé","Voie orale en gouttes, uniquement si le patient peut avaler","Douleur modérée"]
+        ]
+      },
+      {
+        title:"Identifier le point de saignement",
+        do:["Écarter suffisamment les tissus dans la scène pour repérer l'origine.","Éviter de fouiller inutilement.","Préparer une ligature si un vaisseau est clairement identifié."],
+        say:["« Je cherche d'où vient exactement le saignement. »","« Tenez cette compresse ici, sans bouger. »"]
+      },
+      {
+        title:"Ligaturer",
+        do:["Décrire la pose d'une ligature autour du vaisseau atteint.","Vérifier que le saignement diminue.","Nettoyer ensuite la zone."],
+        say:["« Je l'ai. Je vais le ligaturer maintenant. »","« Le saignement est presque sous contrôle. »"]
+      },
+      {
+        title:"Fermer et surveiller",
+        do:["Refermer si la plaie s'y prête.","Poser un pansement épais.","Surveiller pâleur, respiration et reprise de conscience."],
+        say:["« Le saignement est contrôlé. Je vais refermer. »","« Vous allez rester au repos sous surveillance. »"]
+      }
+    ]
+  },
+
+  deep_bullet:{
+    title:"Projectile profondément logé",
+    duration:"4 à 7 min RP",
+    intro:"Quand la balle n'est pas accessible par une extraction simple mais que la scène justifie une exploration.",
+    steps:[
+      {
+        title:"Évaluer le risque",
+        do:["Repérer la zone touchée.","Vérifier respiration, circulation et état de conscience.","Décider si l'exploration est crédible ou trop dangereuse."],
+        say:["« La balle est trop profonde pour être retirée simplement. »","« Je vais devoir explorer un peu plus la plaie. »"]
+      },
+      {
+        title:"Anesthésier",
+        do:["Préparer le patient et le matériel.","Choisir une anesthésie adaptée à la scène."],
+        say:["« Je vais vous endormir avant d'aller plus loin. »","« Respirez doucement. »"],
+        meds:[
+          ["Chloroforme","Liquide volatil","Voie inhalée","Anesthésie générale historique"],
+          ["Éther","Liquide volatil","Voie inhalée","Alternative anesthésique"]
+        ]
+      },
+      {
+        title:"Explorer",
+        do:["Décrire une ouverture limitée et prudente.","Rechercher le projectile sans transformer la scène en cours de chirurgie détaillé.","Arrêter si la trajectoire paraît trop dangereuse."],
+        say:["« Je cherche le projectile. »","« Encore un instant, je travaille doucement. »"]
+      },
+      {
+        title:"Extraire si accessible",
+        do:["Saisir le projectile avec une pince si la scène le permet.","Retirer doucement.","Vérifier le saignement après extraction."],
+        say:["« Je l'ai. Je la retire maintenant. »","« La balle est sortie. »"]
+      },
+      {
+        title:"Nettoyer, suturer, panser",
+        do:["Nettoyer la zone.","Suturer si la plaie est adaptée.","Poser un pansement propre."],
+        say:["« Je vais nettoyer puis refermer. »","« Encore quelques points et ce sera terminé. »"]
+      }
+    ]
+  },
+
+  abdominal:{
+    title:"Plaie abdominale grave",
+    duration:"4 à 7 min RP",
+    intro:"Scène exceptionnelle pour une blessure profonde de l'abdomen avec suspicion d'atteinte interne.",
+    steps:[
+      {
+        title:"Stabiliser",
+        do:["Allonger le patient.","Contrôler les saignements externes.","Éviter de faire boire si une opération est probable."],
+        say:["« Ne bougez plus. La blessure est sérieuse. »","« Je vais devoir vous opérer. »"]
+      },
+      {
+        title:"Anesthésier",
+        do:["Préparer le patient et le matériel.","Mettre en place une anesthésie générale RP."],
+        say:["« Je vais vous endormir avant de commencer. »","« Respirez lentement. »"],
+        meds:[
+          ["Chloroforme","Liquide volatil","Voie inhalée","Anesthésie générale historique"],
+          ["Éther","Liquide volatil","Voie inhalée","Alternative anesthésique"]
+        ]
+      },
+      {
+        title:"Explorer",
+        do:["Jouer une ouverture abdominale brève et descriptive.","Chercher la source du saignement ou une lésion évidente.","Éviter les détails anatomiques trop techniques."],
+        say:["« J'ouvre maintenant. Gardez les compresses prêtes. »","« Je cherche la source du saignement. »"]
+      },
+      {
+        title:"Traiter la lésion",
+        do:["Décrire la réparation ou la ligature de la zone atteinte.","Contrôler le saignement.","Nettoyer avant fermeture."],
+        say:["« J'ai trouvé la lésion. Je la traite maintenant. »","« Le saignement diminue. »"]
+      },
+      {
+        title:"Fermer",
+        do:["Refermer l'abdomen en plusieurs temps de manière RP simplifiée.","Poser un pansement large.","Prévoir surveillance stricte."],
+        say:["« Je vais refermer maintenant. »","« L'opération est terminée, il va falloir le surveiller de près. »"]
+      }
+    ]
+  },
+
+  trepanation:{
+    title:"Trépanation",
+    duration:"4 à 7 min RP",
+    intro:"Très rare. À réserver à un traumatisme crânien grave dans une scène exceptionnelle.",
+    steps:[
+      {
+        title:"Confirmer la gravité",
+        do:["Vérifier perte de connaissance, confusion persistante ou aggravation.","S'assurer que la scène justifie un geste aussi lourd.","Préparer assistants et matériel."],
+        say:["« Son état se dégrade. Je vais devoir intervenir sur le crâne. »","« Préparez le matériel et gardez-le immobile. »"]
+      },
+      {
+        title:"Anesthésier",
+        do:["Installer le patient.","Mettre en place une anesthésie générale RP."],
+        say:["« Je vais l'endormir avant de commencer. »","« Surveillez sa respiration. »"],
+        meds:[
+          ["Chloroforme","Liquide volatil","Voie inhalée","Anesthésie générale historique"],
+          ["Éther","Liquide volatil","Voie inhalée","Alternative anesthésique"]
+        ]
+      },
+      {
+        title:"Accéder à la zone",
+        do:["Décrire la préparation du cuir chevelu.","Ouvrir la zone de manière brève et RP.","Repérer la partie du crâne concernée."],
+        say:["« J'accède à la zone maintenant. »","« Gardez les compresses prêtes. »"]
+      },
+      {
+        title:"Décomprimer",
+        do:["Décrire l'utilisation d'un trépan sans détailler une technique réelle.","Faire comprendre qu'une petite ouverture osseuse est réalisée.","Surveiller le saignement et l'état du patient."],
+        say:["« Je commence la décompression. »","« Encore un instant, la pression devrait diminuer. »"]
+      },
+      {
+        title:"Refermer et surveiller",
+        do:["Refermer le cuir chevelu.","Poser un pansement.","Prévoir une surveillance neurologique prolongée."],
+        say:["« Je vais refermer maintenant. »","« Il faudra le surveiller toute la nuit. »"]
+      }
+    ]
+  },
+
+  infected_wound:{
+    title:"Plaie gravement infectée",
+    duration:"4 à 7 min RP",
+    intro:"Pour une plaie profonde très infectée avec tissus abîmés, pus ou mauvaise odeur.",
+    steps:[
+      {
+        title:"Examiner",
+        do:["Observer rougeur, gonflement, écoulement et tissus abîmés.","Vérifier fièvre et état général.","Décider si un nettoyage chirurgical est nécessaire."],
+        say:["« La plaie est sérieusement infectée. »","« Je vais devoir nettoyer bien plus profondément. »"]
+      },
+      {
+        title:"Soulager",
+        do:["Préparer le patient.","Choisir un antalgique selon la scène."],
+        say:["« Je vais calmer la douleur avant de commencer. »"],
+        meds:[
+          ["Morphine","Sel de morphine en solution injectable","Injection hypodermique avec seringue","Douleur importante"],
+          ["Laudanum","Liquide opiacé","Voie orale en gouttes si le patient peut avaler","Douleur modérée"]
+        ]
+      },
+      {
+        title:"Nettoyer chirurgicalement",
+        do:["Décrire le retrait des tissus manifestement morts ou souillés.","Laisser s'écouler les sécrétions.","Nettoyer abondamment avec du phénol / acide carbolique dilué (solution antiseptique liquide, application locale)."],
+        say:["« Je retire ce qui est trop abîmé pour cicatriser. »","« Je vais nettoyer toute l'infection visible. »"],
+        meds:[
+          ["Phénol / acide carbolique","Solution antiseptique liquide diluée","Application locale","Antisepsie"]
+        ]
+      },
+      {
+        title:"Laisser drainer",
+        do:["Éviter de fermer hermétiquement une plaie encore infectée.","Poser des compresses propres.","Prévoir changement régulier du pansement."],
+        say:["« Je ne vais pas refermer complètement. Il faut que la plaie puisse se drainer. »","« On changera le pansement régulièrement. »"]
+      },
+      {
+        title:"Surveiller",
+        do:["Surveiller fièvre, douleur, odeur et extension de la rougeur.","Garder le patient au repos.","Prévoir une nouvelle inspection."],
+        say:["« Je veux revoir cette plaie rapidement. »","« Si la fièvre monte, vous revenez immédiatement. »"]
+      }
+    ]
+  }
+};
+
+let currentSurgery = null;
+let surgeryStepIndex = 0;
+
+let currentFlow = null;
+let stepIndex = 0;
+let answers = {};
+let compactMode = false;
+let activeStepTitle = "";
+
+
+function showSurgery(){
+  currentSurgery = null;
+  surgeryStepIndex = 0;
+  show("surgery");
+}
+
+function openSurgery(id){
+  currentSurgery = id;
+  surgeryStepIndex = 0;
+  materialPanelOpen = false;
+  renderSurgery();
+  show("surgeryFlow");
+}
+
+function renderSurgery(){
+  const s = surgeries[currentSurgery];
+  const step = s.steps[surgeryStepIndex];
+  activeStepTitle = step.title;
+  const pct = Math.round(((surgeryStepIndex+1)/s.steps.length)*100);
+
+  let html = `
+    <div class="topbar">
+      <div>
+        <span class="badge">Chirurgie lourde</span>
+        <h2 style="margin:8px 0 0">${s.title}</h2>
+        <div class="muted">${s.duration}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        ${compactButton("surgery")}
+        <button class="material-btn" onclick="toggleMaterialPanel('surgery')">🧰 Matériel nécessaire</button>
+        <button class="danger" onclick="showSurgery()">Changer de chirurgie</button>
+      </div>
+    </div>
+    <div class="section"><b>Quand l'utiliser :</b> ${s.intro}</div>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    ${materialPanel("surgery")}
+    <h3>${surgeryStepIndex+1} / ${s.steps.length} - ${step.title}</h3>
+  `;
+
+  if(step.do) html += section("À faire", step.do);
+  if(step.say) {
+    html += sayLines(step.say);
+  } else {
+    html += sayLines(["« Très bien, je passe à l’étape suivante. Restez tranquille. »"]);
+  }
+  if(step.meds) html += meds(step.meds);
+
+  html += `<div class="nav">
+    <button class="secondary" onclick="prevSurgery()">← Précédent</button>
+    <button class="next" onclick="nextSurgery()">${surgeryStepIndex===s.steps.length-1?"Terminer":"Étape suivante →"}</button>
+  </div>`;
+
+  document.getElementById("surgeryFlow").innerHTML = html;
+}
+
+function nextSurgery(){
+  const s = surgeries[currentSurgery];
+  if(surgeryStepIndex < s.steps.length-1){
+    surgeryStepIndex++;
+    renderSurgery();
+  }else{
+    document.getElementById("surgeryFlow").innerHTML = `
+      <div class="section" style="text-align:center;padding:28px">
+        <h2>Scène chirurgicale terminée</h2>
+        <p>Finir avec pansement, repos et surveillance selon la situation.</p>
+        <button class="next" onclick="showSurgery()">Autre chirurgie</button>
+        <div style="margin-top:12px"><button class="danger" onclick="goHome()">Accueil</button></div>
+      </div>`;
+  }
+}
+
+function prevSurgery(){
+  if(surgeryStepIndex > 0){
+    surgeryStepIndex--;
+    renderSurgery();
+  }else{
+    showSurgery();
+  }
+}
+
+
+function toggleCompact(target){
+  compactMode = !compactMode;
+  if(target === "surgery" && currentSurgery){
+    renderSurgery();
+  } else if(currentFlow){
+    render();
+  }
+}
+
+function compactButton(target){
+  return `<button class="compact-toggle ${compactMode ? "on" : ""}" onclick="toggleCompact('${target}')">
+    Mode compact : ${compactMode ? "ON" : "OFF"}
+  </button>`;
+}
+
+function show(id){
+  ["home","cases","lexique","surgery","surgeryFlow","flow"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  const compactSections = ["cases","lexique","surgery","surgeryFlow","flow"];
+  document.body.classList.toggle("compact-header", compactSections.includes(id));
+}
+function goHome(){ currentFlow=null; stepIndex=0; answers={}; show("home"); }
+function showCases(){ show("cases"); }
+function showLexique(){
+  lexTab = "meds";
+  const input = document.getElementById("lexSearch");
+  if(input) input.value = "";
+  updateLexTabs();
+  filterLexique();
+  show("lexique");
+}
+
+function setLexTab(tab){
+  if(!["meds","equipment","symptoms"].includes(tab)) return;
+  lexTab = tab;
+  const input = document.getElementById("lexSearch");
+  if(input) input.value = "";
+  updateLexTabs();
+  filterLexique();
+}
+
+function updateLexTabs(){
+  document.querySelectorAll("[data-lex-tab]").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.lexTab === lexTab);
+  });
+  const grid = document.getElementById("lexGrid");
+  const helper = document.getElementById("lexHelpful");
+  const search = document.getElementById("lexSearch");
+  if(grid) grid.classList.remove("hidden");
+  if(helper) helper.classList.toggle("hidden", lexTab !== "meds");
+  if(search){
+    search.classList.remove("hidden");
+    const placeholders = {
+      meds:"Rechercher un médicament, un usage ou une administration...",
+      equipment:"Rechercher un instrument ou du matériel...",
+      symptoms:"Rechercher un symptôme ou un signe..."
+    };
+    search.placeholder = placeholders[lexTab] || "Rechercher dans le lexique...";
+  }
+}
+
+function filterLexique(){
+  const input = document.getElementById("lexSearch");
+  const q = input ? input.value.toLowerCase().trim() : "";
+  if(lexTab === "meds"){
+    const list = lexique.filter(x =>
+      (x.name+" "+x.tags+" "+x.type+" "+x.form+" "+x.admin+" "+x.use).toLowerCase().includes(q)
+    );
+    renderLexique(list);
+  } else if(lexTab === "equipment"){
+    const list = equipmentLexicon.filter(x =>
+      (x.name+" "+x.tags+" "+x.desc+" "+x.use).toLowerCase().includes(q)
+    );
+    renderReferenceCards(list, "equipment");
+  } else if(lexTab === "symptoms"){
+    const list = symptomLexicon.filter(x =>
+      (x.name+" "+x.tags+" "+x.desc+" "+x.rp).toLowerCase().includes(q)
+    );
+    renderReferenceCards(list, "symptoms");
+  }
+}
+
+function renderLexique(list){
+  const grid = document.getElementById("lexGrid");
+  const sorted = [...list].sort((a,b)=>a.name.localeCompare(b.name, "fr", {sensitivity:"base"}));
+  grid.innerHTML = sorted.length ? sorted.map(x=>`
+    <div class="lex-card ${categoryClass(x.category)}">
+      <strong>${x.icon} ${x.name}</strong>
+      <div class="muted">${x.type}</div>
+      <div class="cat-badge">${x.category || "Autre"}</div>
+      <small><b>Forme :</b> ${x.form}</small>
+      ${x.composition ? `<small><b>Composition :</b> ${x.composition}</small>` : ""}
+      <small><b>Administration :</b> ${x.admin}</small>
+      <small><b>Usage RP :</b> ${x.use}</small>
+    </div>
+  `).join("") : `<div class="section">Aucun résultat.</div>`;
+}
+
+function renderReferenceCards(list,type){
+  const grid = document.getElementById("lexGrid");
+  const sorted = [...list].sort((a,b)=>a.name.localeCompare(b.name, "fr", {sensitivity:"base"}));
+  grid.innerHTML = sorted.length ? sorted.map(x=>`
+    <div class="reference-card">
+      <strong>${type === "equipment" ? "🧰" : "🔎"} ${x.name}</strong>
+      <small><b>Ce que c'est :</b> ${x.desc}</small>
+      <small><b>${type === "equipment" ? "Utilisation RP" : "À retenir en RP"} :</b> ${type === "equipment" ? x.use : x.rp}</small>
+    </div>
+  `).join("") : `<div class="section">Aucun résultat.</div>`;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleMaterialPanel(kind){
+  materialPanelOpen = !materialPanelOpen;
+  if(kind === "surgery") renderSurgery();
+  else render();
+}
+
+function materialPanel(kind){
+  if(!materialPanelOpen) return "";
+  const list = kind === "surgery"
+    ? (surgeryMaterials[currentSurgery] || [])
+    : (interventionMaterials[currentFlow] || []);
+  return `<div class="material-panel">
+    <h3>Matériel nécessaire</h3>
+    <ul>${list.map(x=>`<li>${x}</li>`).join("")}</ul>
+  </div>`;
+}
+
+function applyChoice(set){
+  Object.assign(answers,set);
+  next();
+}
+function next(){
+  const max = flows[currentFlow].steps.length;
+  if(stepIndex < max-1){ stepIndex++; render(); }
+  else renderEnd();
+}
+function prev(){
+  if(stepIndex>0){ stepIndex--; render(); }
+  else showCases();
+}
+function section(title,items,cls=""){
+  if(compactMode){
+    if(title === "Matériel"){
+      return `<div class="section ${cls}"><h3>${title}</h3><div class="compact-inline">${items.join(" · ")}</div></div>`;
+    }
+    const limited = items.slice(0,3);
+    return `<div class="section ${cls}"><h3>${title}</h3><ul>${limited.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  }
+  return `<div class="section ${cls}"><h3>${title}</h3><ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+}
+
+function extraPhraseVariants(title){
+  const t = (title || "").toLowerCase();
+  if(t.includes("saign") || t.includes("hémorrag")){
+    return ["« Je maintiens la pression, ne bougez pas. »","« Le saignement ralentit, continuez à respirer calmement. »"];
+  }
+  if(t.includes("suture") || t.includes("fermer") || t.includes("refermer")){
+    return ["« Je vais rapprocher les bords de la plaie. »","« Encore quelques points et ce sera terminé. »"];
+  }
+  if(t.includes("nettoy") || t.includes("antisept")){
+    return ["« Je vais nettoyer maintenant, ça risque de piquer. »","« Je préfère que la zone soit propre avant de continuer. »"];
+  }
+  if(t.includes("douleur") || t.includes("soulager") || t.includes("anesth")){
+    return ["« Je vais vous donner quelque chose pour la douleur. »","« Dites-moi si la douleur devient plus forte. »"];
+  }
+  if(t.includes("exam") || t.includes("évaluer") || t.includes("vérif")){
+    return ["« Je vais vérifier rapidement avant de continuer. »","« Dites-moi immédiatement si quelque chose vous fait très mal. »"];
+  }
+  if(t.includes("respir") || t.includes("stabil")){
+    return ["« Restez avec moi et respirez doucement. »","« Ne vous relevez pas pour le moment. »"];
+  }
+  if(t.includes("immobil") || t.includes("fracture") || t.includes("luxation")){
+    return ["« Je vais immobiliser la zone pour éviter d’aggraver la blessure. »","« Ne forcez pas sur ce membre. »"];
+  }
+  if(t.includes("pansement") || t.includes("protéger")){
+    return ["« Je vais protéger la zone maintenant. »","« Gardez ce pansement propre et sec. »"];
+  }
+  return ["« Très bien, je continue. Dites-moi si quelque chose change. »"];
+}
+
+function sayLines(items){
+  const merged = [...new Set([...(items || []), ...extraPhraseVariants(activeStepTitle)])];
+  const visible = compactMode ? merged.slice(0,1) : merged.slice(0,3);
+  return `<div class="rp-lines">${visible.map(x=>`
+    <div class="rp-line">
+      <span class="rp-arrow">→</span>
+      <span>${x}</span>
+    </div>
+  `).join("")}</div>`;
+}
+function meds(rows){
+  if(compactMode){
+    return `<div class="section">
+      <h3>Médicament / produit</h3>
+      ${rows.map(r=>`
+        <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
+          <strong>${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
+          <div class="compact-inline"><b>Forme :</b> ${r[1]}<br><b>Administration :</b> ${r[2]}</div>
+        </div>
+      `).join("")}
+    </div>`;
+  }
+  return `<div class="section">
+    <h3>Médicament / produit</h3>
+    ${rows.map(r=>`
+      <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
+        <strong style="font-size:17px">${r[0]}</strong>
+        <div class="cat-badge">${medCategory(r[0], r[3])}</div>
+        <div class="med">
+          <div><strong>Forme</strong>${r[1]}</div>
+          <div><strong>Administration</strong>${r[2]}</div>
+          ${medComposition(r[0]) ? `<div><strong>Composition</strong>${medComposition(r[0])}</div>` : ""}
+          <div><strong>Utilisation RP</strong>${r[3]}</div>
+        </div>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+
+function urgencyBadge(level){
+  const labels = {
+    light:["Léger","urgency-light"],
+    serious:["Sérieux","urgency-serious"],
+    critical:["Critique","urgency-critical"]
+  };
+  const item = labels[level] || labels.serious;
+  return `<span class="urgency ${item[1]}">${item[0]}</span>`;
+}
+
+function medCategory(name, usage){
+  const text = (name + " " + (usage || "")).toLowerCase();
+  if(text.includes("morphine") || text.includes("laudanum")) return "Antidouleur";
+  if(text.includes("chloroforme") || text.includes("éther") || text.includes("ether")) return "Anesthésique";
+  if(text.includes("phénol") || text.includes("carbol") || text.includes("alcool") || text.includes("antisept")) return "Antiseptique";
+  if(text.includes("arnica") || text.includes("baume") || text.includes("onguent") || text.includes("carron")) return "Soin local";
+  if(text.includes("quinine")) return "Fièvre / maladie";
+  if(text.includes("ammoniaque") || text.includes("sels odorants") || text.includes("atropine")) return "Stimulant";
+  return "Autre";
+}
+
+
+function medComposition(name){
+  const n = name.toLowerCase();
+  if(n.includes("laudanum")) return "Teinture d’opium dans de l’alcool.";
+  if(n.includes("morphine")) return "Sel de morphine en solution injectable.";
+  if(n.includes("chloroforme")) return "Chloroforme liquide volatil.";
+  if(n.includes("éther") || n.includes("ether")) return "Éther éthylique volatil.";
+  if(n.includes("phénol") || n.includes("carbol")) return "Acide carbolique dilué.";
+  if(n.includes("arnica")) return "Fleurs d’arnica macérées dans l’alcool ; éventuellement incorporées à une base grasse/cireuse.";
+  if(n.includes("onguent")) return "Base grasse ou cireuse, parfois additionnée d’un extrait végétal.";
+  if(n.includes("carron")) return "Huile de lin + eau de chaux.";
+  if(n.includes("ammoniaque") || n.includes("sels odorants")) return "Préparation libérant des vapeurs ammoniacales.";
+  if(n.includes("atropine")) return "Alcaloïde végétal préparé sous forme médicinale.";
+  if(n.includes("quinine")) return "Alcaloïde du quinquina, sous forme de poudre ou de sel.";
+  return "";
+}
+
+function categoryClass(category){
+  switch(category){
+    case "Antidouleur": return "cat-pain";
+    case "Anesthésique": return "cat-anesthetic";
+    case "Antiseptique": return "cat-antiseptic";
+    case "Soin local": return "cat-topical";
+    case "Fièvre / maladie": return "cat-fever";
+    case "Stimulant": return "cat-stimulant";
+    default: return "cat-other";
+  }
+}
+
+function render(){
+  const flow = flows[currentFlow];
+  const step = flow.steps[stepIndex];
+  activeStepTitle = step.title;
+  const pct = Math.round(((stepIndex+1)/flow.steps.length)*100);
+  let html = `
+    <div class="topbar">
+      <div>
+        <span class="badge">${flow.title}</span>
+        ${urgencyBadge(flow.urgency)}
+        <h2 style="margin:8px 0 0">${stepIndex+1} / ${flow.steps.length} - ${step.title}</h2>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        ${compactButton("flow")}
+        <button class="material-btn" onclick="toggleMaterialPanel('flow')">🧰 Matériel nécessaire</button>
+        <button class="danger" onclick="showCases()">Changer de cas</button>
+      </div>
+    </div>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    ${compactMode ? "" : `<div class="quick-note">Objectif RP : aller à l'essentiel. Si une étape ne correspond pas à la scène, choisis l'option la plus proche et avance.</div>`}
+    ${materialPanel("flow")}
+  `;
+
+  if(step.dynamicUnknownBreathing){
+    if(answers.unknownBreathing === "no"){
+      html += section("À faire",[
+        "Dégager le cou et la poitrine.",
+        "Vérifier rapidement qu'aucun objet visible n'obstrue la bouche.",
+        "Utiliser la méthode de Silvester comme respiration artificielle d'époque.",
+        "Ne chercher la cause qu'une fois la respiration reprise dans la scène."
+      ]);
+      html += sayLines(["« Il ne respire pas. Aidez-moi à dégager sa poitrine. »","« Je tente de relancer sa respiration. »"]);
+    } else if(answers.unknownBreathing === "weak"){
+      html += section("À faire",[
+        "Garder les voies respiratoires dégagées.",
+        "Surveiller chaque respiration.",
+        "Préparer une respiration artificielle si elle s'arrête."
+      ]);
+      html += sayLines(["« Restez avec moi. Respirez doucement. »"]);
+    } else if(answers.unknownBreathing === "unknown"){
+      html += section("À faire",[
+        "Se concentrer uniquement sur la respiration pendant quelques instants.",
+        "Observer poitrine, bouche et souffle avant toute autre étape.",
+        "Traiter comme potentiellement grave tant que ce n'est pas clair."
+      ]);
+      html += sayLines(["« J'ai besoin qu'on me laisse vérifier sa respiration. »"]);
+    } else {
+      html += section("À faire",[
+        "Le patient respire.",
+        "Le garder allongé et dégager ce qui gêne la respiration.",
+        "Passer immédiatement au contrôle du saignement."
+      ]);
+      html += sayLines(["« Il respire. Je vérifie maintenant s'il saigne. »"]);
+    }
+
+  } else if(step.dynamicUnknownBleeding){
+    if(answers.unknownBleeding === "major"){
+      html += section("À faire",[
+        "Comprimer immédiatement avec linge ou compresses.",
+        "Ne pas interrompre la pression pour poser des questions.",
+        "Prévoir une prise en charge d'hémorragie majeure si le saignement ne ralentit pas."
+      ]);
+      html += sayLines(["« Maintenez la pression ici. Ne relâchez pas. »"]);
+    } else if(answers.unknownBleeding === "minor"){
+      html += section("À faire",[
+        "Nettoyer rapidement et couvrir la petite plaie.",
+        "Ne pas laisser ce soin retarder la recherche d'une cause plus grave."
+      ]);
+    } else if(answers.unknownBleeding === "unknown"){
+      html += section("À faire",[
+        "Inspecter rapidement les vêtements et les zones visibles.",
+        "Chercher du sang au sol ou sur les mains.",
+        "Continuer si aucun saignement majeur n'apparaît."
+      ]);
+    } else {
+      html += section("À faire",[
+        "Pas de saignement majeur visible.",
+        "Passer à l'état de conscience et à la recherche de la cause."
+      ]);
+    }
+
+  } else if(step.dynamicUnknownCause){
+    if(answers.unknownWake === "awake"){
+      html += section("À faire",[
+        "Poser seulement trois questions rapides : où avez-vous mal, que s'est-il passé, avez-vous reçu un coup à la tête ?",
+        "Choisir ensuite l'intervention correspondant au symptôme principal."
+      ]);
+      html += sayLines(["« Dites-moi simplement où vous avez le plus mal. »","« Qu'est-ce qui s'est passé juste avant ? »"]);
+    } else if(answers.unknownWake === "confused"){
+      html += section("À faire",[
+        "Garder le patient allongé.",
+        "Suspecter en priorité chute, traumatisme crânien ou intoxication selon la scène.",
+        "Ne pas chercher un récit détaillé."
+      ]);
+      html += sayLines(["« Ne vous relevez pas. Dites-moi seulement votre nom et où vous avez mal. »"]);
+    } else {
+      html += section("À faire",[
+        "Le patient ne fournit toujours pas d'informations fiables.",
+        "Continuer à surveiller respiration, saignement et signes visibles.",
+        "Choisir l'intervention correspondant à ce que tu observes, pas à ce que tu supposes."
+      ]);
+      html += sayLines(["« Il ne peut pas encore me répondre. Je vais travailler avec ce que je vois. »"]);
+    }
+
+  } else if(step.dynamicGunArea){
+    if(answers.gunArea === "chest"){
+      html += section("Priorité",[
+        "Vérifier immédiatement la respiration.",
+        "Une difficulté à respirer rend la situation critique.",
+        "Éviter de perdre du temps à chercher la balle avant stabilisation."
+      ]);
+      html += sayLines(["« Respirez pour moi. Est-ce que ça vous lance dans la poitrine ? »"]);
+    } else if(answers.gunArea === "abdomen"){
+      html += section("Priorité",[
+        "Considérer la blessure comme sérieuse.",
+        "Éviter de faire boire avant d'avoir évalué la gravité.",
+        "Contrôler le saignement externe et surveiller faiblesse et pâleur."
+      ]);
+      html += sayLines(["« Ne buvez rien pour le moment. Je vais regarder la blessure. »"]);
+    } else if(answers.gunArea === "head"){
+      html += section("Priorité",[
+        "Vérifier conscience, respiration et saignement.",
+        "Éviter toute manipulation inutile.",
+        "Surveiller confusion et aggravation rapide."
+      ]);
+    } else if(answers.gunArea === "unknown"){
+      html += section("À faire",[
+        "Ne pas inventer la localisation.",
+        "Dégager les vêtements et chercher rapidement l'origine du sang.",
+        "Continuer avec les informations visibles."
+      ]);
+    } else {
+      html += section("À faire",[
+        "Vérifier sensibilité et mouvement du membre.",
+        "Contrôler le saignement avant de chercher le projectile."
+      ]);
+    }
+
+  } else if(step.dynamicFightCare){
+    if(answers.fightIssue === "bruise"){
+      html += section("À faire",[
+        "Appliquer un linge frais si disponible.",
+        "Sur peau intacte, utiliser une préparation à l'arnica.",
+        "Repos si la zone reste douloureuse."
+      ]);
+      html += meds([["Préparation à l’arnica","Teinture alcoolique liquide ou pommade semi-solide","Application locale sur peau intacte","Contusion, bosse ou bleu"]]);
+    } else if(answers.fightIssue === "cut"){
+      html += section("À faire",[
+        "Nettoyer la coupure.",
+        "Appliquer du phénol / acide carbolique dilué.",
+        "Pansement, ou suture si les bords restent franchement ouverts."
+      ]);
+    } else if(answers.fightIssue === "ribs"){
+      html += section("À faire",[
+        "Faire prendre une inspiration lente.",
+        "Surveiller douleur importante ou difficulté respiratoire.",
+        "Repos et antidouleur si nécessaire."
+      ]);
+      html += meds([["Laudanum","Liquide opiacé","Voie orale en gouttes si le patient peut avaler","Douleur modérée"]]);
+    } else if(answers.fightIssue === "head"){
+      html += section("À faire",[
+        "Passer en logique traumatisme crânien.",
+        "Surveiller confusion, nausée, somnolence et perte de connaissance."
+      ]);
+    } else if(answers.fightIssue === "general"){
+      html += section("À faire",[
+        "Repos.",
+        "Chercher la zone la plus douloureuse.",
+        "Utiliser un antidouleur léger si nécessaire."
+      ]);
+      html += meds([["Laudanum","Liquide opiacé","Voie orale en gouttes","Douleur modérée"]]);
+    } else {
+      html += section("À faire",[
+        "Traiter uniquement ce qui est visible.",
+        "Ne pas inventer une blessure.",
+        "Surveiller l'état général quelques instants."
+      ]);
+    }
+
+  } else if(step.dynamicConscious){
+    if(answers.conscious === "not_breathing"){
+      html += section("Priorité : respiration artificielle",[
+        "Allonger le patient sur le dos et dégager le cou et la poitrine.",
+        "Vérifier rapidement la bouche et retirer seulement ce qui obstrue visiblement.",
+        "Surélever légèrement les épaules avec un vêtement plié.",
+        "Pour un RP historiquement cohérent en 1889 : utiliser la méthode de Silvester.",
+        "Lever doucement les bras du patient au-dessus de la tête, puis les ramener contre les côtés du thorax en exerçant une pression douce.",
+        "Répéter le mouvement de façon régulière jusqu’à reprise d’une respiration dans la scène."
+      ]);
+      html += sayLines([
+        "« Il ne respire pas. Aidez-moi à lui dégager la poitrine. »",
+        "« Je vais tenter de faire reprendre les mouvements respiratoires. »",
+        "Après reprise : « Voilà… restez avec moi. Respirez doucement. »"
+      ]);
+      html += section("Méthode de Silvester - repère RP",[
+        "Position : patient sur le dos.",
+        "Inspiration simulée : bras tirés doucement vers le haut.",
+        "Expiration simulée : bras ramenés contre la poitrine avec une pression douce.",
+        "Technique historique de respiration artificielle, pas un massage cardiaque moderne."
+      ]);
+      html += section("Après reprise de la respiration",[
+        "Garder le patient au chaud.",
+        "Surveiller sa respiration.",
+        "Contrôler immédiatement les grosses hémorragies.",
+        "Attendre qu’il reprenne suffisamment connaissance avant de lui demander ce qui s’est passé."
+      ]);
+    } else if(answers.conscious === "unconscious_breathing"){
+      html += section("À faire",[
+        "Le patient respire : ne pas commencer une respiration artificielle.",
+        "Dégager ce qui gêne le cou et la respiration.",
+        "Contrôler immédiatement les saignements importants.",
+        "Stimuler doucement le patient par la voix et le toucher.",
+        "Pour une scène d’époque, des sels odorants / vapeurs d’ammoniaque peuvent être utilisés avec prudence comme stimulant.",
+        "Quand il revient à lui, poser seulement des questions simples au début."
+      ]);
+      html += sayLines([
+        "« Vous m’entendez ? Ouvrez les yeux. »",
+        "« Restez avec moi. Vous êtes en sécurité. »",
+        "Au réveil : « Ne vous relevez pas encore. Dites-moi simplement où vous avez mal. »"
+      ]);
+      html += meds([
+        ["Sels odorants / ammoniaque","Vapeurs / sels","Présentés brièvement sous le nez","Stimulation d’un patient évanoui qui respire"]
+      ]);
+    } else if(answers.conscious === "confused"){
+      html += section("À faire",[
+        "Garder le patient allongé ou assis.",
+        "Vérifier qu’il respire correctement et qu’il ne saigne pas abondamment.",
+        "Poser des questions très simples : nom, douleur, ce dont il se souvient.",
+        "Ne pas insister sur les détails tant qu’il reste confus.",
+        "Surveiller particulièrement la tête après une chute ou des coups."
+      ]);
+      html += sayLines([
+        "« Regardez-moi. Comment vous appelez-vous ? »",
+        "« Ne cherchez pas à vous lever. »",
+        "« Dites-moi seulement où vous avez mal. »"
+      ]);
+    } else if(answers.conscious === "unknown"){
+      html += section("À faire",[
+        "Tu n'as pas encore assez d'informations.",
+        "Vérifier respiration, réaction à la voix et gros saignement.",
+        "Ne poser des questions qu'une fois l'état un peu plus clair."
+      ]);
+      html += sayLines(["« Vous m'entendez ? Serrez ma main si vous pouvez. »"]);
+    } else {
+      html += section("À faire",[
+        "Le patient est conscient et répond correctement.",
+        "Vérifier malgré tout respiration et saignement important.",
+        "Passer ensuite à l’examen de la blessure.",
+        "Continuer à surveiller son état pendant toute la prise en charge."
+      ]);
+      html += sayLines([
+        "« Très bien. Restez avec moi et dites-moi si quelque chose change. »"
+      ]);
+    }
+  } else if(step.dynamicBreathing){
+    if(answers.breathing === "no"){
+      html += section("Méthode de Silvester",[
+        "Allonger le patient sur le dos.",
+        "Dégager le cou et la poitrine.",
+        "Surélever légèrement les épaules.",
+        "Lever les bras au-dessus de la tête puis les ramener contre la poitrine avec une pression douce.",
+        "Répéter régulièrement jusqu’à reprise d’une respiration dans la scène."
+      ]);
+      html += sayLines(["« Il ne respire pas. Aidez-moi à dégager sa poitrine. »","« Je tente de faire reprendre les mouvements respiratoires. »"]);
+    } else if(answers.breathing === "weak"){
+      html += section("À faire",[
+        "Garder les voies respiratoires dégagées.",
+        "Stimuler le patient et surveiller chaque respiration.",
+        "Préparer la respiration artificielle si la respiration cesse."
+      ]);
+      html += sayLines(["« Restez avec moi. Respirez lentement. »"]);
+    } else {
+      html += section("À faire",[
+        "Le patient respire : ne pas pratiquer de respiration artificielle.",
+        "Le garder allongé, au chaud, et surveiller sa respiration.",
+        "Stimuler doucement s’il reste inconscient."
+      ]);
+    }
+  } else if(step.dynamicHead){
+    if(answers.headState === "not_breathing"){
+      html += section("Priorité",[
+        "La respiration passe avant l’examen de la tête.",
+        "Utiliser la méthode de Silvester comme respiration artificielle d’époque.",
+        "Après reprise, immobiliser et reprendre l’examen neurologique."
+      ]);
+    } else if(answers.headState === "unconscious"){
+      html += section("À faire",[
+        "Le patient respire : le garder immobile.",
+        "Contrôler les saignements visibles.",
+        "Le stimuler doucement sans le relever.",
+        "Surveiller sa respiration jusqu’au réveil."
+      ]);
+    } else if(answers.headState === "confused"){
+      html += section("À faire",[
+        "Garder le patient au repos.",
+        "Poser seulement des questions simples.",
+        "Surveiller vomissements, somnolence et aggravation de la confusion."
+      ]);
+    } else {
+      html += section("À faire",[
+        "Le patient est cohérent : poursuivre l’examen.",
+        "Ne pas exclure une commotion simplement parce qu’il parle normalement."
+      ]);
+    }
+  } else if(step.dynamicBurn){
+    if(answers.burnSeverity === "minor"){
+      html += section("À faire",[
+        "Refroidir doucement la zone avec de l’eau fraîche si disponible.",
+        "Nettoyer délicatement.",
+        "Protéger avec un pansement propre."
+      ]);
+      html += section("Soin local",[
+        "Une pommade ou un onguent léger peut servir dans une scène RP pour une petite brûlure.",
+        "Les huiles et préparations grasses étaient historiquement utilisées au XIXe siècle."
+      ]);
+    } else if(answers.burnSeverity === "airway"){
+      html += section("Priorité : respiration",[
+        "Éloigner immédiatement de la fumée.",
+        "Observer voix, toux et difficulté respiratoire.",
+        "Garder le patient assis ou dans la position où il respire le mieux.",
+        "Surveiller avant de s’occuper des lésions cutanées."
+      ]);
+      html += sayLines(["« Respirez doucement. Dites-moi si votre gorge vous brûle. »"]);
+    } else {
+      html += section("À faire",[
+        "Refroidir doucement si possible.",
+        "Ne pas arracher les vêtements collés à la peau.",
+        "Couvrir largement avec du linge propre.",
+        "Traiter la douleur si nécessaire (laudanum, liquide oral en gouttes ; ou morphine, solution injectable hypodermique, selon l’intensité) et surveiller l’état général."
+      ]);
+    }
+  } else if(step.dynamicPoison){
+    if(answers.poisonState === "not_breathing"){
+      html += section("Priorité : respiration",[
+        "Allonger le patient et dégager le cou et la poitrine.",
+        "Utiliser la méthode de Silvester si la respiration paraît absente.",
+        "Continuer jusqu’à reprise d’une respiration dans la scène."
+      ]);
+    } else if(answers.poisonState === "unconscious"){
+      html += section("À faire",[
+        "Le patient respire : le surveiller sans interruption.",
+        "Le stimuler doucement.",
+        "Des sels odorants peuvent servir de stimulant RP d’époque.",
+        "Préparer une respiration artificielle si la respiration s’affaiblit davantage."
+      ]);
+    } else {
+      html += section("À faire",[
+        "Empêcher le patient de se rendormir si possible.",
+        "Le faire parler et surveiller son rythme respiratoire.",
+        "Rechercher rapidement ce qu’il a pris."
+      ]);
+      html += sayLines(["« Gardez les yeux ouverts. Regardez-moi. »","« Qu’avez-vous pris ? »"]);
+    }
+  } else if(step.dynamic && currentFlow==="gunshot"){
+    if(answers.bullet==="in"){
+      html += section("À faire",[
+        "Si le projectile est visible et facilement accessible, préparer une extraction simple.",
+        "Éviter de fouiller profondément dans la plaie.",
+        "Utiliser une pince/forceps seulement si cela reste cohérent avec la scène."
+      ]);
+      html += sayLines([
+        "« La balle semble être encore dedans. Je vais voir si je peux l’atteindre sans aggraver la blessure. »",
+        "« Ne bougez surtout pas. »"
+      ]);
+      html += section("Matériel",["Forceps / pince","Compresses","Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)"]);
+    } else if(answers.bullet==="out"){
+      html += section("À faire",[
+        "Ne pas prévoir d’extraction.",
+        "Nettoyer la plaie d’entrée et la plaie de sortie.",
+        "Passer directement à la fermeture et au pansement si approprié."
+      ]);
+      html += sayLines(["« La balle est ressortie. Je vais surtout nettoyer et refermer correctement. »"]);
+    } else {
+      html += section("À faire",[
+        "Ne pas inventer une extraction.",
+        "Nettoyer et protéger la plaie.",
+        "Rester prudent si la trajectoire est inconnue."
+      ]);
+      html += sayLines(["« Je ne vais pas fouiller à l’aveugle. Je nettoie et je protège la blessure. »"]);
+    }
+  } else if(step.dynamicSuture){
+    if(answers.needsSuture === true){
+      html += section("À faire",[
+        "Nettoyer une dernière fois la plaie et ses bords.",
+        "Rapprocher doucement les bords de la plaie.",
+        "Préparer une aiguille et du fil de suture.",
+        "Poser quelques points séparés, juste assez pour maintenir les bords rapprochés.",
+        "Couper le fil proprement.",
+        "Nettoyer autour de la suture avant le pansement."
+      ]);
+      html += sayLines([
+        "« Je vais refermer la plaie maintenant. »",
+        "« Essayez de ne pas bouger. »",
+        "« Vous allez sentir que ça tire un peu. »"
+      ]);
+      html += section("Matériel",[
+        "Aiguille de suture",
+        "Fil de suture",
+        "Pince",
+        "Ciseaux",
+        "Compresses",
+        "Phénol / acide carbolique dilué (solution antiseptique liquide, application locale sur plaie, compresses ou matériel)"
+      ]);
+      html += meds([
+        ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur forte ou suture douloureuse"],
+        ["Laudanum","Liquide opiacé, teinture d’opium","Voie orale, en gouttes ou petite quantité diluée, uniquement si le patient est conscient et peut avaler","Douleur modérée"]
+      ]);
+    } else if(answers.needsSuture === "avoid"){
+      html += section("Ne pas suturer immédiatement",[
+        "La plaie semble trop sale, irrégulière ou trop profonde pour une fermeture simple.",
+        "Nettoyer et protéger la zone.",
+        "Contrôler le saignement.",
+        "Éviter de fermer à l’aveugle une plaie qui pourrait contenir des saletés ou une atteinte plus profonde."
+      ]);
+      html += sayLines([
+        "« Je ne vais pas refermer ça tout de suite. Je veux éviter d’enfermer des saletés dans la plaie. »"
+      ]);
+    } else {
+      html += section("Pas de suture nécessaire",[
+        "La plaie est trop petite ou superficielle pour nécessiter des points.",
+        "Nettoyer correctement.",
+        "Poser une compresse ou un petit pansement."
+      ]);
+      html += sayLines([
+        "« Pas besoin de points ici. Je vais simplement nettoyer et protéger la zone. »"
+      ]);
+    }
+  } else if(step.dynamicMovementQuestion && currentFlow==="horse"){
+    const area = answers.horseArea;
+    if(area === "none"){
+      html += section("À faire",[
+        "Le patient ne décrit presque aucune douleur.",
+        "Lui demander de se relever lentement seulement s’il est bien conscient.",
+        "Vérifier qu’il marche normalement et ne présente pas de vertige."
+      ]);
+      html += sayLines([
+        "« Relevez-vous doucement. Prenez votre temps. »",
+        "« Faites quelques pas et dites-moi si quelque chose tire ou vous lance. »"
+      ]);
+    } else if(area === "back" || area === "head"){
+      html += section("À faire",[
+        "Éviter les mouvements brusques.",
+        "Ne pas chercher à faire bouger fortement la nuque ou le dos.",
+        "Vérifier sensibilité, confusion, vertiges et douleur."
+      ]);
+      html += sayLines([
+        "« Ne tournez pas brusquement la tête. »",
+        "« Dites-moi si vous avez des fourmillements ou si vous voyez trouble. »"
+      ]);
+    } else if(area === "ribs"){
+      html += section("À faire",[
+        "Demander une respiration lente et profonde.",
+        "Vérifier si la douleur augmente fortement à l’inspiration.",
+        "Palper très doucement la zone sans appuyer brutalement."
+      ]);
+      html += sayLines([
+        "« Prenez une grande inspiration pour moi. »",
+        "« Est-ce que ça vous lance davantage quand vous respirez ? »"
+      ]);
+    } else {
+      html += section("Teste doucement le membre",[
+        "Demander au patient de bouger doucement doigts, main, pied ou orteils selon la zone.",
+        "Vérifier s’il ressent correctement le toucher.",
+        "Ne pas forcer un mouvement très douloureux."
+      ]);
+      html += `<div class="section"><h3>Résultat</h3><div class="choices">
+        <button class="choice" onclick='applyChoice({"horseMove":"normal"})'>Il bouge normalement</button>
+        <button class="choice" onclick='applyChoice({"horseMove":"painful"})'>Il bouge mais ça fait mal</button>
+        <button class="choice" onclick='applyChoice({"horseMove":"limited"})'>Il bouge très peu / difficilement</button>
+        <button class="choice" onclick='applyChoice({"horseMove":"none"})'>Impossible de bouger</button>
+      </div></div>`;
+    }
+
+  } else if(step.dynamicHorseCare && currentFlow==="horse"){
+    const area = answers.horseArea;
+    const vis = answers.horseVisible;
+    const move = answers.horseMove;
+    const pain = answers.horsePain;
+
+    if(vis === "deformity" || move === "none"){
+      html += section("À faire",[
+        "Considérer une fracture ou luxation possible.",
+        "Immobiliser dans la position la plus stable.",
+        "Poser une attelle rembourrée sans serrer excessivement.",
+        "Éviter de faire marcher le patient."
+      ]);
+      html += sayLines([
+        "« Je ne veux pas que vous bougiez ce membre. »",
+        "« Je vais l’immobiliser avant de faire quoi que ce soit d’autre. »"
+      ]);
+      html += section("Matériel",["Attelle","Bandages","Tissu rembourré"]);
+    } else if(vis === "wound"){
+      html += section("À faire",[
+        "Nettoyer l’éraflure ou la petite coupure.",
+        "Appliquer un antiseptique adapté.",
+        "Poser un petit pansement si nécessaire.",
+        "Traiter ensuite la douleur liée au choc si nécessaire (laudanum, liquide oral en gouttes ; ou morphine, solution injectable hypodermique, si douleur forte)."
+      ]);
+      html += meds([
+        ["Phénol / acide carbolique","Solution antiseptique liquide diluée","Application locale sur la plaie / les compresses","Nettoyage de la petite plaie"]
+      ]);
+    } else if(vis === "bruise" || vis === "swelling"){
+      html += section("À faire",[
+        "Faire reposer la zone.",
+        "Appliquer un linge frais ou une compresse fraîche si disponible.",
+        "Sur peau intacte, appliquer une préparation à l’arnica.",
+        "Ajouter un bandage de soutien si le mouvement est douloureux."
+      ]);
+      html += meds([
+        ["Préparation à l’arnica","Teinture alcoolique liquide ou pommade semi-solide","Application locale sur peau intacte, en friction légère","Contusion, bosse ou douleur superficielle"]
+      ]);
+    } else if(area === "back"){
+      html += section("À faire",[
+        "Repos et mouvements prudents.",
+        "Éviter de manipuler fortement le dos.",
+        "Surveiller apparition de faiblesse, fourmillements ou douleur qui augmente."
+      ]);
+    } else if(area === "ribs"){
+      html += section("À faire",[
+        "Mettre au repos.",
+        "Éviter les efforts et mouvements brusques.",
+        "Surveiller toute difficulté respiratoire ou douleur qui s’aggrave."
+      ]);
+    } else if(area === "head"){
+      html += section("À faire",[
+        "Garder au repos.",
+        "Surveiller confusion, nausée, vomissement ou somnolence inhabituelle.",
+        "Nettoyer une petite plaie du cuir chevelu si présente."
+      ]);
+    } else if(area === "none"){
+      html += section("À faire",[
+        "Pas de soin important nécessaire.",
+        "Faire marcher doucement le patient quelques instants.",
+        "Conseiller de revenir si une douleur apparaît après coup."
+      ]);
+    } else {
+      html += section("À faire",[
+        "Pas de fracture évidente.",
+        "Faire reposer le membre.",
+        "Mettre un bandage de soutien si cela soulage.",
+        "Traiter la douleur ou la contusion si besoin (arnica, teinture/pommade locale ; laudanum, liquide oral en gouttes, selon l’intensité)."
+      ]);
+    }
+
+  } else if(step.dynamicHorsePain && currentFlow==="horse"){
+    const pain = answers.horsePain;
+    const conscious = answers.conscious;
+
+    if(answers.horseArea === "none" && pain === "mild"){
+      html += section("Optionnel",[
+        "Aucun antidouleur n’est forcément nécessaire si la gêne est minime.",
+        "Un soin local (préparation à l’arnica, teinture alcoolique ou pommade, application locale) suffit souvent pour une petite contusion."
+      ]);
+      html += meds([
+        ["Préparation à l’arnica","Teinture alcoolique liquide ou pommade semi-solide","Application locale sur peau intacte, en friction légère","Petite douleur ou contusion"]
+      ]);
+    } else if(pain === "mild"){
+      html += section("Douleur légère",[
+        "Privilégier repos, soutien du membre et soin local (préparation à l’arnica, teinture alcoolique ou pommade, application locale).",
+        "Un antidouleur n’est pas obligatoire, mais du laudanum (liquide, voie orale, en gouttes) peut être envisagé si la gêne devient plus marquée."
+      ]);
+      html += meds([
+        ["Préparation à l’arnica","Teinture alcoolique ou pommade","Application locale sur peau intacte","Contusion ou douleur légère"]
+      ]);
+    } else if(pain === "moderate"){
+      html += section("Douleur modérée",[
+        "Un antidouleur oral (laudanum, liquide, voie orale, en gouttes) peut être proposé si le patient est bien conscient et peut avaler.",
+        "Continuer le repos et l’immobilisation légère si nécessaire."
+      ]);
+      if(conscious === "awake" || conscious === "confused"){
+        html += meds([
+          ["Laudanum","Liquide opiacé (teinture d’opium)","Voie orale, quelques gouttes ou petite quantité diluée","Douleur modérée"]
+        ]);
+      } else {
+        html += section("Attention",[
+          "Le patient n’est pas suffisamment conscient pour lui faire boire quoi que ce soit.",
+          "Attendre qu’il soit réveillé et capable d’avaler."
+        ]);
+      }
+    } else {
+      html += section("Douleur forte",[
+        "Rechercher à nouveau fracture, luxation ou lésion importante.",
+        "Immobiliser la zone douloureuse.",
+        "Un antalgique puissant (morphine, solution injectable, voie hypodermique) peut être envisagé dans le cadre RP."
+      ]);
+      html += meds([
+        ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur forte"],
+        ["Laudanum","Liquide opiacé (teinture d’opium)","Voie orale uniquement si le patient est suffisamment conscient et peut avaler","Alternative orale selon la scène"]
+      ]);
+    }
+
+  } else if(step.dynamicHorseFinish && currentFlow==="horse"){
+    html += section("Avant de terminer",[
+      "Vérifier que le patient est bien conscient.",
+      "Demander si la douleur a changé depuis le début.",
+      "Vérifier qu’il peut bouger ou marcher si cela est cohérent avec la blessure.",
+      "Conseiller repos et surveillance."
+    ]);
+    html += sayLines([
+      "« Ça devrait aller, mais ménagez-vous pour le moment. »",
+      "« Si la douleur augmente, si vous avez des vertiges ou si vous perdez de la sensibilité, revenez me voir. »"
+    ]);
+
+  } else {
+    if(step.do) html += section("À faire", step.do);
+    if(step.say) html += sayLines(step.say);
+    if(step.material) html += section("Matériel", step.material);
+    if(step.med) html += meds(step.med);
+  }
+
+  if(step.choices){
+    html += `<div class="section"><h3>Choisis ce qui correspond à la scène</h3><div class="choices">`;
+    step.choices.forEach(c=>{
+      html += `<button class="choice" onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if(!step.choices){
+    html += `<div class="nav">
+      <button class="secondary" onclick="prev()">← Précédent</button>
+      <button class="next" onclick="next()">${stepIndex===flow.steps.length-1?"Terminer":"Étape suivante →"}</button>
+    </div>`;
+  } else {
+    html += `<div class="nav"><button class="secondary" onclick="prev()">← Précédent</button></div>`;
+  }
+
+  document.getElementById("flow").innerHTML=html;
+}
+function renderEnd(){
+  document.getElementById("flow").innerHTML=`
+    <div class="section" style="text-align:center;padding:28px">
+      <h2>Intervention terminée</h2>
+      <p>Tu peux finir la scène avec quelques consignes simples de repos et de surveillance.</p>
+      <button class="next" onclick="showCases()">Nouvelle intervention</button>
+      <div style="margin-top:12px"><button class="danger" onclick="goHome()">Accueil</button></div>
+    </div>
+  `;
+}
+
+(function initLexiqueTabs(){
+  document.querySelectorAll("[data-lex-tab]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      setLexTab(btn.dataset.lexTab);
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

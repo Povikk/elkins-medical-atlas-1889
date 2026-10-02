@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elkins &amp; Elkins Medical Atlas</title>
+<meta name="description" content="Atlas médical RP de terrain pour des scènes RedM en 1889." />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%232f5149'/%3E%3Cpath d='M27 12h10v15h15v10H37v15H27V37H12V27h15z' fill='%23f2e3c4'/%3E%3C/svg%3E" />
+<script>
+  (() => {
+    let saved = null;
+    try { saved = localStorage.getItem("elkins-theme"); } catch (error) {}
+    const theme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">Aller au contenu</a>
+<div class="wrap">
+  <header id="siteHeader">
+    <h1>Elkins &amp; Elkins Medical Atlas</h1>
+    <div class="subtitle">Practical Medicine, Surgery &amp; Field Notes - 1889</div>
+    <div class="byline">Compiled by Dr. Everett Elkins &amp; Dr. Effie Elkins</div>
+    <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false"></button>
+  </header>
+
+  <main id="mainContent">
+    <section id="home">
+      <div class="home">
+        <button class="home-btn primary-home" onclick="showCases()">
+          <strong>Intervention</strong>
+          <span>Prise en charge principale, guidée étape par étape</span>
+        </button>
+        <button class="case priority-case priority-case-home" onclick="start('unknown')">
+          <strong>⚠ Patient inconscient / cause inconnue</strong>
+          <span class="muted">Commencer par l'état vital avant de chercher ce qui s'est passé</span>
+        </button>
+        <button class="home-btn" onclick="showLexique()">
+          <strong>Lexique</strong>
+          <span>Produits, antidouleurs, antiseptiques, anesthésiques et soins</span>
+        </button>
+        <button class="home-btn" onclick="showSurgery()">
+          <strong>Chirurgie lourde</strong>
+          <span>Opérations lourdes, rares et de dernier recours</span>
+        </button>
+        <button class="home-btn" onclick="showAtlas()">
+          <strong>Atlas anatomique</strong>
+          <span>Squelette, muscles et organes avec repères interactifs</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="cases" class="hidden">
+      <div class="topbar">
+        <h2 style="margin:0">Quelle intervention ?</h2>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+      <div class="case-grid">
+        <button class="case priority-case" onclick="start('unknown')">
+          <strong>⚠ Inconscient / cause inconnue</strong>
+          <span class="muted">Respiration, saignement, réveil, puis recherche de la cause</span>
+        </button>
+        <button class="case" onclick="start('gunshot')">
+          <strong>🔫 Blessure par balle</strong>
+          <span class="muted">Projectile, saignement, plaie d’entrée/sortie</span>
+        </button>
+        <button class="case" onclick="start('knife')">
+          <strong>🔪 Blessure au couteau</strong>
+          <span class="muted">Plaie ouverte, profondeur, hémorragie</span>
+        </button>
+        <button class="case" onclick="start('fight')">
+          <strong>👊 Bagarre / coups</strong>
+          <span class="muted">Ecchymoses, coupures, tête, côtes</span>
+        </button>
+        <button class="case" onclick="start('horse')">
+          <strong>🐎 Chute de cheval</strong>
+          <span class="muted">Fracture, luxation, commotion</span>
+        </button>
+        <button class="case" onclick="start('fracture')">
+          <strong>🦴 Fracture / luxation</strong>
+          <span class="muted">Déformation, douleur, immobilisation</span>
+        </button>
+        <button class="case" onclick="start('minor')">
+          <strong>🩹 Petit bobo / soin léger</strong>
+          <span class="muted">Éraflure, petit bleu, coupure légère</span>
+        </button>
+        <button class="case" onclick="start('drowning')">
+          <strong>🌊 Noyade / asphyxie</strong>
+          <span class="muted">Inconscience, respiration absente ou difficile</span>
+        </button>
+        <button class="case" onclick="start('head')">
+          <strong>🧠 Traumatisme crânien</strong>
+          <span class="muted">Chute, coup à la tête, confusion, perte de connaissance</span>
+        </button>
+        <button class="case" onclick="start('burn')">
+          <strong>🔥 Brûlure</strong>
+          <span class="muted">Chaleur, feu, vapeur, peau lésée</span>
+        </button>
+        <button class="case" onclick="start('poison')">
+          <strong>☠️ Intoxication / opiacés</strong>
+          <span class="muted">Laudanum, opium, somnolence, respiration lente</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="lexique" class="hidden">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0">Lexique médical RP</h2>
+          <div class="muted" style="margin-top:4px">Références rapides pour la scène</div>
+        </div>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+
+      <div class="lex-tabs">
+        <button type="button" class="lex-tab active" data-lex-tab="meds">Médicaments</button>
+        <button type="button" class="lex-tab" data-lex-tab="equipment">Matériel</button>
+        <button type="button" class="lex-tab" data-lex-tab="symptoms">Symptômes</button>
+        
+      </div>
+
+      <input id="lexSearch" class="search" placeholder="Rechercher dans le lexique..." oninput="filterLexique()" />
+
+      <div id="lexHelpful" class="section">
+        <h3>À ne pas confondre</h3>
+        <ul>
+          <li><b>Laudanum</b> : liquide, voie orale, en gouttes.</li>
+          <li><b>Morphine</b> : solution injectable, voie hypodermique.</li>
+          <li><b>Chloroforme / éther</b> : liquides volatils, voie inhalée.</li>
+          <li><b>Phénol / acide carbolique</b> : solution antiseptique liquide, application locale.</li>
+          <li><b>Arnica</b> : teinture liquide ou pommade, application locale sur peau intacte.</li>
+        </ul>
+      </div>
+
+      <div id="lexGrid" class="lex-grid"></div>
+    </section>
+
+    <section id="surgery" class="hidden">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0">Chirurgie lourde</h2>
+          <div class="muted" style="margin-top:5px">Actes rares, graves ou de dernier recours</div>
+        </div>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+      <div class="surgery-grid">
+        <button class="case" onclick="openSurgery('amputation')">
+          <strong>🪚 Amputation</strong>
+          <span class="muted">Membre irrécupérable, gangrène ou destruction majeure</span>
+        </button>
+        <button class="case" onclick="openSurgery('major_bleeding')">
+          <strong>🩸 Hémorragie majeure</strong>
+          <span class="muted">Vaisseau important, saignement impossible à contrôler simplement</span>
+        </button>
+        <button class="case" onclick="openSurgery('deep_bullet')">
+          <strong>🔩 Projectile profondément logé</strong>
+          <span class="muted">Balle inaccessible par une extraction simple</span>
+        </button>
+        <button class="case" onclick="openSurgery('abdominal')">
+          <strong>🫀 Plaie abdominale grave</strong>
+          <span class="muted">Atteinte profonde nécessitant une exploration chirurgicale RP</span>
+        </button>
+        <button class="case" onclick="openSurgery('trepanation')">
+          <strong>🧠 Trépanation</strong>
+          <span class="muted">Traumatisme crânien exceptionnel avec signes très inquiétants</span>
+        </button>
+        <button class="case" onclick="openSurgery('infected_wound')">
+          <strong>🦠 Plaie gravement infectée</strong>
+          <span class="muted">Tissus abîmés, infection profonde, nettoyage chirurgical</span>
+        </button>
+      </div>
+      <div class="section" style="margin-top:16px">
+        <h3>Quand utiliser cette section ?</h3>
+        <ul>
+          <li>Quand une intervention classique ne suffit plus.</li>
+          <li>Quand le patient risque de perdre un membre ou sa vie.</li>
+          <li>Quand tu veux jouer une vraie scène d'opération courte et exceptionnelle.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="surgeryFlow" class="hidden"></section>
+
+    <section id="atlas" class="hidden">
+      <div class="topbar">
+        <div>
+          <h2 style="margin:0">Atlas anatomique</h2>
+          <div class="muted" style="margin-top:4px">Survoler, sélectionner ou toucher un repère pour afficher sa fiche.</div>
+        </div>
+        <button class="danger" onclick="goHome()">Accueil</button>
+      </div>
+      <div class="atlas-tabs" role="tablist" aria-label="Planches anatomiques">
+        <button type="button" class="atlas-tab active" data-anatomy-tab="skeleton" role="tab" aria-selected="true" onclick="selectAnatomyPlate('skeleton')">Squelette</button>
+        <button type="button" class="atlas-tab" data-anatomy-tab="muscles" role="tab" aria-selected="false" onclick="selectAnatomyPlate('muscles')">Muscles</button>
+        <button type="button" class="atlas-tab" data-anatomy-tab="organs" role="tab" aria-selected="false" onclick="selectAnatomyPlate('organs')">Organes</button>
+      </div>
+      <div class="atlas-layout">
+        <div>
+          <div id="anatomyStage" class="anatomy-stage"></div>
+          <button type="button" class="secondary anatomy-enlarge" onclick="openAnatomyDialog()">Agrandir la planche</button>
+        </div>
+        <aside id="anatomyInfo" class="anatomy-info" aria-live="polite"></aside>
+      </div>
+    </section>
+
+    <dialog id="anatomyDialog" class="anatomy-dialog" aria-labelledby="anatomyDialogTitle">
+      <div class="anatomy-dialog-bar">
+        <h2 id="anatomyDialogTitle">Planche anatomique</h2>
+        <button type="button" class="secondary" onclick="closeAnatomyDialog()">Fermer</button>
+      </div>
+      <div class="anatomy-zoom-scroll">
+        <img id="anatomyDialogImage" alt="" />
+      </div>
+    </dialog>
+
+    <section id="flow" class="hidden"></section>
+  </main>
+
+  <footer>
+    Outil de soutien RP historique (1889). Les techniques décrites servent au jeu de rôle et ne sont pas des gestes de secours modernes.
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+@Sites
+
+Je te fournis un petit projet web appelé "Elkins & Elkins Medical Atlas".
+
+Lis d'abord intégralement :
+- PROJECT_BRIEF.md
+- index.html
+- sources/Manuel_medecine_RP_1889_Effie_Elkins.pdf
+
+Objectif :
+reprendre l'application actuelle, corriger proprement son architecture front-end et livrer une version stable, responsive et facile à modifier.
+
+IMPORTANT :
+Le fichier index.html actuel contient des fonctionnalités utiles mais les dernières modifications ont créé des bugs dans certains onglets. Ne te contente pas de patcher à l'aveugle. Analyse le code, nettoie-le et réorganise-le si nécessaire.
+
+Priorités :
+1. Faire fonctionner parfaitement tous les boutons et tous les onglets.
+2. Conserver le comportement et le contenu utiles déjà présents.
+3. Respecter exactement le cahier des charges de PROJECT_BRIEF.md.
+4. Garder l'application rapide et simple en pleine scène RP.
+5. Ne pas ajouter d'images anatomiques pour le moment.
+6. Ne jamais utiliser de tirets longs.
+7. Ne pas créer de backend ou de base de données.
+8. Garder une application simple et autonome.
+9. Ne pas ajouter de fonctions qui enregistrent automatiquement les interventions.
+
+Avant de publier :
+- teste toutes les navigations
+- teste tous les onglets du Lexique
+- teste plusieurs parcours d'Intervention
+- teste le mode compact
+- teste le bouton Matériel nécessaire
+- vérifie la version desktop 2K et la version mobile
+
+Commence par me montrer une preview privée.
+Ne publie pas le site tant que je ne t'ai pas donné mon accord.
