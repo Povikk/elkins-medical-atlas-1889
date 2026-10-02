@@ -82,14 +82,14 @@ async function finishSurgery(page, id) {
     return image && image.complete && image.naturalWidth > 0;
   });
   await page.locator(".anatomy-hotspot").first().hover();
-  check((await page.locator("#anatomyInfo").innerText()).includes("Crâne"), "Fiche au survol absente");
+  check((await page.locator("#anatomyTooltip").innerText()).includes("Crâne"), "Fiche au survol absente");
   await page.getByRole("tab", { name: "Muscles" }).click();
   check((await page.locator("#anatomyStage img").getAttribute("src")).includes("plate-8.webp"), "Planche Muscles incorrecte");
   await page.locator(".anatomy-hotspot").nth(1).focus();
-  check((await page.locator("#anatomyInfo").innerText()).includes("Deltoïde"), "Fiche au clavier absente");
+  check((await page.locator("#anatomyTooltip").innerText()).includes("Deltoïde"), "Fiche au clavier absente");
   await page.getByRole("tab", { name: "Organes" }).click();
   await page.getByLabel("Afficher la fiche : Poumon droit", {exact:true}).click({ position: { x: 5, y: 5 } });
-  check((await page.locator("#anatomyInfo").innerText()).includes("Poumon droit"), "Fiche au toucher absente");
+  check((await page.locator("#anatomyTooltip").innerText()).includes("Poumon droit"), "Fiche au toucher absente");
   await page.getByRole("button", { name: "Agrandir la planche" }).click();
   check(await page.locator("#anatomyDialog").evaluate(element => element.open), "Agrandissement absent");
   await page.getByRole("button", { name: "Fermer" }).click();

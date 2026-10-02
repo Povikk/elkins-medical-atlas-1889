@@ -98,6 +98,7 @@ Object.entries(atlasLabelRegions).forEach(([key,regions])=>{
 });
 
 let anatomyHideTimer;
+let anatomyKeyboardTooltip = false;
 const anatomyTooltip = document.createElement("div");
 anatomyTooltip.id = "anatomyTooltip";
 anatomyTooltip.className = "anatomy-tooltip";
@@ -133,11 +134,11 @@ function revealAnatomyTooltip(key,index,event,button){
   const spot = anatomyPlates[key]?.hotspots[index];
   if(!spot) return;
   clearTimeout(anatomyHideTimer);
-  showAnatomyInfo(key,index);
+  anatomyKeyboardTooltip = event?.type === "focus";
   document.querySelectorAll('[aria-describedby="anatomyTooltip"]').forEach(el=>el.removeAttribute("aria-describedby"));
   const dialog = document.getElementById("anatomyDialog");
   (dialog.open ? dialog : document.body).append(anatomyTooltip);
-  anatomyTooltip.innerHTML = `<strong>${spot.label}</strong><p>${spot.role}</p>`;
+  anatomyTooltip.innerHTML = anatomyInfoMarkup(anatomyPlates[key],spot);
   anatomyTooltip.hidden = false;
   button.setAttribute("aria-describedby","anatomyTooltip");
   positionAnatomyTooltip(event,button);
@@ -158,14 +159,16 @@ document.addEventListener("keydown",event=>{if(event.key === "Escape") hideAnato
 document.addEventListener("pointerdown",event=>{
   if(!event.target.closest(".anatomy-label,.anatomy-tooltip")) hideAnatomyTooltip();
 });
-window.addEventListener("scroll",hideAnatomyTooltip,true);
+window.addEventListener("scroll",event=>{
+  if(anatomyTooltip.contains(event.target)) return;
+  if(anatomyKeyboardTooltip && document.activeElement?.matches(".anatomy-label")){
+    positionAnatomyTooltip(null,document.activeElement);
+  } else hideAnatomyTooltip();
+},true);
 window.addEventListener("resize",hideAnatomyTooltip);
 
 function anatomyInfoMarkup(plate, hotspot){
-  if(!hotspot){
-    return `<span class="badge">${plate.title}</span><h3>Choisir un repère</h3><p>${plate.intro}</p><p class="muted">Les zones sont utilisables à la souris, au clavier et au toucher.</p>`;
-  }
-  return `<span class="badge">${plate.title}</span><h3>${hotspot.label}</h3>
+  return `<span class="badge">${plate.title}</span><strong>${hotspot.label}</strong>
     <p><b>Rôle :</b> ${hotspot.role}</p>
     <p><b>À observer en RP :</b> ${hotspot.observe}</p>
     <p class="anatomy-caution"><b>Prudence :</b> ${hotspot.caution}</p>`;
@@ -185,17 +188,6 @@ function selectAnatomyPlate(key){
   if(stage){
     stage.innerHTML = anatomyStageMarkup(plate,key);
   }
-  const info = document.getElementById("anatomyInfo");
-  if(info) info.innerHTML = anatomyInfoMarkup(plate,null);
-}
-
-function showAnatomyInfo(key,index){
-  const plate = anatomyPlates[key];
-  const hotspot = plate?.hotspots[index];
-  const info = document.getElementById("anatomyInfo");
-  if(!plate || !hotspot || !info) return;
-  info.innerHTML = anatomyInfoMarkup(plate,hotspot);
-  document.querySelectorAll(".anatomy-hotspot").forEach((button,buttonIndex)=>button.classList.toggle("selected",buttonIndex===index));
 }
 
 function showAtlas(){
