@@ -86,10 +86,10 @@ async function finishSurgery(page, id) {
   await page.getByRole("tab", { name: "Muscles" }).click();
   check((await page.locator("#anatomyStage img").getAttribute("src")).includes("plate-8.webp"), "Planche Muscles incorrecte");
   await page.locator(".anatomy-hotspot").nth(1).focus();
-  check((await page.locator("#anatomyInfo").innerText()).includes("Épaules"), "Fiche au clavier absente");
+  check((await page.locator("#anatomyInfo").innerText()).includes("Deltoïde"), "Fiche au clavier absente");
   await page.getByRole("tab", { name: "Organes" }).click();
-  await page.getByLabel("Afficher la fiche : Poumons").click({ position: { x: 5, y: 5 } });
-  check((await page.locator("#anatomyInfo").innerText()).includes("Poumons"), "Fiche au toucher absente");
+  await page.getByLabel("Afficher la fiche : Poumon droit", {exact:true}).click({ position: { x: 5, y: 5 } });
+  check((await page.locator("#anatomyInfo").innerText()).includes("Poumon droit"), "Fiche au toucher absente");
   await page.getByRole("button", { name: "Agrandir la planche" }).click();
   check(await page.locator("#anatomyDialog").evaluate(element => element.open), "Agrandissement absent");
   await page.getByRole("button", { name: "Fermer" }).click();
@@ -127,7 +127,7 @@ async function finishSurgery(page, id) {
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Débordement horizontal sur mobile");
   await page.evaluate(() => window.showAtlas());
   await page.getByRole("tab", { name: "Organes" }).click();
-  await page.getByLabel("Afficher la fiche : Poumons").click({ position: { x: 5, y: 5 } });
+  await page.getByLabel("Afficher la fiche : Poumon droit", {exact:true}).click({ position: { x: 5, y: 5 } });
   await page.waitForTimeout(300);
   await page.screenshot({ path: path.join(outputDir, "atlas-mobile.png"), fullPage: true });
   await page.evaluate(() => window.goHome());

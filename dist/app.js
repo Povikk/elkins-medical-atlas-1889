@@ -90,6 +90,76 @@ const anatomyPlates = {
 };
 
 let currentAnatomyPlate = "skeleton";
+Object.entries(atlasLabelRegions).forEach(([key,regions])=>{
+  const original = anatomyPlates[key].hotspots;
+  anatomyPlates[key].hotspots = regions.map(([label,x,y,w,h,group,role])=>({
+    ...original[group],label,role,x:x/1158*100,y:y/1638*100,w:w/1158*100,h:h/1638*100
+  }));
+});
+
+let anatomyHideTimer;
+const anatomyTooltip = document.createElement("div");
+anatomyTooltip.id = "anatomyTooltip";
+anatomyTooltip.className = "anatomy-tooltip";
+anatomyTooltip.setAttribute("role","tooltip");
+anatomyTooltip.hidden = true;
+document.body.append(anatomyTooltip);
+anatomyTooltip.addEventListener("pointerenter",()=>clearTimeout(anatomyHideTimer));
+anatomyTooltip.addEventListener("pointerleave",()=>hideAnatomyTooltip());
+
+function hideAnatomyTooltip(){
+  clearTimeout(anatomyHideTimer);
+  anatomyTooltip.hidden = true;
+  document.querySelectorAll('[aria-describedby="anatomyTooltip"]').forEach(el=>el.removeAttribute("aria-describedby"));
+}
+function scheduleAnatomyHide(){
+  clearTimeout(anatomyHideTimer);
+  anatomyHideTimer = setTimeout(hideAnatomyTooltip,180);
+}
+function positionAnatomyTooltip(event,button){
+  if(anatomyTooltip.hidden) return;
+  const rect = button.getBoundingClientRect();
+  const x = event && event.type !== "focus" && event.type !== "focusin" ? event.clientX : rect.right;
+  const y = event && event.type !== "focus" && event.type !== "focusin" ? event.clientY : rect.bottom;
+  const box = anatomyTooltip.getBoundingClientRect();
+  let left = x + 14, top = y + 16;
+  if(left + box.width > innerWidth - 10) left = x - box.width - 14;
+  if(top + box.height > innerHeight - 10) top = y - box.height - 16;
+  anatomyTooltip.style.left = `${Math.max(10,Math.min(left,innerWidth-box.width-10))}px`;
+  anatomyTooltip.style.top = `${Math.max(10,Math.min(top,innerHeight-box.height-10))}px`;
+}
+function revealAnatomyTooltip(key,index,event,button){
+  if(event?.pointerType === "touch") return;
+  const spot = anatomyPlates[key]?.hotspots[index];
+  if(!spot) return;
+  clearTimeout(anatomyHideTimer);
+  showAnatomyInfo(key,index);
+  document.querySelectorAll('[aria-describedby="anatomyTooltip"]').forEach(el=>el.removeAttribute("aria-describedby"));
+  const dialog = document.getElementById("anatomyDialog");
+  (dialog.open ? dialog : document.body).append(anatomyTooltip);
+  anatomyTooltip.innerHTML = `<strong>${spot.label}</strong><p>${spot.role}</p>`;
+  anatomyTooltip.hidden = false;
+  button.setAttribute("aria-describedby","anatomyTooltip");
+  positionAnatomyTooltip(event,button);
+}
+function anatomyStageMarkup(plate,key,zoom=false){
+  return `<img ${zoom ? 'id="anatomyDialogImage"' : ''} src="${plate.image}" alt="${plate.alt}" loading="lazy" decoding="async" draggable="false">
+    <div class="anatomy-hotspots">${plate.hotspots.map((spot,index)=>`
+      <button type="button" class="anatomy-hotspot anatomy-label" style="left:${spot.x}%;top:${spot.y}%;width:${spot.w}%;height:${spot.h}%"
+        aria-label="Afficher la fiche : ${spot.label}"
+        onpointerenter="revealAnatomyTooltip('${key}',${index},event,this)"
+        onpointermove="positionAnatomyTooltip(event,this)"
+        onpointerleave="scheduleAnatomyHide()"
+        onfocus="revealAnatomyTooltip('${key}',${index},event,this)"
+        onblur="scheduleAnatomyHide()"
+        onclick="revealAnatomyTooltip('${key}',${index},null,this)"></button>`).join("")}</div>`;
+}
+document.addEventListener("keydown",event=>{if(event.key === "Escape") hideAnatomyTooltip();});
+document.addEventListener("pointerdown",event=>{
+  if(!event.target.closest(".anatomy-label,.anatomy-tooltip")) hideAnatomyTooltip();
+});
+window.addEventListener("scroll",hideAnatomyTooltip,true);
+window.addEventListener("resize",hideAnatomyTooltip);
 
 function anatomyInfoMarkup(plate, hotspot){
   if(!hotspot){
@@ -103,6 +173,7 @@ function anatomyInfoMarkup(plate, hotspot){
 
 function selectAnatomyPlate(key){
   if(!Object.prototype.hasOwnProperty.call(anatomyPlates,key)) return;
+  hideAnatomyTooltip();
   currentAnatomyPlate = key;
   const plate = anatomyPlates[key];
   document.querySelectorAll("[data-anatomy-tab]").forEach(button=>{
@@ -112,13 +183,7 @@ function selectAnatomyPlate(key){
   });
   const stage = document.getElementById("anatomyStage");
   if(stage){
-    stage.innerHTML = `<img src="${plate.image}" alt="${plate.alt}" loading="lazy" decoding="async" draggable="false">
-      <div class="anatomy-hotspots">${plate.hotspots.map((spot,index)=>`
-        <button type="button" class="anatomy-hotspot" style="left:${spot.x}%;top:${spot.y}%;width:${spot.w}%;height:${spot.h}%"
-          aria-label="Afficher la fiche : ${spot.label}"
-          onmouseenter="showAnatomyInfo('${key}',${index})"
-          onfocus="showAnatomyInfo('${key}',${index})"
-          onclick="showAnatomyInfo('${key}',${index})"><span>${spot.label}</span></button>`).join("")}</div>`;
+    stage.innerHTML = anatomyStageMarkup(plate,key);
   }
   const info = document.getElementById("anatomyInfo");
   if(info) info.innerHTML = anatomyInfoMarkup(plate,null);
@@ -140,17 +205,18 @@ function showAtlas(){
 
 function openAnatomyDialog(){
   const dialog = document.getElementById("anatomyDialog");
-  const image = document.getElementById("anatomyDialogImage");
+  const stage = document.getElementById("anatomyZoomStage");
   const title = document.getElementById("anatomyDialogTitle");
   const plate = anatomyPlates[currentAnatomyPlate];
-  if(!dialog || !image || !title || !plate) return;
-  image.src = plate.image;
-  image.alt = plate.alt;
+  if(!dialog || !stage || !title || !plate) return;
+  hideAnatomyTooltip();
+  stage.innerHTML = anatomyStageMarkup(plate,currentAnatomyPlate,true);
   title.textContent = `Planche : ${plate.title}`;
   dialog.showModal();
 }
 
 function closeAnatomyDialog(){
+  hideAnatomyTooltip();
   document.getElementById("anatomyDialog")?.close();
 }
 
@@ -262,6 +328,7 @@ function compactButton(target){
 }
 
 function show(id){
+  hideAnatomyTooltip();
   const target = document.getElementById(id);
   if(!target) return;
   ["home","cases","lexique","surgery","surgeryFlow","atlas","flow"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));

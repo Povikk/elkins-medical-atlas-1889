@@ -217,7 +217,7 @@
       <div class="topbar">
         <div>
           <h2 style="margin:0">Atlas anatomique</h2>
-          <div class="muted" style="margin-top:4px">Survoler, sélectionner ou toucher un repère pour afficher sa fiche.</div>
+          <div class="muted" style="margin-top:4px">Survole un nom pour découvrir son rôle. Sur mobile, touche le nom ou agrandis la planche.</div>
         </div>
         <button class="danger" onclick="goHome()">Accueil</button>
       </div>
@@ -241,7 +241,7 @@
         <button type="button" class="secondary" onclick="closeAnatomyDialog()">Fermer</button>
       </div>
       <div class="anatomy-zoom-scroll">
-        <img id="anatomyDialogImage" alt="" />
+        <div id="anatomyZoomStage" class="anatomy-stage anatomy-zoom-stage"></div>
       </div>
     </dialog>
 
@@ -256,6 +256,7 @@
 
 <script src="data.js"></script>
 <script src="pharmacy.js"></script>
+<script src="atlas-labels.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
