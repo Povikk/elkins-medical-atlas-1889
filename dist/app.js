@@ -435,7 +435,7 @@ function renderLexique(list){
   grid.innerHTML = sorted.length ? sorted.map((x,index)=>`
     ${index===0 || sorted[index-1].category!==x.category ? `<h3 class="lex-category-heading">${x.category}</h3>` : ''}
     <div class="lex-card ${categoryClass(x.category)}">
-      <strong>${x.name}</strong>
+      <strong>${emojiIcon(lexEmoji(x))} ${x.name}</strong>
       ${lexPriority(x) ? `<span class="lex-priority">${priorityLabel(x)}</span>` : ''}
       <div class="muted">${x.type}</div>
       <div class="cat-badge">${x.category || "Autre"}</div>
@@ -458,7 +458,7 @@ function renderReferenceCards(list,type){
   const sorted = sortLexReferences(list);
   grid.innerHTML = sorted.length ? sorted.map(x=>`
     <div class="reference-card">
-      <strong>${x.name}</strong>
+      <strong>${emojiIcon(referenceEmoji(x,type))} ${x.name}</strong>
       ${lexPriority(x) ? '<span class="lex-priority">Repère courant en scène RP</span>' : ''}
       <small><b>Ce que c'est :</b> ${x.desc}</small>
       <small><b>${type === "equipment" ? "Utilisation RP" : "À retenir en RP"} :</b> ${type === "equipment" ? x.use : x.rp}</small>
@@ -602,7 +602,7 @@ function meds(rows){
       ${assessment}
       ${rows.map(r=>`
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
-          <strong>${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
+          <strong>${emojiIcon(lexEmoji({name:r[0],form:r[1],admin:r[2],category:medCategory(r[0],r[3])}))} ${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
           ${medicineReferenceButton(r[0])}
           <div class="compact-inline"><b>Forme :</b> ${r[1]}<br><b>Administration :</b> ${r[2]}</div>
           ${sensoryNote(r[0])}
@@ -615,7 +615,7 @@ function meds(rows){
     ${assessment}
     ${rows.map(r=>`
       <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
-        <strong style="font-size:17px">${r[0]}</strong>
+        <strong style="font-size:17px">${emojiIcon(lexEmoji({name:r[0],form:r[1],admin:r[2],category:medCategory(r[0],r[3])}))} ${r[0]}</strong>
         ${medicineReferenceButton(r[0])}
         <div class="cat-badge">${medCategory(r[0], r[3])}</div>
         <div class="med">
