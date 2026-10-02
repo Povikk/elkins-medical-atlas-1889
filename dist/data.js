@@ -160,7 +160,7 @@ const lexique = [
     form:"Poudre ou sels/cristaux de quinine selon la préparation",
     composition:"Alcaloïde extrait du quinquina, souvent préparé sous forme de sels ou de poudre.",
     admin:"Voie orale, poudre ou sels dissous / mélangés à une préparation",
-    use:"Fièvres selon le contexte RP",
+    use:"Fièvres intermittentes liées au paludisme dans la pratique d'époque, pas toute fièvre.",
     icon:"🥄"
   }
 ];

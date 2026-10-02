@@ -144,9 +144,17 @@
       </div>
 
       <input id="lexSearch" class="search" placeholder="Rechercher dans le lexique..." oninput="filterLexique()" />
+      <div id="lexFilters" class="lex-filters">
+        <label for="lexCategory">Catégorie</label>
+        <select id="lexCategory" onchange="filterLexique()"><option value="">Toutes les catégories</option></select>
+        <label for="lexContext">Contexte</label>
+        <select id="lexContext" onchange="filterLexique()"><option value="">Tous les contextes</option><option>Pharmacopée XIXe</option><option>Spécialisé</option><option>Nouveauté de l'époque</option><option>Historique dangereux</option></select>
+        <span id="lexCount" class="muted" role="status" aria-live="polite"></span>
+      </div>
 
-      <div id="lexHelpful" class="section">
-        <h3>À ne pas confondre</h3>
+      <details id="lexHelpful" class="section">
+        <summary>Repères et précautions pour la pharmacie de 1889</summary>
+        <p>Usages historiques pour le jeu de rôle, pas des conseils de soin. Disponibilité variable selon le pays, le médecin et la pharmacie. Aucun dosage ni recette. Un effet inquiétant ne doit jamais être présenté comme normal.</p>
         <ul>
           <li><b>Laudanum</b> : liquide, voie orale, en gouttes.</li>
           <li><b>Morphine</b> : solution injectable, voie hypodermique.</li>
@@ -154,7 +162,7 @@
           <li><b>Phénol / acide carbolique</b> : solution antiseptique liquide, application locale.</li>
           <li><b>Arnica</b> : teinture liquide ou pommade, application locale sur peau intacte.</li>
         </ul>
-      </div>
+      </details>
 
       <div id="lexGrid" class="lex-grid"></div>
     </section>
@@ -247,6 +255,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="pharmacy.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

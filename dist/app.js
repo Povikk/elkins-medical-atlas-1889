@@ -296,6 +296,8 @@ function showCases(){
 }
 function showLexique(){
   lexTab = "meds";
+  document.getElementById("lexCategory").value = "";
+  document.getElementById("lexContext").value = "";
   const input = document.getElementById("lexSearch");
   if(input) input.value = "";
   updateLexTabs();
@@ -313,6 +315,13 @@ function setLexTab(tab){
 }
 
 function updateLexTabs(){
+  document.getElementById("lexFilters").classList.toggle("hidden", lexTab !== "meds");
+  const categorySelect = document.getElementById("lexCategory");
+  if(categorySelect.options.length === 1){
+    [...new Set(lexique.map(x=>x.category || "Autre"))].sort((a,b)=>a.localeCompare(b,"fr")).forEach(category=>{
+      categorySelect.add(new Option(category,category));
+    });
+  }
   document.querySelectorAll("[data-lex-tab]").forEach(btn=>{
     btn.classList.toggle("active", btn.dataset.lexTab === lexTab);
   });
@@ -334,20 +343,25 @@ function updateLexTabs(){
 
 function filterLexique(){
   const input = document.getElementById("lexSearch");
-  const q = input ? input.value.toLowerCase().trim() : "";
+  const normalize = value => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’']/g," ");
+  const q = normalize(input ? input.value.trim() : "");
   if(lexTab === "meds"){
+    const category = document.getElementById("lexCategory").value;
+    const context = document.getElementById("lexContext").value;
     const list = lexique.filter(x =>
-      (x.name+" "+x.tags+" "+x.type+" "+x.form+" "+x.admin+" "+x.use).toLowerCase().includes(q)
+      (!category || x.category === category) && (!context || x.context === context) &&
+      normalize([x.name,x.tags,x.category,x.type,x.form,x.admin,x.use,x.context].join(" ")).includes(q)
     );
+    document.getElementById("lexCount").textContent = `${list.length} / ${lexique.length} fiches`;
     renderLexique(list);
   } else if(lexTab === "equipment"){
     const list = equipmentLexicon.filter(x =>
-      (x.name+" "+x.tags+" "+x.desc+" "+x.use).toLowerCase().includes(q)
+      normalize(x.name+" "+x.tags+" "+x.desc+" "+x.use).includes(q)
     );
     renderReferenceCards(list, "equipment");
   } else if(lexTab === "symptoms"){
     const list = symptomLexicon.filter(x =>
-      (x.name+" "+x.tags+" "+x.desc+" "+x.rp).toLowerCase().includes(q)
+      normalize(x.name+" "+x.tags+" "+x.desc+" "+x.rp).includes(q)
     );
     renderReferenceCards(list, "symptoms");
   }
@@ -361,10 +375,16 @@ function renderLexique(list){
       <strong>${x.icon} ${x.name}</strong>
       <div class="muted">${x.type}</div>
       <div class="cat-badge">${x.category || "Autre"}</div>
+      ${x.context ? `<span class="lex-context">${x.context}</span>` : ""}
       <small><b>Forme :</b> ${x.form}</small>
-      ${x.composition ? `<small><b>Composition :</b> ${x.composition}</small>` : ""}
       <small><b>Administration :</b> ${x.admin}</small>
       <small><b>Usage RP :</b> ${x.use}</small>
+      <details class="lex-details"><summary>Détails et précautions</summary>
+        ${x.composition ? `<small><b>Composition :</b> ${x.composition}</small>` : ""}
+        ${x.sensory || sensoryCue(x.name) ? `<small><b>Sensations / odeur :</b> ${x.sensory || sensoryCue(x.name)[1]}</small>` : ""}
+        <small><b>Attention :</b> ${x.warning || "Référence historique uniquement. Aucun dosage ni recette ; ne pas transposer aux soins réels."}</small>
+        ${x.sources ? `<small><b>Sources :</b> ${x.sources.map(s=>`<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title}</a>`).join(" · ")}</small>` : ""}
+      </details>
     </div>
   `).join("") : `<div class="section">Aucun résultat.</div>`;
 }

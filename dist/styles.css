@@ -421,7 +421,18 @@ button:active{transform:translateY(0)}
 }
 .case,.choice,.home-btn{transition:transform .15s ease,background-color .15s ease,box-shadow .15s ease}
 .case:hover,.choice:hover,.home-btn:hover{box-shadow:0 8px 20px rgba(70,40,20,.14)}
-.lex-grid{align-items:stretch}
+.lex-grid{align-items:start}
+.lex-filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px}
+.lex-filters.hidden{display:none}
+.lex-filters select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;max-width:100%;min-height:44px}
+.lex-context{display:block;font-size:14px;color:var(--muted);margin:8px 0}
+.lex-details{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.lex-details summary,#lexHelpful summary{cursor:pointer;font-size:16px;line-height:1.5}
+.lex-details a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+#lexHelpful{margin-bottom:18px}
+#lexGrid .lex-card{height:auto}
+#lexGrid .lex-card small{font-size:16px;line-height:1.5}
+@media(max-width:600px){.lex-filters{display:grid;grid-template-columns:1fr}.lex-filters select{width:100%}}
 .lex-card,.reference-card{height:100%}
 .section{overflow-wrap:anywhere}
 .atlas-tabs{
