@@ -475,6 +475,27 @@ function sayLines(items){
     </div>
   `).join("")}</div>`;
 }
+function sensoryCue(name){
+  const n = name.toLowerCase();
+  if(n.includes("morphine")) return ["« Vous allez sentir une petite piqûre. Prévenez-moi si vous vous sentez mal. »", "Une somnolence peut apparaître ; ne pas présenter une difficulté à respirer comme normale."];
+  if(n.includes("laudanum")) return ["« Le goût peut être fort. Vous pourriez vous sentir somnolent. »", "Le goût et l'odeur varient selon la préparation alcoolique."];
+  if(n.includes("chloroforme")) return ["« Vous allez sentir l'odeur du produit sur le linge. »", "Odeur légèrement douce ; l'endormissement est joué sous surveillance."];
+  if(n.includes("éther") || n.includes("ether")) return ["« L'odeur sera forte. Dites-moi si elle vous gêne. »", "Odeur pénétrante, légèrement douce ; une irritation est possible."];
+  if(n.includes("phénol") || n.includes("carbol")) return ["« Prévenez-moi si l'application vous brûle ou vous fait mal. »", "Odeur caractéristique, douce et âcre ; la brûlure ne doit pas être banalisée."];
+  if(n.includes("alcool")) return ["« Ça peut piquer pendant le nettoyage. Dites-moi si c'est trop douloureux. »", "Une odeur d'alcool se dégage du linge imbibé."];
+  if(n.includes("arnica")) return ["« Vous allez sentir le contact de la préparation pendant que je l'applique. »", "La teinture peut sentir l'alcool ; l'odeur d'une pommade dépend de sa composition."];
+  if(n.includes("onguent") || n.includes("baume") || n.includes("carron")) return ["« Vous allez sentir une fine couche grasse sur la peau. »", "L'odeur dépend de la préparation ; ne pas lui attribuer de parfum systématique."];
+  if(n.includes("ammoniaque") || n.includes("sels odorants")) return ["« L'odeur est très piquante ; signalez toute gêne. »", "Odeur ammoniacale forte ; une irritation n'est pas un signe de réveil garanti."];
+  if(n.includes("quinine")) return ["« Le goût peut être très amer. »", "Pas d'effet immédiat garanti à faire jouer."];
+  return null;
+}
+
+function sensoryNote(name){
+  const cue = sensoryCue(name);
+  if(!cue) return "";
+  return `<div class="sensory-note"><span>${cue[0]}</span>${compactMode ? "" : `<small>${cue[1]}</small>`}</div>`;
+}
+
 function meds(rows){
   if(compactMode){
     return `<div class="section">
@@ -483,6 +504,7 @@ function meds(rows){
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
           <strong>${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
           <div class="compact-inline"><b>Forme :</b> ${r[1]}<br><b>Administration :</b> ${r[2]}</div>
+          ${sensoryNote(r[0])}
         </div>
       `).join("")}
     </div>`;
@@ -499,6 +521,7 @@ function meds(rows){
           ${medComposition(r[0]) ? `<div><strong>Composition</strong>${medComposition(r[0])}</div>` : ""}
           <div><strong>Utilisation RP</strong>${r[3]}</div>
         </div>
+        ${sensoryNote(r[0])}
       </div>
     `).join("")}
   </div>`;

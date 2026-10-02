@@ -1185,6 +1185,10 @@ html[data-theme="dark"] footer{color:var(--muted);opacity:1}
   .anatomy-info{position:static}
 }
 
+.sensory-note{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font-size:15px;line-height:1.45}
+.sensory-note>span{display:block;font-style:italic;color:var(--ink)}
+.sensory-note>small{display:block;margin-top:4px;font-size:13px;color:var(--muted);line-height:1.4}
+
 /* Readability and single-screen workflow refinement */
 @media(min-width:761px){
   #siteHeader,body.compact-header #siteHeader{display:none}
