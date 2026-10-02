@@ -28,8 +28,11 @@ const path = require('node:path');
       for(const category of categories){
         await page.locator('#lexCategory').selectOption(category);
         assert(await page.locator('#lexGrid .lex-card').count()>0);
+        assert(await page.locator('#lexGrid .lex-card').first().locator('.lex-priority').count(),`Repère absent pour ${category}`);
         assert(await page.locator('#lexGrid .cat-badge').evaluateAll((els,c)=>els.every(x=>x.textContent===c),category));
       }
+      await page.locator('#lexCategory').selectOption('Technique');
+      assert.equal(await page.locator('#lexGrid .lex-card').count(),16);
       await page.locator('#lexCategory').selectOption('');
       for(const context of ['Pharmacopée XIXe','Spécialisé',"Nouveauté de l'époque",'Historique dangereux']){
         await page.locator('#lexContext').selectOption(context);
@@ -48,6 +51,11 @@ const path = require('node:path');
       assert.equal(await page.locator('#lexGrid .lex-card').count(),total);
     }
     assert.deepEqual(errors,[]);
+    await page.evaluate(()=>{openSurgery('amputation');nextSurgery();nextSurgery();});
+    assert.match(await page.locator('#surgeryFlow .rp-lines').innerText(),/assistant/);
+    await page.evaluate(()=>{nextSurgery();nextSurgery();nextSurgery();});
+    assert.match(await page.locator('#surgeryFlow').innerText(),/réveil joué/);
+    assert.doesNotMatch(await page.locator('#surgeryFlow').innerText(),/2 minutes/);
     console.log('Pharmacy: search, all categories, all contexts, details, tabs, desktop/mobile, light/dark OK');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

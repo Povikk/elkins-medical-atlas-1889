@@ -6,6 +6,7 @@ let stepIndex = 0;
 let answers = {};
 let compactMode = false;
 let activeStepTitle = "";
+let activeRouteKind = "flow";
 
 function storedTheme(){
   try { return localStorage.getItem("elkins-theme"); }
@@ -16,7 +17,7 @@ function updateThemeButton(){
   const button = document.getElementById("themeToggle");
   if(!button) return;
   const dark = document.documentElement.dataset.theme === "dark";
-  button.textContent = dark ? "☀ Mode clair" : "☾ Mode sombre";
+  button.textContent = dark ? " Mode clair" : "☾ Mode sombre";
   button.setAttribute("aria-label", dark ? "Activer le mode clair" : "Activer le mode sombre");
   button.setAttribute("aria-pressed", String(dark));
 }
@@ -243,6 +244,7 @@ function openSurgery(id){
 }
 
 function renderSurgery(){
+  activeRouteKind = "surgery";
   const s = surgeries[currentSurgery];
   const step = s.steps[surgeryStepIndex];
   activeStepTitle = step.title;
@@ -282,7 +284,6 @@ function renderSurgery(){
   </div>`;
 
   document.getElementById("surgeryFlow").innerHTML = html;
-  prepareSceneView(document.getElementById("surgeryFlow"));
 }
 
 function nextSurgery(){
@@ -430,10 +431,12 @@ function filterLexique(){
 
 function renderLexique(list){
   const grid = document.getElementById("lexGrid");
-  const sorted = [...list].sort((a,b)=>a.name.localeCompare(b.name, "fr", {sensitivity:"base"}));
-  grid.innerHTML = sorted.length ? sorted.map(x=>`
+  const sorted = sortLexReferences(list).sort((a,b)=>a.category.localeCompare(b.category,'fr'));
+  grid.innerHTML = sorted.length ? sorted.map((x,index)=>`
+    ${index===0 || sorted[index-1].category!==x.category ? `<h3 class="lex-category-heading">${x.category}</h3>` : ''}
     <div class="lex-card ${categoryClass(x.category)}">
-      <strong>${x.icon} ${x.name}</strong>
+      <strong>${x.name}</strong>
+      ${lexPriority(x) ? `<span class="lex-priority">${priorityLabel(x)}</span>` : ''}
       <div class="muted">${x.type}</div>
       <div class="cat-badge">${x.category || "Autre"}</div>
       ${x.context ? `<span class="lex-context">${x.context}</span>` : ""}
@@ -452,10 +455,11 @@ function renderLexique(list){
 
 function renderReferenceCards(list,type){
   const grid = document.getElementById("lexGrid");
-  const sorted = [...list].sort((a,b)=>a.name.localeCompare(b.name, "fr", {sensitivity:"base"}));
+  const sorted = sortLexReferences(list);
   grid.innerHTML = sorted.length ? sorted.map(x=>`
     <div class="reference-card">
-      <strong>${type === "equipment" ? "🧰" : "🔎"} ${x.name}</strong>
+      <strong>${x.name}</strong>
+      ${lexPriority(x) ? '<span class="lex-priority">Repère courant en scène RP</span>' : ''}
       <small><b>Ce que c'est :</b> ${x.desc}</small>
       <small><b>${type === "equipment" ? "Utilisation RP" : "À retenir en RP"} :</b> ${type === "equipment" ? x.use : x.rp}</small>
     </div>
@@ -551,7 +555,9 @@ function extraPhraseVariants(title){
 }
 
 function sayLines(items){
-  const merged = [...new Set([...(items || []), ...extraPhraseVariants(activeStepTitle)])];
+  const contextual=casePhrase();
+  const base=sleepingSurgery() ? [contextual,'À l’assistant : « Dites-moi immédiatement si sa respiration ou son état change. »'] : items || [];
+  const merged = [...new Set([...base, contextual])].filter(Boolean);
   const visible = compactMode ? merged.slice(0,1) : merged.slice(0,3);
   return `<div class="rp-lines">${visible.map(x=>`
     <div class="rp-line">
@@ -713,6 +719,7 @@ function categoryClass(category){
 }
 
 function render(){
+  activeRouteKind = "flow";
   const flow = flows[currentFlow];
   const step = flow.steps[stepIndex];
   activeStepTitle = step.title;
@@ -1349,7 +1356,6 @@ function render(){
   }
 
   document.getElementById("flow").innerHTML=html;
-  prepareSceneView(document.getElementById("flow"));
 }
 function renderEnd(){
   interventionEnded=true;

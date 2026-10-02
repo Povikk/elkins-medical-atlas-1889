@@ -57,5 +57,5 @@ const pharmacyRows = [
 ];
 pharmacyRows.forEach(([name,category,form,admin,use,sensory,warning,context,tags]) => {
   const sourceKey = name.startsWith("Cocaïne") ? "cocaine" : name.startsWith("Antifébrine") ? "antifebrin" : name === "Phénacétine" ? "phenacetin" : "brunton";
-  lexique.push({name,category,type:category,form,composition:form,admin,use,sensory,warning,context,tags,icon:"⚕",sources:[pharmacySources[sourceKey],...(sourceKey === "brunton" ? [pharmacySources.bp] : [])]});
+  lexique.push({name,category,type:category,form,composition:form,admin,use,sensory,warning,context,tags,icon:"",sources:[pharmacySources[sourceKey],...(sourceKey === "brunton" ? [pharmacySources.bp] : [])]});
 });

@@ -1,5 +1,4 @@
 // Scene UI and transient navigation only. No records, storage or generated outcomes.
-let sceneMode = false;
 let flowHistory = [];
 let interventionEnded = false;
 let surgeryEnded = false;
@@ -8,14 +7,9 @@ let incidentKind = "";
 
 function sceneToolbar(kind){
   return `<div class="scene-tools">
-    <button type="button" class="secondary" aria-pressed="${sceneMode}" onclick="toggleSceneMode('${kind}')">En scène : ${sceneMode ? 'oui' : 'non'}</button>
     <button type="button" class="secondary" onclick="openSceneReferences()">Références</button>
     <button type="button" class="incident-button" onclick="openIncident()">Son état change</button>
   </div>`;
-}
-function toggleSceneMode(kind){
-  sceneMode = !sceneMode;
-  kind === 'surgery' ? renderSurgery() : render();
 }
 function shouldSkipStep(step){
   if(step.dynamicSuture && answers.needsSuture === false) return true;
@@ -40,27 +34,6 @@ function patientQuestion(step){
   if(!question) return '';
   const unable = /unconscious|not_breathing|unknown/.test(answers.conscious || '') || incidentKind;
   return `<div class="patient-question"><b>${unable ? 'Si le patient ne peut pas répondre' : 'À demander au joueur'}</b><p>${unable ? "Observe les signes visibles ou utilise une réponse incertaine. Ne lui impose pas une sensation." : question}</p></div>`;
-}
-function prepareSceneView(root){
-  root.classList.toggle('scene-active',sceneMode);
-  root.querySelectorAll('.rp-lines').forEach(block=>{
-    if(sceneMode) [...block.children].slice(1).forEach(line=>line.remove());
-  });
-  if(!sceneMode) return;
-  root.querySelectorAll(':scope > .section').forEach(section=>{
-    const heading=section.querySelector('h3')?.textContent;
-    if(!['Matériel','Médicament / produit'].includes(heading)) return;
-    const assessment=section.querySelector('.pain-assessment');
-    if(assessment) root.insertBefore(assessment,section);
-    const details=document.createElement('details');
-    details.className='scene-secondary';
-    const summary=document.createElement('summary');
-    summary.textContent=heading;
-    details.append(summary);
-    section.replaceWith(details);
-    details.append(section);
-  });
-  [...root.querySelectorAll(':scope > .section')].find(section=>section.querySelector('h3')?.textContent==='À faire')?.classList.add('scene-primary');
 }
 function flowRouteNote(){
   if(answers.needsSuture !== false) return '';

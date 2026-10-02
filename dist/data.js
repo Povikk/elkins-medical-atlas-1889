@@ -8,7 +8,7 @@ const lexique = [
     composition:"Iodoforme (triiodométhane), incorporé à une préparation de pansement.",
     admin:"Usage externe dans un pansement préparé, en contexte chirurgical RP",
     use:"Variante de pansement après nettoyage. Ne remplace ni le nettoyage ni la surveillance d'une infection ; produit historiquement toxique.",
-    icon:"🩹"
+    icon:""
   },
   {
     name:"Onguent à l'oxyde de zinc",
@@ -19,7 +19,7 @@ const lexique = [
     composition:"Oxyde de zinc dans une base grasse ; composition variable selon la pharmacie.",
     admin:"Application externe sur peau intacte ou superficiellement irritée",
     use:"Protection d'une zone irritée par les frottements. Ne traite pas une plaie profonde, une fracture ou une infection.",
-    icon:"🫙"
+    icon:""
   },
   {
     name:"Laudanum",
@@ -30,7 +30,7 @@ const lexique = [
     composition:"Teinture d’opium dans de l’alcool, généralement aromatisée selon la préparation.",
     admin:"Voie orale, en gouttes ou petite quantité diluée",
     use:"Douleur, agitation selon la scène",
-    icon:"🥄"
+    icon:""
   },
   {
     name:"Morphine",
@@ -41,7 +41,7 @@ const lexique = [
     composition:"Sel de morphine dissous dans une solution destinée à l’injection hypodermique.",
     admin:"Injection hypodermique à l’aide d’une seringue",
     use:"Douleur importante",
-    icon:"💉"
+    icon:""
   },
   {
     name:"Chloroforme",
@@ -52,7 +52,7 @@ const lexique = [
     composition:"Chloroforme liquide pur ou préparation anesthésique à base de chloroforme.",
     admin:"Voie inhalée, versé sur un linge, une compresse ou un masque simple",
     use:"Intervention importante nécessitant une anesthésie",
-    icon:"🌫️"
+    icon:""
   },
   {
     name:"Éther",
@@ -63,7 +63,7 @@ const lexique = [
     composition:"Éther éthylique volatil utilisé comme anesthésique inhalé.",
     admin:"Voie inhalée, sur linge, compresse ou dispositif d’anesthésie simple",
     use:"Alternative anesthésique",
-    icon:"🌫️"
+    icon:""
   },
   {
     name:"Phénol / acide carbolique",
@@ -74,7 +74,7 @@ const lexique = [
     composition:"Acide carbolique dilué dans une solution adaptée à l’usage antiseptique.",
     admin:"Application locale sur la peau, la plaie, les compresses ou le matériel",
     use:"Nettoyage et antisepsie",
-    icon:"🧴"
+    icon:""
   },
   {
     name:"Alcool",
@@ -85,7 +85,7 @@ const lexique = [
     composition:"Éthanol ou alcool fort utilisé comme nettoyant / antiseptique de fortune.",
     admin:"Application locale",
     use:"Nettoyage simple du matériel ou d’une zone",
-    icon:"🧴"
+    icon:""
   },
   {
     name:"Préparation à l’arnica",
@@ -96,7 +96,7 @@ const lexique = [
     composition:"Fleurs d’arnica macérées dans l’alcool ; pour une pommade RP, la préparation peut être incorporée à une base grasse/cireuse.",
     admin:"Application locale sur peau intacte, en friction légère",
     use:"Bleus, bosses, contusions et douleurs superficielles sans plaie ouverte",
-    icon:"🌼"
+    icon:""
   },
   {
     name:"Onguent protecteur",
@@ -107,7 +107,7 @@ const lexique = [
     composition:"Base grasse, cireuse ou huileuse ; la composition pouvait varier selon la pharmacie.",
     admin:"Application locale en fine couche",
     use:"Irritations, petites brûlures, protection cutanée",
-    icon:"🫙"
+    icon:""
   },
   {
     name:"Méthode de Silvester",
@@ -117,7 +117,7 @@ const lexique = [
     form:"Manœuvre manuelle",
     admin:"Patient sur le dos : élévation des bras puis compression douce du thorax",
     use:"Asphyxie / absence apparente de respiration dans un contexte RP 1889",
-    icon:"🫁"
+    icon:""
   },
   {
     name:"Ammoniaque / sels odorants",
@@ -128,7 +128,7 @@ const lexique = [
     composition:"Préparation libérant des vapeurs ammoniacales irritantes.",
     admin:"Présentés brièvement sous le nez, sans contact direct",
     use:"Tentative de stimulation d’un patient évanoui qui respire encore",
-    icon:"👃"
+    icon:""
   },
   {
     name:"Carron oil / huile pour brûlures",
@@ -139,7 +139,7 @@ const lexique = [
     composition:"Mélange traditionnel à base d’huile de lin et d’eau de chaux.",
     admin:"Application locale sur la brûlure, puis pansement",
     use:"Soin RP historiquement plausible pour brûlures au XIXe siècle",
-    icon:"🔥"
+    icon:""
   },
   {
     name:"Suture",
@@ -150,7 +150,7 @@ const lexique = [
     composition:"Matériel : aiguille, fil, pince, ciseaux, compresses et antiseptique.",
     admin:"Rapprocher les bords de la plaie puis poser des points séparés.",
     use:"Plaie propre, suffisamment profonde pour nécessiter une fermeture, sans contre-indication évidente dans la scène.",
-    icon:"🪡"
+    icon:""
   },
   {
     name:"Quinine",
@@ -161,7 +161,7 @@ const lexique = [
     composition:"Alcaloïde extrait du quinquina, souvent préparé sous forme de sels ou de poudre.",
     admin:"Voie orale, poudre ou sels dissous / mélangés à une préparation",
     use:"Fièvres intermittentes liées au paludisme dans la pratique d'époque, pas toute fièvre.",
-    icon:"🥄"
+    icon:""
   }
 ];
 

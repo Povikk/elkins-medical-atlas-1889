@@ -56,7 +56,7 @@
           <span>Prise en charge principale, guidée étape par étape</span>
         </button>
         <button class="case priority-case priority-case-home" onclick="start('unknown')">
-          <strong>⚠ Patient inconscient / cause inconnue</strong>
+          <strong> Patient inconscient / cause inconnue</strong>
           <span class="muted">Commencer par l'état vital avant de chercher ce qui s'est passé</span>
         </button>
         <button class="home-btn" onclick="showLexique()">
@@ -81,47 +81,47 @@
       </div>
       <div class="case-grid">
         <button class="case priority-case" onclick="start('unknown')">
-          <strong>⚠ Inconscient / cause inconnue</strong>
+          <strong> Inconscient / cause inconnue</strong>
           <span class="muted">Respiration, saignement, réveil, puis recherche de la cause</span>
         </button>
         <button class="case" onclick="start('gunshot')">
-          <strong>🔫 Blessure par balle</strong>
+          <strong> Blessure par balle</strong>
           <span class="muted">Projectile, saignement, plaie d’entrée/sortie</span>
         </button>
         <button class="case" onclick="start('knife')">
-          <strong>🔪 Blessure au couteau</strong>
+          <strong> Blessure au couteau</strong>
           <span class="muted">Plaie ouverte, profondeur, hémorragie</span>
         </button>
         <button class="case" onclick="start('fight')">
-          <strong>👊 Bagarre / coups</strong>
+          <strong> Bagarre / coups</strong>
           <span class="muted">Ecchymoses, coupures, tête, côtes</span>
         </button>
         <button class="case" onclick="start('horse')">
-          <strong>🐎 Chute de cheval</strong>
+          <strong> Chute de cheval</strong>
           <span class="muted">Fracture, luxation, commotion</span>
         </button>
         <button class="case" onclick="start('fracture')">
-          <strong>🦴 Fracture / luxation</strong>
+          <strong> Fracture / luxation</strong>
           <span class="muted">Déformation, douleur, immobilisation</span>
         </button>
         <button class="case" onclick="start('minor')">
-          <strong>🩹 Petit bobo / soin léger</strong>
+          <strong> Petit bobo / soin léger</strong>
           <span class="muted">Éraflure, petit bleu, coupure légère</span>
         </button>
         <button class="case" onclick="start('drowning')">
-          <strong>🌊 Noyade / asphyxie</strong>
+          <strong> Noyade / asphyxie</strong>
           <span class="muted">Inconscience, respiration absente ou difficile</span>
         </button>
         <button class="case" onclick="start('head')">
-          <strong>🧠 Traumatisme crânien</strong>
+          <strong> Traumatisme crânien</strong>
           <span class="muted">Chute, coup à la tête, confusion, perte de connaissance</span>
         </button>
         <button class="case" onclick="start('burn')">
-          <strong>🔥 Brûlure</strong>
+          <strong> Brûlure</strong>
           <span class="muted">Chaleur, feu, vapeur, peau lésée</span>
         </button>
         <button class="case" onclick="start('poison')">
-          <strong>☠️ Intoxication / opiacés</strong>
+          <strong> Intoxication / opiacés</strong>
           <span class="muted">Laudanum, opium, somnolence, respiration lente</span>
         </button>
       </div>
@@ -131,7 +131,7 @@
       <div class="topbar">
         <div>
           <h2 style="margin:0">Lexique médical RP</h2>
-          <div class="muted" style="margin-top:4px">Références rapides pour la scène</div>
+          <div class="muted" style="margin-top:4px">Les repères utiles en scène sont placés en tête de chaque catégorie. Sélection RP, pas un classement médical ni des statistiques d'usage.</div>
         </div>
         <button class="danger" onclick="goHome()">Accueil</button>
       </div>
@@ -177,27 +177,27 @@
       </div>
       <div class="surgery-grid">
         <button class="case" onclick="openSurgery('amputation')">
-          <strong>🪚 Amputation</strong>
+          <strong> Amputation</strong>
           <span class="muted">Membre irrécupérable, gangrène ou destruction majeure</span>
         </button>
         <button class="case" onclick="openSurgery('major_bleeding')">
-          <strong>🩸 Hémorragie majeure</strong>
+          <strong> Hémorragie majeure</strong>
           <span class="muted">Vaisseau important, saignement impossible à contrôler simplement</span>
         </button>
         <button class="case" onclick="openSurgery('deep_bullet')">
-          <strong>🔩 Projectile profondément logé</strong>
+          <strong> Projectile profondément logé</strong>
           <span class="muted">Balle inaccessible par une extraction simple</span>
         </button>
         <button class="case" onclick="openSurgery('abdominal')">
-          <strong>🫀 Plaie abdominale grave</strong>
+          <strong> Plaie abdominale grave</strong>
           <span class="muted">Atteinte profonde nécessitant une exploration chirurgicale RP</span>
         </button>
         <button class="case" onclick="openSurgery('trepanation')">
-          <strong>🧠 Trépanation</strong>
+          <strong> Trépanation</strong>
           <span class="muted">Traumatisme crânien exceptionnel avec signes très inquiétants</span>
         </button>
         <button class="case" onclick="openSurgery('infected_wound')">
-          <strong>🦠 Plaie gravement infectée</strong>
+          <strong> Plaie gravement infectée</strong>
           <span class="muted">Tissus abîmés, infection profonde, nettoyage chirurgical</span>
         </button>
       </div>
@@ -264,6 +264,7 @@
 <script src="data.js"></script>
 <script src="pharmacy.js"></script>
 <script src="atlas-labels.js"></script>
+<script src="lexicon-extra.js"></script>
 <script src="scene.js"></script>
 <script src="app.js"></script>
 </body>
