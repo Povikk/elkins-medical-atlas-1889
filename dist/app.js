@@ -215,6 +215,7 @@ function closeAnatomyDialog(){
 
 function start(id){
   if(!Object.prototype.hasOwnProperty.call(flows, id)) return;
+  resetRpScene();
   currentFlow = id;
   stepIndex = 0;
   answers = {};
@@ -234,6 +235,7 @@ function showSurgery(){
 
 function openSurgery(id){
   if(!surgeries[id]) return;
+  resetRpScene();
   answers = {};
   surgeryEnded = false;
   currentSurgery = id;
@@ -244,6 +246,7 @@ function openSurgery(id){
 }
 
 function renderSurgery(){
+  rpPhraseBlocks=[];
   activeRouteKind = "surgery";
   const s = surgeries[currentSurgery];
   const step = s.steps[surgeryStepIndex];
@@ -267,6 +270,7 @@ function renderSurgery(){
     <div class="progress"><div style="width:${pct}%"></div></div>
     ${materialPanel("surgery")}
     ${sceneToolbar("surgery")}
+    ${rpContextMarkup("surgery")}
     <h3>${surgeryStepIndex+1} / ${s.steps.length} - ${step.title}</h3>
   `;
 
@@ -555,16 +559,7 @@ function extraPhraseVariants(title){
 }
 
 function sayLines(items){
-  const contextual=casePhrase();
-  const base=sleepingSurgery() ? [contextual,'À l’assistant : « Dites-moi immédiatement si sa respiration ou son état change. »'] : items || [];
-  const merged = [...new Set([...base, contextual])].filter(Boolean);
-  const visible = compactMode ? merged.slice(0,1) : merged.slice(0,3);
-  return `<div class="rp-lines">${visible.map(x=>`
-    <div class="rp-line">
-      <span class="rp-arrow">→</span>
-      <span>${x}</span>
-    </div>
-  `).join("")}</div>`;
+  return rpDialogue(items);
 }
 function sensoryCue(name){
   const n = name.toLowerCase();
@@ -586,6 +581,7 @@ function sensoryCue(name){
 function sensoryNote(name){
   const cue = sensoryCue(name);
   if(!cue) return "";
+  if(['asleep','unresponsive'].includes(rpPatientState())) return `<div class="sensory-note"><span>Observation RP : ${cue[1]}</span></div>`;
   return `<div class="sensory-note"><span>${cue[0]}</span>${compactMode ? "" : `<small>${cue[1]}</small>`}</div>`;
 }
 
@@ -719,6 +715,7 @@ function categoryClass(category){
 }
 
 function render(){
+  rpPhraseBlocks=[];
   activeRouteKind = "flow";
   const flow = flows[currentFlow];
   const step = flow.steps[stepIndex];
@@ -743,6 +740,7 @@ function render(){
     ${compactMode ? "" : `<div class="quick-note">Objectif RP : aller à l'essentiel. Si une étape ne correspond pas à la scène, choisis l'option la plus proche et avance.</div>`}
     ${materialPanel("flow")}
     ${sceneToolbar("flow")}
+    ${rpContextMarkup("flow")}
     ${flowRouteNote()}
   `;
 
@@ -1342,7 +1340,7 @@ function render(){
     html += `</div></div>`;
   }
 
-  if(!html.includes('class="rp-lines"')){
+  if(!html.includes('class="rp-lines')){
     html += sayLines([]);
   }
 

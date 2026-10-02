@@ -1,0 +1,43 @@
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+ const page=await browser.newPage({viewport:{width:2560,height:1440}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:4173/');await page.evaluate(()=>start('gunshot'));
+ assert.equal(await page.locator('.rp-context').getAttribute('open'),null);
+ await page.evaluate(()=>applyChoice({conscious:'awake'}));
+ await page.locator('.rp-context summary').click();
+ await page.locator('[data-rp-context="place"]').selectOption('field');
+ await page.locator('[data-rp-context="team"]').selectOption('solo');
+ await page.locator('[data-rp-context="mood"]').selectOption('panic');
+ assert.match(await page.locator('.rp-dialogue-heading').innerText(),/paniqué/);
+ assert.match(await page.locator('.rp-gesture').innerText(),/linge propre/);
+ const before=await page.evaluate(()=>JSON.stringify({stepIndex,answers,rpContext}));
+ const phrase=await page.locator('.rp-current-phrase').first().innerText();
+ await page.getByRole('button',{name:'Autre formulation',exact:true}).first().click();
+ assert.notEqual(await page.locator('.rp-current-phrase').first().innerText(),phrase);
+ assert.equal(await page.evaluate(()=>JSON.stringify({stepIndex,answers,rpContext})),before);
+ await page.evaluate(()=>{next();prev();});
+ assert.equal(await page.evaluate(()=>rpContext.place),'field');
+ await page.evaluate(()=>{start('head');applyChoice({headState:'unconscious'});});
+ assert.match(await page.locator('.rp-dialogue-heading').innerText(),/assistant/);
+ assert.doesNotMatch(await page.locator('.rp-current-phrase').innerText(),/Dites-moi|Pouvez-vous/);
+ await page.evaluate(()=>setRpContext('team','solo','flow'));
+ assert.match(await page.locator('.rp-current-phrase').innerText(),/renfort/);
+ await page.evaluate(()=>{openSurgery('amputation');nextSurgery();nextSurgery();});
+ assert.equal(await page.evaluate(()=>rpPatientState()),'asleep');
+ assert.match(await page.locator('#surgeryFlow .rp-dialogue-heading').innerText(),/assistant/);
+ await page.evaluate(()=>setRpContext('place','office','surgery'));
+ assert.match(await page.locator('#surgeryFlow .rp-gesture').innerText(),/table de soin/);
+ await page.evaluate(()=>{start('minor');});
+ assert.deepEqual(await page.evaluate(()=>rpContext),{place:'',team:'',mood:''});
+ await page.screenshot({path:'tmp/site-qa/rp-context-desktop.png'});
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('#flow .rp-context summary').click();
+ await page.screenshot({path:'tmp/site-qa/rp-context-mobile.png',fullPage:true});
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ assert.deepEqual(errors,[]);console.log('RP context, alternatives, patient states, surgery, reset, desktop/mobile OK');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

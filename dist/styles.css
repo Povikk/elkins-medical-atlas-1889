@@ -8,6 +8,17 @@
     --line:#8a6b45;
     --soft:#fff8ea;
   }
+  .rp-context{grid-column:1/-1;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:0 0 12px;padding:10px 14px}
+  .rp-context summary{cursor:pointer;font-size:15px}
+  .rp-context-fields{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-top:12px}
+  .rp-context-fields label{display:grid;gap:5px;font-size:14px;flex:1;min-width:150px}
+  .rp-context select{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px;min-height:42px}
+  .rp-context p{font-size:14px;line-height:1.45;margin:10px 0 0}
+  .rp-gesture{grid-column:1/-1;display:flex;gap:12px;align-items:baseline;padding:10px 14px;margin:8px 0;background:var(--panel);border-left:2px solid var(--accent2);font-size:16px;line-height:1.45}
+  .rp-gesture b{white-space:nowrap}.rp-gesture span{font-style:italic}
+  .rp-dialogue-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;font-size:14px;font-style:normal}
+  .rp-dialogue-heading button{min-height:36px;padding:6px 10px;font-size:14px;white-space:nowrap}
+  @media(max-width:600px){.rp-gesture{display:block}.rp-gesture b{display:block;margin-bottom:4px}.rp-dialogue-heading{align-items:start}.rp-context-fields label{min-width:100%;}.rp-dialogue-heading>span{max-width:52%}}
   .topic-emoji{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.17em;object-fit:contain;margin-right:.2em;flex-shrink:0}
   .emoji-credit{display:block;margin-top:8px;font-size:12px}
   .emoji-credit a{color:inherit}
