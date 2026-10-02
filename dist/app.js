@@ -477,6 +477,8 @@ function sayLines(items){
 }
 function sensoryCue(name){
   const n = name.toLowerCase();
+  if(n.includes("iodoforme")) return ["« Ce pansement a une odeur marquée. Dites-moi s'il vous gêne. »", "Poudre jaune ou gaze préparée, à odeur caractéristique persistante."];
+  if(n.includes("oxyde de zinc")) return ["« Je pose une couche protectrice sur la zone irritée. »", "Préparation blanche et épaisse ; odeur liée à la base, sans parfum garanti."];
   if(n.includes("morphine")) return ["« Vous allez sentir une petite piqûre. Prévenez-moi si vous vous sentez mal. »", "Une somnolence peut apparaître ; ne pas présenter une difficulté à respirer comme normale."];
   if(n.includes("laudanum")) return ["« Le goût peut être fort. Vous pourriez vous sentir somnolent. »", "Le goût et l'odeur varient selon la préparation alcoolique."];
   if(n.includes("chloroforme")) return ["« Vous allez sentir l'odeur du produit sur le linge. »", "Odeur légèrement douce ; l'endormissement est joué sous surveillance."];
@@ -557,6 +559,8 @@ function painAssessment(){
 function productContext(name){
   const n = name.toLowerCase();
   let text = "";
+  if(n.includes("iodoforme")) return `<details class="product-context"><summary>Choix et précautions RP</summary><p>Pansement chirurgical historique, attesté avant 1889. Produit toxique : aucune quantité ou recette proposée. Une odeur de produit ne permet pas de juger l'état de la plaie.</p></details>`;
+  if(n.includes("oxyde de zinc")) return `<details class="product-context"><summary>Choix et précautions RP</summary><p>Choisir pour une irritation superficielle par frottement, plutôt que pour un bleu. Ne pas confondre oxyde de zinc et chlorure de zinc. Ne remplace pas les soins d'une plaie ouverte.</p></details>`;
   if(/morphine|laudanum/.test(n)) text = "Soulagement de la douleur et sédation possible. Surveiller conscience et respiration ; ne pas confondre antidouleur et anesthésie chirurgicale. Le laudanum suppose un patient capable d'avaler.";
   else if(/chloroforme|éther|ether/.test(n)) text = "Anesthésie pour une scène opératoire exceptionnelle, avec surveillance continue. Ce n'est pas le soin d'une douleur légère.";
   else if(/arnica/.test(n)) text = "Soin d'une contusion sur peau intacte. Ne pas appliquer dans une plaie ouverte ; réévaluer si douleur, gonflement ou mobilité s'aggravent.";
@@ -579,6 +583,8 @@ function urgencyBadge(level){
 
 function medCategory(name, usage){
   const text = (name + " " + (usage || "")).toLowerCase();
+  if(text.includes("iodoforme")) return "Antiseptique";
+  if(text.includes("oxyde de zinc")) return "Soin local";
   if(text.includes("morphine") || text.includes("laudanum")) return "Antidouleur";
   if(text.includes("chloroforme") || text.includes("éther") || text.includes("ether")) return "Anesthésique";
   if(text.includes("phénol") || text.includes("carbol") || text.includes("alcool") || text.includes("antisept")) return "Antiseptique";
@@ -591,6 +597,8 @@ function medCategory(name, usage){
 
 function medComposition(name){
   const n = name.toLowerCase();
+  if(n.includes("iodoforme")) return "Iodoforme dans une poudre ou une gaze préparée.";
+  if(n.includes("oxyde de zinc")) return "Oxyde de zinc dans une base grasse.";
   if(n.includes("laudanum")) return "Teinture d’opium dans de l’alcool.";
   if(n.includes("morphine")) return "Sel de morphine en solution injectable.";
   if(n.includes("chloroforme")) return "Chloroforme liquide volatil.";

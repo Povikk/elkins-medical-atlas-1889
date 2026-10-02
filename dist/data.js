@@ -1,5 +1,27 @@
 const lexique = [
   {
+    name:"Iodoforme",
+    category:"Antiseptique",
+    tags:"iodoforme poudre jaune gaze pansement plaie chirurgie antiseptique",
+    type:"Antiseptique historique pour pansements",
+    form:"Poudre jaune ou gaze préparée à l'iodoforme",
+    composition:"Iodoforme (triiodométhane), incorporé à une préparation de pansement.",
+    admin:"Usage externe dans un pansement préparé, en contexte chirurgical RP",
+    use:"Variante de pansement après nettoyage. Ne remplace ni le nettoyage ni la surveillance d'une infection ; produit historiquement toxique.",
+    icon:"🩹"
+  },
+  {
+    name:"Onguent à l'oxyde de zinc",
+    category:"Soin local",
+    tags:"zinc oxyde pommade onguent irritation frottement peau intacte protection",
+    type:"Préparation protectrice cutanée",
+    form:"Pommade blanche, épaisse",
+    composition:"Oxyde de zinc dans une base grasse ; composition variable selon la pharmacie.",
+    admin:"Application externe sur peau intacte ou superficiellement irritée",
+    use:"Protection d'une zone irritée par les frottements. Ne traite pas une plaie profonde, une fracture ou une infection.",
+    icon:"🫙"
+  },
+  {
     name:"Laudanum",
     category:"Antidouleur",
     tags:"douleur antidouleur opium liquide oral boire gouttes",
@@ -593,6 +615,7 @@ const flows = {
         med:[
           ["Préparation à l’arnica","Teinture alcoolique ou pommade","Application locale sur peau intacte","Bosse, bleu, contusion légère"],
           ["Onguent protecteur","Pommade","Application locale","Petite irritation ou peau échauffée"]
+          ,["Onguent à l'oxyde de zinc","Pommade blanche dans une base grasse","Application externe sur peau intacte irritée","Alternative protectrice pour les frottements ; pas pour une plaie profonde"]
         ],
         say:["« Je vais mettre un peu de préparation à l’arnica, ça devrait vous soulager. »"]
       },
@@ -978,6 +1001,7 @@ const surgeries = {
       {
         title:"Laisser drainer",
         do:["Éviter de fermer hermétiquement une plaie encore infectée.","Poser des compresses propres.","Prévoir changement régulier du pansement."],
+        meds:[["Iodoforme","Gaze préparée à l'iodoforme","Pansement externe dans la scène chirurgicale","Variante historique après nettoyage ; ne remplace pas la surveillance"]],
         say:["« Je ne vais pas refermer complètement. Il faut que la plaie puisse se drainer. »","« On changera le pansement régulièrement. »"]
       },
       {
