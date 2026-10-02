@@ -48,6 +48,7 @@ async function finishSurgery(page, id) {
   page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
+  check((await page.locator("html").getAttribute("data-theme")) === "dark", "Le mode sombre n'est pas le thème par défaut");
   check(await page.getByRole("heading", { name: "Elkins & Elkins Medical Atlas" }).isVisible(), "Titre absent");
   check(await page.locator("#home button").count() === 5, "Accueil incomplet");
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Débordement horizontal en 2K");
@@ -115,6 +116,11 @@ async function finishSurgery(page, id) {
 
   const surgeryIds = ["amputation", "major_bleeding", "deep_bullet", "abdominal", "trepanation", "infected_wound"];
   for (const id of surgeryIds) await finishSurgery(page, id);
+
+  await page.evaluate(() => window.start("gunshot"));
+  await page.evaluate(() => window.showCases());
+  check(await page.locator("#flow").isHidden(), "L'ancien parcours reste visible après retour aux interventions");
+  check(await page.locator("#cases").isVisible(), "La liste des interventions ne réapparaît pas");
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: "networkidle" });

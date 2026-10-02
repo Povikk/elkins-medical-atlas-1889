@@ -10,7 +10,7 @@
   (() => {
     let saved = null;
     try { saved = localStorage.getItem("elkins-theme"); } catch (error) {}
-    const theme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const theme = saved || "dark";
     document.documentElement.dataset.theme = theme;
   })();
 </script>
@@ -18,13 +18,35 @@
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Aller au contenu</a>
-<div class="wrap">
-  <header id="siteHeader">
-    <h1>Elkins &amp; Elkins Medical Atlas</h1>
-    <div class="subtitle">Practical Medicine, Surgery &amp; Field Notes - 1889</div>
-    <div class="byline">Compiled by Dr. Everett Elkins &amp; Dr. Effie Elkins</div>
-    <button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false"></button>
-  </header>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navigation principale">
+    <button type="button" class="brand" onclick="goHome()" aria-label="Retour à l'accueil">
+      <span class="brand-mark" aria-hidden="true">E</span>
+      <span class="brand-copy"><h1>Elkins &amp; Elkins Medical Atlas</h1><small>Practical medicine · 1889</small></span>
+    </button>
+    <nav class="side-nav">
+      <button type="button" class="side-nav-item active" data-shell-view="home" onclick="goHome()"><span aria-hidden="true">⌂</span>Vue d’ensemble</button>
+      <button type="button" class="side-nav-item" data-shell-view="cases" onclick="showCases()" aria-label="Ouvrir les soins guidés"><span aria-hidden="true">✚</span>Intervention</button>
+      <button type="button" class="side-nav-item" data-shell-view="lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
+      <button type="button" class="side-nav-item" data-shell-view="surgery" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
+      <button type="button" class="side-nav-item" data-shell-view="atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
+    </nav>
+    <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
+    <div class="sidebar-note">
+      <span class="eyebrow">USAGE RP</span>
+      <strong>Rapide et autonome</strong>
+      <small>Des repères lisibles pendant la scène, sans enregistrement automatique.</small>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header id="siteHeader">
+      <div class="header-copy">
+        <h1>Elkins &amp; Elkins Medical Atlas</h1>
+        <div class="subtitle">Practical Medicine, Surgery &amp; Field Notes · 1889</div>
+        <div class="byline">Compiled by Dr. Everett Elkins &amp; Dr. Effie Elkins</div>
+      </div>
+    </header>
 
   <main id="mainContent">
     <section id="home">
@@ -221,6 +243,7 @@
   <footer>
     Outil de soutien RP historique (1889). Les techniques décrites servent au jeu de rôle et ne sont pas des gestes de secours modernes.
   </footer>
+  </div>
 </div>
 
 <script src="data.js"></script>

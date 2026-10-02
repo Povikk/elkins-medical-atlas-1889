@@ -39,11 +39,6 @@ const themeToggle = document.getElementById("themeToggle");
 if(themeToggle) themeToggle.addEventListener("click", toggleTheme);
 updateThemeButton();
 
-const systemTheme = matchMedia("(prefers-color-scheme: dark)");
-systemTheme.addEventListener?.("change", event => {
-  if(!storedTheme()) applyTheme(event.matches ? "dark" : "light");
-});
-
 const anatomyPlates = {
   skeleton:{
     title:"Squelette",
@@ -262,7 +257,7 @@ function toggleCompact(target){
 
 function compactButton(target){
   return `<button class="compact-toggle ${compactMode ? "on" : ""}" aria-pressed="${compactMode}" onclick="toggleCompact('${target}')">
-    Mode compact : ${compactMode ? "activé" : "désactivé"}
+    Compact : ${compactMode ? "oui" : "non"}
   </button>`;
 }
 
@@ -271,6 +266,13 @@ function show(id){
   if(!target) return;
   ["home","cases","lexique","surgery","surgeryFlow","atlas","flow"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
   target.classList.remove("hidden");
+  const shellView = id === "flow" ? "cases" : id === "surgeryFlow" ? "surgery" : id;
+  document.querySelectorAll("[data-shell-view]").forEach(button=>{
+    const active = button.dataset.shellView === shellView;
+    button.classList.toggle("active",active);
+    if(active) button.setAttribute("aria-current","page");
+    else button.removeAttribute("aria-current");
+  });
   const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow"];
   document.body.classList.toggle("compact-header", compactSections.includes(id));
   window.scrollTo({top:0,behavior:"auto"});
