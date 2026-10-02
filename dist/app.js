@@ -497,9 +497,16 @@ function sensoryNote(name){
 }
 
 function meds(rows){
+  const opioids = rows.some(r=>/morphine|laudanum/i.test(r[0]));
+  const assessment = opioids ? painAssessment() : "";
+  const selected = answers.rpPain;
+  if(opioids && selected === "mild") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
+  if(opioids && selected === "moderate") rows = rows.filter(r=>!/morphine/i.test(r[0]));
+  if(opioids && selected === "unsafe") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(compactMode){
     return `<div class="section">
       <h3>Médicament / produit</h3>
+      ${assessment}
       ${rows.map(r=>`
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
           <strong>${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
@@ -511,6 +518,7 @@ function meds(rows){
   }
   return `<div class="section">
     <h3>Médicament / produit</h3>
+    ${assessment}
     ${rows.map(r=>`
       <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
         <strong style="font-size:17px">${r[0]}</strong>
@@ -522,9 +530,40 @@ function meds(rows){
           <div><strong>Utilisation RP</strong>${r[3]}</div>
         </div>
         ${sensoryNote(r[0])}
+        ${productContext(r[0])}
       </div>
     `).join("")}
   </div>`;
+}
+
+function setRpPain(value){
+  answers.rpPain = value;
+  if(currentSurgery && !document.getElementById("surgeryFlow").classList.contains("hidden")) renderSurgery();
+  else render();
+}
+
+function painAssessment(){
+  const options = [["mild","Gêne légère"],["moderate","Douleur modérée"],["strong","Douleur forte"],["unsafe","Conscience / respiration inquiétante"],["unknown","Pas encore évalué"]];
+  const notes = {
+    mild:"Privilégier installation confortable, repos et soin de la blessure. Un opiacé n'est pas systématique.",
+    moderate:"Le laudanum reste une possibilité RP uniquement si le patient est conscient et peut avaler. Réévaluer ensuite.",
+    strong:"Une douleur forte justifie une évaluation plus attentive ; elle ne suffit pas à elle seule à choisir un produit.",
+    unsafe:"Priorité à l'état vital. Suspendre le choix d'un opiacé et reprendre l'évaluation de la conscience et de la respiration.",
+    unknown:"Les produits ci-dessous sont des possibilités, pas une prescription automatique. Évaluer l'état du patient d'abord."
+  };
+  return `<div class="pain-assessment"><div class="assessment-options" aria-label="Évaluation RP de la douleur">${options.map(([v,label])=>`<button type="button" aria-pressed="${answers.rpPain===v}" onclick="setRpPain('${v}')">${label}</button>`).join("")}</div><p>${notes[answers.rpPain] || notes.unknown}</p></div>`;
+}
+
+function productContext(name){
+  const n = name.toLowerCase();
+  let text = "";
+  if(/morphine|laudanum/.test(n)) text = "Soulagement de la douleur et sédation possible. Surveiller conscience et respiration ; ne pas confondre antidouleur et anesthésie chirurgicale. Le laudanum suppose un patient capable d'avaler.";
+  else if(/chloroforme|éther|ether/.test(n)) text = "Anesthésie pour une scène opératoire exceptionnelle, avec surveillance continue. Ce n'est pas le soin d'une douleur légère.";
+  else if(/arnica/.test(n)) text = "Soin d'une contusion sur peau intacte. Ne pas appliquer dans une plaie ouverte ; réévaluer si douleur, gonflement ou mobilité s'aggravent.";
+  else if(/alcool|phénol|carbol/.test(n)) text = "Antisepsie : distinguer le nettoyage du matériel de celui des tissus. Une brûlure ou une irritation importante appelle une réévaluation.";
+  else if(/onguent|baume|carron/.test(n)) text = "Protection locale selon la préparation. L'aspect de la plaie et son évolution comptent davantage qu'un effet apaisant supposé.";
+  if(!text) return "";
+  return `<details class="product-context"><summary>Choix et précautions RP</summary><p>${text}</p></details>`;
 }
 
 
