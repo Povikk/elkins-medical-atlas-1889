@@ -244,6 +244,14 @@
       </div>
     </dialog>
 
+    <dialog id="sceneReferenceDialog" class="scene-dialog" aria-labelledby="sceneReferenceTitle">
+      <div class="dialog-heading"><h2 id="sceneReferenceTitle">Références du soin</h2><button type="button" class="secondary" onclick="closeSceneReferences()">Fermer</button></div>
+      <p class="muted">Consulte une fiche sans quitter l'étape en cours.</p>
+      <div class="scene-tools"><button class="secondary" data-scene-ref="meds" onclick="setSceneReferenceTab('meds')">Produits</button><button class="secondary" data-scene-ref="equipment" onclick="setSceneReferenceTab('equipment')">Matériel</button><button class="secondary" data-scene-ref="anatomy" onclick="setSceneReferenceTab('anatomy')">Anatomie</button></div>
+      <input id="sceneReferenceSearch" type="search" aria-label="Chercher une référence" placeholder="Chercher une référence" oninput="renderSceneReferences()">
+      <div id="sceneReferenceContent"></div>
+    </dialog>
+    <dialog id="incidentDialog" class="scene-dialog" aria-labelledby="incidentTitle"><div class="dialog-heading"><h2 id="incidentTitle">Son état change</h2><button type="button" class="secondary" onclick="closeIncident()">Fermer</button></div><div id="incidentContent"></div></dialog>
     <section id="flow" class="hidden"></section>
   </main>
 
@@ -256,6 +264,7 @@
 <script src="data.js"></script>
 <script src="pharmacy.js"></script>
 <script src="atlas-labels.js"></script>
+<script src="scene.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

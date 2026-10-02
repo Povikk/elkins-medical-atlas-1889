@@ -61,6 +61,7 @@ async function finishSurgery(page, id) {
   await page.reload({ waitUntil: "networkidle" });
   check((await page.locator("html").getAttribute("data-theme")) === "dark", "Préférence sombre non conservée");
   await page.screenshot({ path: path.join(outputDir, "desktop-2k-dark.png"), fullPage: true });
+  if(process.env.TEST_SCENE_MODE) await page.evaluate(()=>{sceneMode=true;});
   await page.locator("#themeToggle").click();
   check((await page.locator("html").getAttribute("data-theme")) === "light", "Retour au mode clair impossible");
 

@@ -217,6 +217,8 @@ function start(id){
   currentFlow = id;
   stepIndex = 0;
   answers = {};
+  flowHistory = [];
+  interventionEnded = false;
   materialPanelOpen = false;
   render();
   show("flow");
@@ -230,6 +232,9 @@ function showSurgery(){
 }
 
 function openSurgery(id){
+  if(!surgeries[id]) return;
+  answers = {};
+  surgeryEnded = false;
   currentSurgery = id;
   surgeryStepIndex = 0;
   materialPanelOpen = false;
@@ -259,6 +264,7 @@ function renderSurgery(){
     <div class="section"><b>Quand l'utiliser :</b> ${s.intro}</div>
     <div class="progress"><div style="width:${pct}%"></div></div>
     ${materialPanel("surgery")}
+    ${sceneToolbar("surgery")}
     <h3>${surgeryStepIndex+1} / ${s.steps.length} - ${step.title}</h3>
   `;
 
@@ -276,6 +282,7 @@ function renderSurgery(){
   </div>`;
 
   document.getElementById("surgeryFlow").innerHTML = html;
+  prepareSceneView(document.getElementById("surgeryFlow"));
 }
 
 function nextSurgery(){
@@ -284,13 +291,8 @@ function nextSurgery(){
     surgeryStepIndex++;
     renderSurgery();
   }else{
-    document.getElementById("surgeryFlow").innerHTML = `
-      <div class="section" style="text-align:center;padding:28px">
-        <h2>Scène chirurgicale terminée</h2>
-        <p>Finir avec pansement, repos et surveillance selon la situation.</p>
-        <button class="next" onclick="showSurgery()">Autre chirurgie</button>
-        <div style="margin-top:12px"><button class="danger" onclick="goHome()">Accueil</button></div>
-      </div>`;
+    surgeryEnded = true;
+    document.getElementById("surgeryFlow").innerHTML = endingMarkup("surgery");
   }
 }
 
@@ -492,16 +494,20 @@ function materialPanel(kind){
 }
 
 function applyChoice(set){
+  flowHistory.push({index:stepIndex,answers:{...answers}});
   Object.assign(answers,set);
-  next();
+  next(true);
 }
-function next(){
+function next(fromChoice=false){
+  if(!fromChoice) flowHistory.push({index:stepIndex,answers:{...answers}});
   const max = flows[currentFlow].steps.length;
-  if(stepIndex < max-1){ stepIndex++; render(); }
-  else renderEnd();
+  let candidate=stepIndex+1;
+  while(candidate<max && shouldSkipStep(flows[currentFlow].steps[candidate])) candidate++;
+  if(candidate<max){stepIndex=candidate;render();}else renderEnd();
 }
 function prev(){
-  if(stepIndex>0){ stepIndex--; render(); }
+  const previous=flowHistory.pop();
+  if(previous){stepIndex=previous.index;answers=previous.answers;interventionEnded=false;render();}
   else showCases();
 }
 function section(title,items,cls=""){
@@ -591,6 +597,7 @@ function meds(rows){
       ${rows.map(r=>`
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
           <strong>${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
+          ${medicineReferenceButton(r[0])}
           <div class="compact-inline"><b>Forme :</b> ${r[1]}<br><b>Administration :</b> ${r[2]}</div>
           ${sensoryNote(r[0])}
         </div>
@@ -603,6 +610,7 @@ function meds(rows){
     ${rows.map(r=>`
       <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
         <strong style="font-size:17px">${r[0]}</strong>
+        ${medicineReferenceButton(r[0])}
         <div class="cat-badge">${medCategory(r[0], r[3])}</div>
         <div class="med">
           <div><strong>Forme</strong>${r[1]}</div>
@@ -708,13 +716,15 @@ function render(){
   const flow = flows[currentFlow];
   const step = flow.steps[stepIndex];
   activeStepTitle = step.title;
-  const pct = Math.round(((stepIndex+1)/flow.steps.length)*100);
+  const route=visibleFlowSteps();
+  const position=route.findIndex(item=>item.index===stepIndex)+1;
+  const pct = Math.round((position/route.length)*100);
   let html = `
     <div class="topbar">
       <div>
         <span class="badge">${flow.title}</span>
         ${urgencyBadge(flow.urgency)}
-        <h2 style="margin:8px 0 0">${stepIndex+1} / ${flow.steps.length} - ${step.title}</h2>
+        <h2 style="margin:8px 0 0">${position} / ${route.length} - ${step.title}</h2>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         ${compactButton("flow")}
@@ -725,6 +735,8 @@ function render(){
     <div class="progress"><div style="width:${pct}%"></div></div>
     ${compactMode ? "" : `<div class="quick-note">Objectif RP : aller à l'essentiel. Si une étape ne correspond pas à la scène, choisis l'option la plus proche et avance.</div>`}
     ${materialPanel("flow")}
+    ${sceneToolbar("flow")}
+    ${flowRouteNote()}
   `;
 
   if(step.dynamicUnknownBreathing){
@@ -1315,6 +1327,7 @@ function render(){
   }
 
   if(step.choices){
+    html += patientQuestion(step);
     html += `<div class="section"><h3>Choisis ce qui correspond à la scène</h3><div class="choices">`;
     step.choices.forEach(c=>{
       html += `<button class="choice" onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
@@ -1326,7 +1339,7 @@ function render(){
     html += sayLines([]);
   }
 
-  if(!step.choices){
+  if(!step.choices && !html.includes('class="choices"')){
     html += `<div class="nav">
       <button class="secondary" onclick="prev()">Précédent</button>
       <button class="next" onclick="next()">${stepIndex===flow.steps.length-1?"Terminer":"Étape suivante"}</button>
@@ -1336,16 +1349,11 @@ function render(){
   }
 
   document.getElementById("flow").innerHTML=html;
+  prepareSceneView(document.getElementById("flow"));
 }
 function renderEnd(){
-  document.getElementById("flow").innerHTML=`
-    <div class="section" style="text-align:center;padding:28px">
-      <h2>Intervention terminée</h2>
-      <p>Tu peux finir la scène avec quelques consignes simples de repos et de surveillance.</p>
-      <button class="next" onclick="showCases()">Nouvelle intervention</button>
-      <div style="margin-top:12px"><button class="danger" onclick="goHome()">Accueil</button></div>
-    </div>
-  `;
+  interventionEnded=true;
+  document.getElementById("flow").innerHTML=endingMarkup("flow");
 }
 
 (function initLexiqueTabs(){
