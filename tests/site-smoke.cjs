@@ -107,9 +107,8 @@ async function finishSurgery(page, id) {
 
   await page.evaluate(() => window.start("horse"));
   const materialButton = page.locator("#flow .material-btn");
-  await materialButton.click();
-  check(await page.locator("#flow .material-panel").isVisible(), "Panneau Matériel absent");
-  check(await materialButton.getAttribute("aria-expanded") === "true", "État du panneau Matériel incorrect");
+  check(await materialButton.count() === 0, "Ancien bouton Matériel encore présent");
+  check(await page.locator("#flow .care-memo-cell").count() === 4, "Pense-bête absent en détaillé");
   await page.locator("#flow .compact-toggle").click();
   check(await page.locator("#flow .compact-toggle").getAttribute("aria-pressed") === "true", "Mode compact non activé");
   check(await page.locator("#flow .rp-line").count() <= 1, "Mode compact affiche trop de phrases");

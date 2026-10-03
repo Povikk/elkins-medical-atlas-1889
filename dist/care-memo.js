@@ -1,6 +1,6 @@
 // Quick RP reference inspired by Effie's supplied tables, not a prescription engine.
-let careMemoOpen=false;
-let careMemoOnly=true;
+let careMemoOpen=true;
+let careMemoOnly=false;
 const careMemoRows={
  unknown:['Réactions · respiration · saignement','Vérifier les priorités ; chercher la cause seulement après','Aucun produit systématique ; état vital d’abord','Cause inconnue ; ne pas déduire un diagnostic'],
  gunshot:['Entrée / sortie · sang · sensibilité du membre','Contrôler le saignement ; examiner sans fouiller ; protéger','Laudanum ou morphine si état compatible ; soin local adapté','Hémorragie · infection ; abdomen et thorax à réévaluer'],
@@ -36,10 +36,7 @@ function careMemoData(kind){
  return {title,row};
 }
 function careMemoMarkup(kind){
- if(!careMemoOpen)return '';
  const {title,row}=careMemoData(kind);
- return `<section class="care-memo" aria-label="Pense-bête du soin"><div class="care-memo-heading"><h3>Pense-bête d’Effie <small>${condensedEscape(title)}</small></h3><label><input type="checkbox" ${careMemoOnly?'checked':''} onchange="setCareMemoOnly(this.checked)"> Pense-bête seul</label></div><div class="care-memo-row">${['Observer','Agir','Produits facultatifs','Danger / vigilance'].map((label,i)=>`<div class="care-memo-cell ${i===3?'care-memo-danger':''}"><h4>${label}</h4><p>${condensedEscape(row[i])}</p></div>`).join('')}</div><small class="care-memo-source">Adaptation des tableaux RP d’Effie et des parcours de l’Atlas. Repères de jeu uniquement, pas une ordonnance.</small></section>`;
+ return `<section class="care-memo" aria-label="Pense-bête du soin"><div class="care-memo-heading"><h3>Pense-bête d’Effie <small>${condensedEscape(title)}</small></h3>${compactMode?`<label><input type="checkbox" ${careMemoOnly?'checked':''} onchange="setCareMemoOnly(this.checked)"> Pense-bête seul</label>`:''}</div><div class="care-memo-row">${['Observer','Agir','Produits facultatifs','Danger / vigilance'].map((label,i)=>`<div class="care-memo-cell ${i===3?'care-memo-danger':''}"><h4>${label}</h4><p>${condensedEscape(row[i])}</p></div>`).join('')}</div><small class="care-memo-source">Adaptation des tableaux RP d’Effie et des parcours de l’Atlas. Repères de jeu uniquement, pas une ordonnance.</small></section>`;
 }
-function toggleCareMemo(){careMemoOpen=!careMemoOpen;careMemoOnly=true;renderCondensed(activeRouteKind);}
-function openCareMemo(kind){compactMode=true;careMemoOpen=true;careMemoOnly=true;kind==='surgery'?renderSurgery():render();}
 function setCareMemoOnly(value){careMemoOnly=!!value;renderCondensed(activeRouteKind);}

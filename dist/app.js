@@ -270,12 +270,11 @@ function renderSurgery(capture=false){
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         ${compactButton("surgery")}
-        <button class="material-btn" aria-expanded="${materialPanelOpen}" onclick="toggleMaterialPanel('surgery')">Matériel nécessaire</button>
-        <button class="danger" onclick="showSurgery()">Changer de chirurgie</button>
       </div>
     </div>
     <details class="surgery-indication"><summary>Quand utiliser cette chirurgie</summary><p>${s.intro}</p></details>
     <div class="progress"><div style="width:${pct}%"></div></div>
+    ${!capture?careMemoMarkup('surgery'):''}
       ${rpChoicesMarkup()}
     ${materialPanel("surgery")}
     ${sceneToolbar("surgery")}
@@ -335,7 +334,7 @@ function toggleCompact(target){
 function compactButton(target){
   return `<button class="compact-toggle ${compactMode ? "on" : ""}" aria-pressed="${compactMode}" onclick="toggleCompact('${target}')">
     ${compactMode ? "Vue détaillée" : "Condensé"}
-  </button>${!compactMode?`<button class="secondary care-memo-launch" onclick="openCareMemo('${target==='surgery'?'surgery':'flow'}')">Pense-bête</button>`:''}`;
+  </button>`;
 }
 
 function show(id){
@@ -747,11 +746,11 @@ function render(capture=false){
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         ${compactButton("flow")}
-        <button class="material-btn" aria-expanded="${materialPanelOpen}" onclick="toggleMaterialPanel('flow')">Matériel nécessaire</button>
         <button class="danger" onclick="showCases()">Changer de cas</button>
       </div>
     </div>
     <div class="progress"><div style="width:${pct}%"></div></div>
+    ${!capture?careMemoMarkup('flow'):''}
     ${rpChoicesMarkup()}
     ${materialPanel("flow")}
     ${sceneToolbar("flow")}
