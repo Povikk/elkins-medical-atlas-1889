@@ -250,8 +250,10 @@ function openSurgery(id){
   show("surgeryFlow");
 }
 
-function renderSurgery(){
-  rpPhraseBlocks=[];
+function renderSurgery(capture=false){
+  if(compactMode&&!capture)return renderCondensed('surgery');
+  if(!capture)document.getElementById('surgeryFlow').classList.remove('condensed-workspace');
+  if(!capture)rpPhraseBlocks=[];
   activeRouteKind = "surgery";
   const s = surgeries[currentSurgery];
   const step = s.steps[surgeryStepIndex];
@@ -295,6 +297,7 @@ function renderSurgery(){
     <button class="next" onclick="nextSurgery()">${surgeryStepIndex===s.steps.length-1?"Terminer":"Étape suivante"}</button>
   </div>`;
 
+  if(capture)return html;
   document.getElementById("surgeryFlow").innerHTML = html;
   finalizeCareLayout(document.getElementById('surgeryFlow'));
 }
@@ -331,7 +334,7 @@ function toggleCompact(target){
 
 function compactButton(target){
   return `<button class="compact-toggle ${compactMode ? "on" : ""}" aria-pressed="${compactMode}" onclick="toggleCompact('${target}')">
-    Compact : ${compactMode ? "oui" : "non"}
+    ${compactMode ? "Vue détaillée" : "Condensé"}
   </button>`;
 }
 
@@ -571,6 +574,7 @@ function extraPhraseVariants(title){
 }
 
 function sayLines(items){
+  if(compactMode)return '';
   return rpDialogue(items);
 }
 function sensoryCue(name){
@@ -609,22 +613,7 @@ function meds(rows){
   if(opioids && selected === "mild") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(opioids && selected === "moderate") rows = rows.filter(r=>!/morphine/i.test(r[0]));
   if(opioids && selected === "unsafe") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
-  if(compactMode){
-    return `<div class="section">
-      <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
-      <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
-      ${assessment}
-      ${unavailable||withheldOral?'<p class="route-note">Réévaluer conscience et respiration avant un opiacé. Aucune proposition orale tant que le patient ne peut pas répondre et avaler.</p>':''}
-      ${rows.map(r=>`
-        <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
-          <strong>${emojiIcon(lexEmoji({name:r[0],form:r[1],admin:r[2],category:medCategory(r[0],r[3])}))} ${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
-          ${medicineReferenceButton(r[0])}
-          <div class="compact-inline"><b>Forme :</b> ${r[1]}<br><b>Administration :</b> ${r[2]}</div>
-          ${sensoryNote(r[0])}
-        </div>
-      `).join("")}
-    </div>`;
-  }
+  if(compactMode)return `<div class="condensed-products"><p>Produits facultatifs : ${rows.length?rows.map(r=>r[0]).join(' ou '):'aucun proposé dans cet état'}.</p>${unavailable||withheldOral?'<p class="condensed-alert">Réévaluer conscience et respiration. Pas de produit oral si le patient ne peut pas répondre et avaler.</p>':''}${opioids?`<label>Douleur <select onchange="setRpPain(this.value)"><option value="">À évaluer</option>${[['mild','Légère'],['moderate','Modérée'],['strong','Forte'],['unsafe','État vital inquiétant'],['unknown','Non évaluée']].map(([v,t])=>`<option value="${v}" ${selected===v?'selected':''}>${t}</option>`).join('')}</select></label>`:''}</div>`;
   return `<div class="section">
     <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
     <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
@@ -735,8 +724,10 @@ function categoryClass(category){
   }
 }
 
-function render(){
-  rpPhraseBlocks=[];
+function render(capture=false){
+  if(compactMode&&!capture)return renderCondensed('flow');
+  if(!capture)document.getElementById('flow').classList.remove('condensed-workspace');
+  if(!capture)rpPhraseBlocks=[];
   activeRouteKind = "flow";
   const flow = flows[currentFlow];
   const step = flow.steps[stepIndex];
@@ -1389,6 +1380,7 @@ function render(){
     html += `<div class="nav"><button class="secondary" onclick="prev()">Précédent</button></div>`;
   }
 
+  if(capture)return html;
   document.getElementById("flow").innerHTML=html;
   finalizeCareLayout(document.getElementById('flow'));
 }

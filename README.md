@@ -11,6 +11,7 @@ Ouvrir `index.html` pour accéder directement à la version actuelle. La version
 - `dist/data.js` contient le Lexique, les parcours et le matériel.
 - `dist/app.js` contient la navigation et le rendu interactif.
 - `dist/care.js` contient les consultations, métadonnées de matériel, réévaluation et aides de soin.
+- `dist/condensed.js` affiche le parcours complet sans dialogue RP, en réutilisant les actions et règles de branchement du rendu détaillé. Les observations ultérieures sont invalidées quand une réponse antérieure change ; les dernières observations vitales restent conservées.
 - `dist/hooks.js` contient les 60 accroches, leurs filtres et la suggestion facultative pendant les soins.
 - `dist/rp-ui.js` contient les formulations, le contexte temporaire et la taille du texte.
 - `dist/scene.js` contient les références rapides, incidents et conclusions.
@@ -22,6 +23,8 @@ Pour ajouter une accroche, ajouter une ligne à une catégorie de `hookGroups` d
 L'application ne possède ni backend, ni base de données, ni sauvegarde automatique.
 
 Seuls le thème et la taille de texte peuvent être mémorisés localement. Les choix du parcours, observations, contexte et formulations sont temporaires. Le mode en scène reste supprimé.
+
+Le bouton « Condensé » remplace « Compact ». Sur PC, le parcours est présenté en colonnes ; sur mobile ou avec un texte fortement agrandi, la lisibilité prime et le défilement reste possible. `tests/condensed.cjs` vérifie les 17 parcours et six chirurgies, les branches, le retour au détail et les deux thèmes.
 
 ## Vérification
 

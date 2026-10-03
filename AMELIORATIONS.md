@@ -5,7 +5,7 @@
 - Gravité visuelle réévaluée selon les observations, sans diagnostic automatique.
 - Conscience, respiration et saignement réévaluables à toute étape. Le rappel distingue l’état initial de la dernière observation.
 - Propositions d’opiacés retirées lorsque conscience, respiration ou saignement rendent le contexte inquiétant. Aucun produit obligatoire.
-- Mode compact conservant toutes les intentions d’action dans trois points condensés, avec une seule phrase.
+- Vue « Condensé » remplaçant le mode compact : parcours complet en cartes, actions essentielles, choix et alertes, sans dialogue ni accroche. Retour au détail sans perdre les réponses. Les branches non déterminées restent à préciser et les réponses ultérieures sont retirées si une réponse précédente change.
 - Matériel de l’étape fondé sur des métadonnées explicites et les choix, non sur le titre. Matériel potentiel de la suite séparé.
 - Réponses incertaines ajoutées pour chute de cheval, noyade, tête, intoxication et petite plaie.
 - Actions, geste et dialogue réunis. Composition et repères détaillés des produits repliables.
