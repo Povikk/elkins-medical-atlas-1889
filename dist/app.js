@@ -350,7 +350,7 @@ function show(id){
     answers={};flowHistory=[];currentFlow=null;currentSurgery=null;materialPanelOpen=false;resetRpScene();
     document.getElementById('flow').innerHTML='';document.getElementById('surgeryFlow').innerHTML='';
   }
-  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
+  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
   target.classList.remove("hidden");
   const shellView = id === "flow" ? "cases" : id === "surgeryFlow" ? "surgery" : id;
   document.querySelectorAll("[data-shell-view]").forEach(button=>{
@@ -359,7 +359,7 @@ function show(id){
     if(active) button.setAttribute("aria-current","page");
     else button.removeAttribute("aria-current");
   });
-  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories"];
+  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz"];
   document.body.classList.toggle("compact-header", compactSections.includes(id));
   window.scrollTo({top:0,behavior:"auto"});
 }

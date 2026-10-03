@@ -1581,7 +1581,7 @@ summary{cursor:pointer;color:var(--ink)}
 @media(max-width:760px){
  #siteHeader,body.compact-header #siteHeader{padding-right:16px;align-items:start;gap:10px}
  #siteHeader>.sidebar-theme{position:static;inset:auto;margin:0 0 0 auto;flex:0 0 auto;max-width:145px}
- .side-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+ .side-nav{grid-template-columns:repeat(7,minmax(0,1fr))!important}
  .side-nav-item{font-size:10px!important;padding:7px 2px!important;min-width:0;overflow-wrap:anywhere}
  .story-grid{grid-template-columns:1fr}.story-card{padding:16px}
  .story-filters{display:grid;grid-template-columns:1fr}.story-filters label{min-width:0}

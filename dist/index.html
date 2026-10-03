@@ -15,6 +15,7 @@
   })();
 </script>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="quiz.css">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Aller au contenu</a>
@@ -25,12 +26,13 @@
       <span class="brand-copy"><h1>Elkins &amp; Elkins Medical Atlas</h1><small>Practical medicine · 1889</small></span>
     </button>
     <nav class="side-nav">
-      <button type="button" class="side-nav-item active" data-shell-view="home" onclick="goHome()"><span aria-hidden="true">⌂</span>Vue d’ensemble</button>
-      <button type="button" class="side-nav-item" data-shell-view="cases" onclick="showCases()" aria-label="Ouvrir les soins guidés"><span aria-hidden="true">✚</span>Intervention</button>
-      <button type="button" class="side-nav-item" data-shell-view="lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
-      <button type="button" class="side-nav-item" data-shell-view="surgery" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
-      <button type="button" class="side-nav-item" data-shell-view="atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
-      <button type="button" class="side-nav-item" data-shell-view="stories" onclick="showStories()"><span aria-hidden="true">▤</span>Accroches</button>
+      <button type="button" class="side-nav-item active" data-shell-view="home" data-mobile-label="Accueil" onclick="goHome()"><span aria-hidden="true">⌂</span>Vue d’ensemble</button>
+      <button type="button" class="side-nav-item" data-shell-view="cases" data-mobile-label="Soins" onclick="showCases()" aria-label="Ouvrir les soins guidés"><span aria-hidden="true">✚</span>Intervention</button>
+      <button type="button" class="side-nav-item" data-shell-view="lexique" data-mobile-label="Lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
+      <button type="button" class="side-nav-item" data-shell-view="surgery" data-mobile-label="Chirurgie" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
+      <button type="button" class="side-nav-item" data-shell-view="atlas" data-mobile-label="Atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
+      <button type="button" class="side-nav-item" data-shell-view="stories" data-mobile-label="Accroches" onclick="showStories()"><span aria-hidden="true">▤</span>Accroches</button>
+      <button type="button" class="side-nav-item" data-shell-view="quiz" data-mobile-label="Quiz" onclick="showQuiz()"><span aria-hidden="true">?</span>Quiz</button>
     </nav>
     <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
     <label class="reading-setting" for="readingSize">Taille du texte
@@ -267,6 +269,7 @@
     </dialog>
     <dialog id="incidentDialog" class="scene-dialog" aria-labelledby="incidentTitle"><div class="dialog-heading"><h2 id="incidentTitle">Son état change</h2><button type="button" class="secondary" onclick="closeIncident()">Fermer</button></div><div id="incidentContent"></div></dialog>
     <section id="flow" class="hidden"></section>
+    <section id="quiz" class="hidden" aria-label="Quiz d'entraînement RP"></section>
   </main>
 
   <footer>
@@ -290,5 +293,7 @@
 <script src="care-memo.js"></script>
 <script src="report.js"></script>
 <script src="lex-quick.js"></script>
+<script src="quiz-bank.js"></script>
+<script src="quiz.js"></script>
 </body>
 </html>
