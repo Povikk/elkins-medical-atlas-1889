@@ -472,7 +472,7 @@ const flows = {
       {
         title:"Vérification finale",
         do:["Vérifier que le patient est bien conscient.","Demander si la douleur augmente ou diminue.","Conseiller repos et retour si de nouveaux symptômes apparaissent."],
-        say:["« Ça devrait aller. Reposez-vous un moment. »","« Si la douleur augmente ou si vous vous sentez étourdi, revenez me voir. »"]
+        say:["« Reposez-vous pendant que nous faisons le point sur votre état. »","« Si la douleur augmente ou si vous vous sentez étourdi, prévenez-moi. »"]
       }
     ]
   },
@@ -813,7 +813,7 @@ const surgeries = {
       {
         title:"Contrôler le saignement",
         do:["Décrire la ligature ou le contrôle des vaisseaux importants.","Vérifier que le saignement ralentit nettement.","Maintenir le patient au chaud."],
-        say:["« Le saignement ralentit. Continuez à maintenir ici. »","« Encore un instant, je termine les ligatures. »"]
+        say:["« Continuez à maintenir ici. Je vérifie si le saignement ralentit. »","« Encore un instant, je termine les gestes prévus. »"]
       },
       {
         title:"Fermer et panser",
@@ -850,12 +850,12 @@ const surgeries = {
       {
         title:"Ligaturer",
         do:["Décrire la pose d'une ligature autour du vaisseau atteint.","Vérifier que le saignement diminue.","Nettoyer ensuite la zone."],
-        say:["« Je l'ai. Je vais le ligaturer maintenant. »","« Le saignement est presque sous contrôle. »"]
+        say:["« Si le vaisseau est repéré, je prépare la ligature. »","« Je vérifie si le saignement diminue après ce geste. »"]
       },
       {
         title:"Fermer et surveiller",
         do:["Refermer si la plaie s'y prête.","Poser un pansement épais.","Surveiller pâleur, respiration et reprise de conscience."],
-        say:["« Le saignement est contrôlé. Je vais refermer. »","« Vous allez rester au repos sous surveillance. »"]
+        say:["« Je revérifie le saignement avant de décider de la fermeture. »","« Vous allez rester au repos sous surveillance. »"]
       }
     ]
   },
@@ -887,7 +887,7 @@ const surgeries = {
       {
         title:"Extraire si accessible",
         do:["Saisir le projectile avec une pince si la scène le permet.","Retirer doucement.","Vérifier le saignement après extraction."],
-        say:["« Je l'ai. Je la retire maintenant. »","« La balle est sortie. »"]
+        say:["« Si elle est accessible, je prépare son retrait. »","« Je vérifie ce qui a pu être retiré avant de poursuivre. »"]
       },
       {
         title:"Nettoyer, suturer, panser",
@@ -924,7 +924,7 @@ const surgeries = {
       {
         title:"Traiter la lésion",
         do:["Décrire la réparation ou la ligature de la zone atteinte.","Contrôler le saignement.","Nettoyer avant fermeture."],
-        say:["« J'ai trouvé la lésion. Je la traite maintenant. »","« Le saignement diminue. »"]
+        say:["« Je recherche la lésion qui peut être traitée dans cette scène. »","« Je vérifie si le saignement diminue après le geste. »"]
       },
       {
         title:"Fermer",

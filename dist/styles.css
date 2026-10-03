@@ -1406,3 +1406,11 @@ body{font-size:17px}
   #flow>.section,#flow>.rp-lines,#surgeryFlow>.section,#surgeryFlow>.rp-lines{grid-column:1/-1;width:100%;max-width:100%}
   #flow>.section:has(>.choices),#surgeryFlow>.section:has(>.choices){width:100%}
 }
+/* Lightweight scene guidance, shared by both themes. */
+.step-cue,.action-cue{font-family:inherit;font-size:.72rem;font-weight:600;color:var(--accent2);border:1px solid var(--line);border-radius:5px;padding:2px 6px;display:inline-block;vertical-align:middle}
+.step-cue{margin-left:8px}
+.action-cue{margin-right:4px}
+.product-choice-note{font-size:.85rem;margin:4px 0 10px}
+.material-panel h4{margin:10px 0 4px}
+.material-panel details{margin-top:8px}
+.material-panel ul{gap:6px 22px}

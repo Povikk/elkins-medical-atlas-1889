@@ -492,13 +492,7 @@ function toggleMaterialPanel(kind){
 
 function materialPanel(kind){
   if(!materialPanelOpen) return "";
-  const list = kind === "surgery"
-    ? (surgeryMaterials[currentSurgery] || [])
-    : (interventionMaterials[currentFlow] || []);
-  return `<div class="material-panel">
-    <h3>Matériel nécessaire</h3>
-    <ul>${list.map(x=>`<li>${x}</li>`).join("")}</ul>
-  </div>`;
+  return sceneMaterialMarkup(kind);
 }
 
 function applyChoice(set){
@@ -519,14 +513,17 @@ function prev(){
   else showCases();
 }
 function section(title,items,cls=""){
+  const label=/^Priorité/.test(title)?'Priorité':/surveill|vérification finale|avant de terminer|consignes/i.test(title)?'À surveiller':/optionnel|soin local|douleur/i.test(title)?'Si nécessaire':'';
+  const heading=`<h3>${title}${label && label!==title ? ` <small class="step-cue">${label}</small>` : ''}</h3>`;
+  const row=x=>`<li>${/\bsi\b|peut |éventuel|selon la scène/i.test(x)?'<span class="action-cue">Si nécessaire</span> ':''}${x}</li>`;
   if(compactMode){
     if(title === "Matériel"){
-      return `<div class="section ${cls}"><h3>${title}</h3><div class="compact-inline">${items.join(" · ")}</div></div>`;
+      return `<div class="section ${cls}">${heading}<div class="compact-inline">${items.join(" · ")}</div></div>`;
     }
     const limited = items.slice(0,3);
-    return `<div class="section ${cls}"><h3>${title}</h3><ul>${limited.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+    return `<div class="section ${cls}">${heading}<ul>${limited.map(row).join("")}</ul></div>`;
   }
-  return `<div class="section ${cls}"><h3>${title}</h3><ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  return `<div class="section ${cls}">${heading}<ul>${items.map(row).join("")}</ul></div>`;
 }
 
 function extraPhraseVariants(title){
@@ -594,7 +591,8 @@ function meds(rows){
   if(opioids && selected === "unsafe") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(compactMode){
     return `<div class="section">
-      <h3>Médicament / produit</h3>
+      <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
+      <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
       ${assessment}
       ${rows.map(r=>`
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
@@ -607,7 +605,8 @@ function meds(rows){
     </div>`;
   }
   return `<div class="section">
-    <h3>Médicament / produit</h3>
+    <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
+    <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
     ${assessment}
     ${rows.map(r=>`
       <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
@@ -1092,7 +1091,7 @@ function render(){
         "Nettoyer la plaie d’entrée et la plaie de sortie.",
         "Passer directement à la fermeture et au pansement si approprié."
       ]);
-      html += sayLines(["« La balle est ressortie. Je vais surtout nettoyer et refermer correctement. »"]);
+      html += sayLines(["« La balle est ressortie. Je vais nettoyer et vérifier si la plaie peut être refermée. »"]);
     } else {
       html += section("À faire",[
         "Ne pas inventer une extraction.",
@@ -1104,12 +1103,9 @@ function render(){
   } else if(step.dynamicSuture){
     if(answers.needsSuture === true){
       html += section("À faire",[
-        "Nettoyer une dernière fois la plaie et ses bords.",
-        "Rapprocher doucement les bords de la plaie.",
-        "Préparer une aiguille et du fil de suture.",
-        "Poser quelques points séparés, juste assez pour maintenir les bords rapprochés.",
-        "Couper le fil proprement.",
-        "Nettoyer autour de la suture avant le pansement."
+        "Nettoyer une dernière fois la plaie et ses bords, puis préparer aiguille et fil.",
+        "Rapprocher doucement les bords et jouer quelques points séparés.",
+        "Couper le fil, nettoyer autour puis préparer le pansement."
       ]);
       html += sayLines([
         "« Je vais refermer la plaie maintenant. »",
@@ -1320,7 +1316,7 @@ function render(){
       "Conseiller repos et surveillance."
     ]);
     html += sayLines([
-      "« Ça devrait aller, mais ménagez-vous pour le moment. »",
+      "« Ménagez-vous pour le moment. Je vais refaire le point sur votre état avant la suite. »",
       "« Si la douleur augmente, si vous avez des vertiges ou si vous perdez de la sensibilité, revenez me voir. »"
     ]);
 

@@ -17,6 +17,34 @@ function shouldSkipStep(step){
   if(currentFlow === 'fracture' && step.title === 'Soulager la douleur' && answers.fracturePain === 'mild') return true;
   return false;
 }
+function sceneMaterialMarkup(kind){
+  const surgery=kind==='surgery';
+  const step=surgery?surgeries[currentSurgery].steps[surgeryStepIndex]:flows[currentFlow].steps[stepIndex];
+  const title=step.title.toLowerCase();
+  let probable=[...(surgery?surgeryMaterials[currentSurgery]:interventionMaterials[currentFlow])];
+  if(!surgery){
+    if(answers.needsSuture===false || answers.needsSuture==='avoid')probable=probable.filter(x=>!/suture/i.test(x));
+    if(answers.bullet && answers.bullet!=='in')probable=probable.filter(x=>!/forceps/i.test(x));
+    if(['mild','moderate','unsafe'].includes(answers.rpPain) || answers.horsePain==='mild' || answers.fracturePain==='mild')probable=probable.filter(x=>!/seringue/i.test(x));
+  }
+  let now=[...(step.material || [])];
+  const add=(...items)=>now.push(...items);
+  if(/saign|ligatur/.test(title) || step.dynamicUnknownBleeding && ['major','minor'].includes(answers.unknownBleeding))add('Compresses / linge propre');
+  if(/nettoy|panser|pansement|protéger|fermer|drain/.test(title))add('Compresses / linge propre');
+  if(/panser|pansement|protéger|drain/.test(title))add('Bandage / pansement');
+  if(step.dynamicSuture && answers.needsSuture===true)add('Aiguille et fil de suture','Pince','Ciseaux','Compresses');
+  if(step.dynamic && currentFlow==='gunshot' && answers.bullet==='in')add('Forceps, uniquement si le projectile est accessible','Compresses');
+  if(step.dynamicHorseCare && (answers.horseVisible==='deformity' || answers.horseMove==='none'))add('Attelle','Bandages','Tissu rembourré');
+  if(/immobiliser/.test(title))add('Attelle','Bandages','Tissu rembourré');
+  if(/anesth/.test(title) || surgery && surgeryStepIndex===1 && (step.meds || []).some(r=>/chloroforme|éther/i.test(r[0])))add('Linge / compresse ou dispositif prévu pour l’anesthésie retenue');
+  if(surgery && /opérer|explorer|accéder|décomprimer|traiter la lésion|ligatur|extraire|nettoyer chirurgicalement/.test(title))add(...probable.filter(x=>!/chloroforme|éther|suture|pansement|bandage/i.test(x)));
+  if(surgery && /fermer/.test(title))add('Aiguille et fil de suture, seulement si fermeture adaptée','Pansement');
+  const products=(step.med || step.meds || []).map(r=>r[0]);
+  if((products.some(x=>/morphine/i.test(x)) || step.dynamicHorsePain || step.dynamicSuture && answers.needsSuture===true) && !['mild','moderate','unsafe'].includes(answers.rpPain) && answers.horsePain!=='moderate')add('Seringue, seulement si la morphine est retenue');
+  now=[...new Set(now)];
+  const list=items=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  return `<div class="material-panel"><h3>Matériel nécessaire</h3><h4>Pour cette étape</h4>${now.length?list(now):'<p>Aucun instrument particulier indiqué à cette étape : observation et préparation selon la scène.</p>'}<details><summary>Éventuellement pour la suite</summary>${list(probable)}<p class="muted">À préparer selon les choix à venir, pas à utiliser systématiquement. Les produits sont des alternatives, pas une liste à administrer.</p></details></div>`;
+}
 function visibleFlowSteps(){
   return flows[currentFlow].steps.map((step,index)=>({step,index})).filter(({step})=>!shouldSkipStep(step));
 }
@@ -55,10 +83,19 @@ const sceneEndings = {
   burn:["Évaluation, protection locale et surveillance.","« La zone est protégée. Je veux savoir si la douleur ou la respiration change. »","Repos et contrôle adapté à l'étendue jouée.","Gêne respiratoire, malaise ou aggravation de la douleur."],
   poison:["Recherche du produit et surveillance de la conscience et de la respiration.","« Même si vous vous sentez mieux, je vais encore vous surveiller. »","Pas de sortie automatique après un réveil ; prolonger la surveillance dans le RP.","Somnolence croissante, respiration faible ou perte de connaissance."]
 };
+const surgeryEndings={
+  amputation:['Reprendre uniquement l’acte et le pansement effectivement joués.','« Nous avons fini les gestes prévus. La surveillance continue avant toute autre décision. »','Repos, protection de la zone opérée et contrôle du pansement dans la scène.','Reprise du saignement, pâleur, douleur, respiration ou conscience qui changent.'],
+  major_bleeding:['Vérifier à nouveau le saignement, sans présumer que la ligature a suffi.','« Je vais revérifier le saignement et votre état avant de poursuivre. »','Rester sous surveillance RP ; ne pas annoncer un départ après la seule fin des gestes.','Saignement qui reprend, faiblesse, pâleur ou perte de connaissance.'],
+  deep_bullet:['Préciser si le projectile a réellement été retiré ou si l’exploration a été interrompue.','« Je vous expliquerai ce qui a pu être fait, puis la suite de la surveillance. »','Contrôle de la plaie et du pansement ; expliquer si le projectile reste en place dans la scène.','Saignement, douleur croissante, malaise ou changement de respiration.'],
+  abdominal:['Reprendre les gestes joués sans conclure que toutes les lésions internes sont réparées.','« La surveillance reste importante après ces gestes. Nous allons rester auprès de vous. »','Repos et surveillance prolongée dans le RP ; aucune guérison ou sortie automatique.','Douleur abdominale, ventre qui se tend, faiblesse, saignement ou conscience qui changent.'],
+  trepanation:['La fin du geste ne garantit ni réveil ni amélioration.','« Nous allons continuer à observer ses réactions et sa respiration. »','Surveillance prolongée de la conscience et de l’évolution jouée, même après un réveil.','Confusion, somnolence, vomissements, respiration ou réactions qui changent.'],
+  infected_wound:['Reprendre le nettoyage et le drainage réellement joués ; ne pas annoncer l’infection guérie.','« Le soin ne termine pas la surveillance de cette plaie. Je veux la revoir dans la scène. »','Prévoir une inspection et le renouvellement du pansement selon le RP.','Fièvre, douleur croissante, rougeur qui s’étend ou nouvel écoulement.']
+};
 function endingMarkup(kind){
   const surgery=kind==='surgery';
   const entry=surgery ? surgeries[currentSurgery] : flows[currentFlow];
-  const notes=surgery ? ["Fin du parcours opératoire : reprendre uniquement les gestes effectivement joués.","« L'acte est fini, mais la surveillance continue. Nous allons vérifier votre état. »","Pansement, repos et surveillance prolongée selon la scène, sans guérison automatique.","Saignement, respiration, conscience, douleur et évolution de la plaie."] : sceneEndings[currentFlow];
+  const notes=surgery ? surgeryEndings[currentSurgery] : sceneEndings[currentFlow];
+  rpPhraseBlocks=[];
   let variant='';
   if(!surgery && answers.needsSuture === true) variant='Des points ont été proposés dans le parcours : mentionne-les seulement si tu les as joués.';
   if(!surgery && answers.needsSuture === false) variant='Pas de points nécessaires selon tes choix : conclure sur le nettoyage et la protection.';

@@ -18,6 +18,9 @@ const path = require('node:path');
       const labels=page.locator('#anatomyStage .anatomy-label');
       for(let i=0;i<await labels.count();i++){
         const button=labels.nth(i);
+        // Test each label from outside the floating card, as a fresh hover.
+        await page.mouse.move(0,0);
+        await page.keyboard.press('Escape');
         await button.hover();
         await tip.waitFor({state:'visible'});
         assert.equal(await tip.locator(':scope > strong').innerText(),(await button.getAttribute('aria-label')).replace('Afficher la fiche : ',''));
@@ -39,10 +42,13 @@ const path = require('node:path');
     await page.keyboard.press('Escape');
     assert(await tip.isHidden());
     const first=page.locator('#anatomyStage .anatomy-label').first();
+    await page.mouse.move(0,0);
+    await first.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(220);
     await first.focus();
-    assert(await tip.isVisible());
+    await tip.waitFor({state:'visible'});
     await page.keyboard.press('Tab');
-    assert(await tip.isVisible());
+    await tip.waitFor({state:'visible'});
     await page.getByRole('button',{name:'Agrandir la planche'}).click();
     const zoomLabel=page.locator('#anatomyZoomStage .anatomy-label').first();
     await zoomLabel.hover();

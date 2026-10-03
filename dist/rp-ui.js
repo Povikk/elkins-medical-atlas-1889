@@ -20,7 +20,7 @@ function rpPatientState(){
  if(sleepingSurgery())return 'asleep';
  if(activeRouteKind==='surgery' && surgeries[currentSurgery]?.steps[surgeryStepIndex]?.recovery)return 'recovery';
  const state=answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:undefined);
- if(/unconscious|not_breathing/.test(state || '') || answers.breathing==='no' || answers.unknownBreathing==='no')return 'unresponsive';
+ if(/unconscious|not_breathing/.test(state || '') || answers.breathing==='no' || !answers.unknownWake && answers.unknownBreathing==='no')return 'unresponsive';
  if(state==='unknown' || currentFlow==='unknown' && !state)return 'uncertain';
  if(state==='confused' || state==='sleepy')return 'confused';
  if(rpContext.mood==='panic')return 'panic';
@@ -41,6 +41,7 @@ function rpGesture(){
 }
 function rpDialogue(items){
  const state=rpPatientState();
+ const ended=activeRouteKind==='surgery'?surgeryEnded:interventionEnded;
  const assistant=rpContext.team==='assistant' || rpContext.team==='';
  let audience='Au patient, s’il peut répondre';
  let pool=[...(items || []),casePhrase()].filter(Boolean);
@@ -71,10 +72,15 @@ function rpDialogue(items){
    pool=[pool[0],question,...pool.slice(1)];
  }
  pool=[...new Set(pool.filter(Boolean))];
+ if(ended){
+   const notes=activeRouteKind==='surgery'?surgeryEndings[currentSurgery]:sceneEndings[currentFlow];
+   const responsive=!['asleep','unresponsive'].includes(state);
+   audience=responsive?'Pour conclure, selon l’état joué':'À l’accompagnant, s’il est présent';
+   pool=responsive?[notes[1],`« Pour la suite : ${notes[2]} »`,`« Prévenez-moi si vous remarquez ceci : ${notes[3]} »`,'À l’accompagnant, s’il est présent : « Restez près de lui et prévenez-moi si son état change. »','« Avant de poursuivre, avez-vous une question sur les consignes ? »']:[`« La surveillance continue : ${notes[3]} »`,'« Il ne répond pas encore. La fin de ces gestes ne signifie pas qu’il peut repartir. »','« Si quelqu’un peut rester auprès de lui, prévenez-moi de toute modification de sa respiration ou de ses réactions. »'];
+ }
  const firstBlock=rpPhraseBlocks.length===0;
  const stepKey=rpDialogueStepKey();
  const index=rpPhraseBlocks.push({pool,position:0,stepKey})-1;
- const ended=activeRouteKind==='surgery'?surgeryEnded:interventionEnded;
  return `${ended || !firstBlock?'':rpGesture()}<div class="rp-lines rp-dialogue"><div class="rp-dialogue-heading"><span>${audience}</span><button type="button" class="secondary" onclick="alternateRpPhrase(${index},this)">Autre formulation</button></div><div class="rp-phrase-list" aria-live="polite">${rpPhraseRows(rpPhraseBlocks[index])}</div></div>`;
 }
 function alternateRpPhrase(index,button){
