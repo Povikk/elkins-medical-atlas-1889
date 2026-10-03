@@ -24,14 +24,15 @@
 - Disponibilité locale distinguée de l’existence historique d’un produit.
 - Trois planches et 45 noms préservés. Recherche avec accents et synonymes, question RP, références et raccourci de parcours thématique.
 - Clic pour garder une fiche anatomique ouverte. Fermeture explicite ou Échap ; aucun panneau permanent à droite.
-- 32 trames : 28 propositions compatibles avec 1889 et 4 repères postérieurs clairement hors jeu.
-- Chaque trame possède une accroche, des rôles, trois temps, des gestes, des questions, des issues ouvertes et des limites. Les faits historiques cités disposent de sources ; les situations inventées sont signalées.
+- 60 accroches dans dix catégories, remplaçant entièrement les anciennes trames et découvertes.
+- Chaque accroche propose une phrase du médecin, une scène possible et une relance repliée. Recherche et filtres par catégorie et soin. Aucun passé ou problème inventé pour le patient, aucune suite imposée.
+- Une suggestion facultative repliée sous les soins, avec « Autre accroche » sans modifier le parcours. Les invitations restent à adapter à ce que le médecin peut réellement organiser.
 
 ## Ergonomie et confidentialité
 
 - Taille de texte réglable préservée dans les deux thèmes.
 - Contrôles de lecture et de thème placés dans l’en-tête mobile, hors de la navigation basse.
-- Navigation à six entrées, accès aux trames depuis l’accueil et la barre latérale.
+- Navigation à six entrées, accès aux accroches depuis l’accueil et la barre latérale.
 - Application autonome sans backend ni base de données. Aucune sauvegarde de patient ou d’intervention. Seules les préférences de thème et de taille sont stockées localement.
 
 Les tests vérifient des parcours représentatifs et les régressions connues. Ils ne constituent pas une validation médicale des techniques historiques, qui restent exclusivement des repères de jeu.

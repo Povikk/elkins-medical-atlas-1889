@@ -30,7 +30,7 @@
       <button type="button" class="side-nav-item" data-shell-view="lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
       <button type="button" class="side-nav-item" data-shell-view="surgery" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
       <button type="button" class="side-nav-item" data-shell-view="atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
-      <button type="button" class="side-nav-item" data-shell-view="stories" onclick="showStories()"><span aria-hidden="true">▤</span>Trames & découvertes</button>
+      <button type="button" class="side-nav-item" data-shell-view="stories" onclick="showStories()"><span aria-hidden="true">▤</span>Accroches</button>
     </nav>
     <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
     <label class="reading-setting" for="readingSize">Taille du texte
@@ -77,7 +77,7 @@
           <strong>Atlas anatomique</strong>
           <span>Squelette, muscles et organes avec repères interactifs</span>
         </button>
-        <button class="home-btn" onclick="showStories()"><strong>Trames & découvertes</strong><span>Préparer une intrigue, une visite ou une correspondance d’époque</span></button>
+        <button class="home-btn" onclick="showStories()"><strong>Accroches</strong><span>Des perches à glisser pendant un soin pour proposer une autre scène</span></button>
       </div>
     </section>
 
@@ -220,9 +220,9 @@
 
     <section id="surgeryFlow" class="hidden"></section>
     <section id="stories" class="hidden">
-      <div class="topbar"><div><h2>Trames & découvertes</h2><p class="muted">Préparer du jeu, pas prescrire un soin. Les développements restent facultatifs.</p></div><button class="secondary" onclick="goHome()">Accueil</button></div>
-      <div class="story-filters"><label>Rechercher<input id="storySearch" type="search" placeholder="Une idée, un métier, un produit…" oninput="renderStories()"></label><label>Thème<select id="storyCategory" onchange="renderStories()"><option value="">Tous les thèmes</option></select></label><label>Cadre<select id="storyPeriod" onchange="renderStories()"><option value="">Tout le catalogue</option><option value="1889">Jouable en 1889</option><option value="future">Repères postérieurs, hors jeu en 1889</option></select></label></div>
-      <p id="storyCount" class="muted" role="status"></p><div id="storyList" class="story-grid"></div><div id="storyDetail" hidden></div>
+      <div class="topbar"><div><h2>Accroches</h2><p class="muted">Une phrase du médecin pour tendre une perche. Le joueur choisit s’il rebondit ; tu ne lui inventes ni passé ni problème.</p></div><button class="secondary" onclick="goHome()">Accueil</button></div>
+      <div class="story-filters"><label>Rechercher<input id="storySearch" type="search" placeholder="Artisan, visite, pharmacien, lettre…" oninput="renderStories()"></label><label>Thème<select id="storyCategory" onchange="renderStories()"><option value="">Tous les thèmes</option></select></label><label>Pendant quel soin ?<select id="hookRoute" onchange="renderStories()"><option value="">Tous les soins</option></select></label></div>
+      <p id="storyCount" class="muted" role="status"></p><div id="storyList" class="story-grid"></div>
     </section>
 
     <section id="atlas" class="hidden">
@@ -283,7 +283,7 @@
 <script src="scene.js"></script>
 <script src="rp-ui.js"></script>
 <script src="care.js"></script>
-<script src="stories.js"></script>
+<script src="hooks.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

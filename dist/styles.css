@@ -1445,15 +1445,19 @@ html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{fo
 .story-filters input,.story-filters select,#atlasSearch{width:100%;min-height:44px;padding:10px 12px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:inherit}
 .story-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
 .story-card{display:flex;flex-direction:column;text-align:left;align-items:start;gap:10px;padding:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;line-height:1.55;font-size:calc(16px * var(--reading-scale))}
-.story-card strong{font-family:Georgia,serif;font-size:calc(23px * var(--reading-scale));line-height:1.2}
-.story-card small{margin-top:auto;color:var(--muted)}
-.story-card:hover{border-color:var(--accent2)}
-.story-article{max-width:1100px;margin:20px auto;text-align:left;font-size:calc(17px * var(--reading-scale));line-height:1.6}
-.story-detail-heading{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-.story-hook{font-size:calc(19px * var(--reading-scale))}
-.story-act,.story-quick{border:1px solid var(--line);border-radius:10px;padding:18px;margin:12px 0;background:var(--panel)}
-.story-act h3{margin-top:0}.story-phrase{color:var(--ink);font-style:italic}
-.story-history,.inline-material,.surgery-indication,.route-links{padding:12px 16px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel);grid-column:1/-1}
+.hook-card h3{font-family:Georgia,serif;font-size:calc(23px * var(--reading-scale));line-height:1.2;margin:0}
+.hook-card p{margin:0;overflow-wrap:anywhere}
+.hook-card small{color:var(--muted)}
+.hook-card>div:first-child{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hook-phrase{font-size:calc(18px * var(--reading-scale));color:var(--ink)}
+.hook-opens{color:var(--muted)}
+.hook-card details{width:100%;margin-top:auto}
+.hook-card details p{margin-top:10px}
+.care-hook{grid-column:1/-1;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--panel)}
+.care-hook>summary{font-size:calc(14px * var(--reading-scale))}
+.care-hook>summary small{color:var(--muted);margin-left:10px}
+.care-hook .hook-card{border:0;padding:16px 0 4px;max-width:900px}
+.inline-material,.surgery-indication,.route-links{padding:12px 16px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel);grid-column:1/-1}
 .product-details{margin-top:10px}.product-details>div{margin-top:10px}
 summary{cursor:pointer;color:var(--ink)}
 .assistant-note{border-left:3px solid var(--accent2);padding:10px 14px;margin:8px 0;grid-column:1/-1;background:var(--panel);font-size:calc(15px * var(--reading-scale))}
@@ -1475,5 +1479,5 @@ summary{cursor:pointer;color:var(--ink)}
  .side-nav-item{font-size:10px!important;padding:7px 2px!important;min-width:0;overflow-wrap:anywhere}
  .story-grid{grid-template-columns:1fr}.story-card{padding:16px}
  .story-filters{display:grid;grid-template-columns:1fr}.story-filters label{min-width:0}
- .story-article{margin:12px 0}.story-act{padding:14px}
+ .care-hook>summary small{display:block;margin:5px 0 0}
 }

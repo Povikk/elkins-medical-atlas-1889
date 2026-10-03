@@ -7,8 +7,8 @@ const fs=require('node:fs');
   const page=await browser.newPage({viewport:{width:2560,height:1440}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
-  const counts=await page.evaluate(()=>({flows:Object.keys(flows),stories:stories.length,playable:stories.filter(s=>s.period==='1889').length,equipment:equipmentLexicon.length,symptoms:symptomLexicon.length}));
-  assert.equal(counts.flows.length,17);assert(counts.stories>=30);assert.equal(counts.equipment,21);assert.equal(counts.symptoms,20);
+  const counts=await page.evaluate(()=>({flows:Object.keys(flows),hooks:hooks.length,equipment:equipmentLexicon.length,symptoms:symptomLexicon.length}));
+  assert.equal(counts.flows.length,17);assert.equal(counts.hooks,60);assert.equal(counts.equipment,21);assert.equal(counts.symptoms,20);
   let runs=0;
   for(const id of counts.flows)for(const last of [false,true]){
    await page.evaluate(id=>start(id),id);
@@ -64,22 +64,32 @@ const fs=require('node:fs');
   await page.evaluate(()=>{setRpContext('team','assistant','flow');});
   assert(await page.locator('.assistant-note').isVisible());
   await page.evaluate(()=>showStories());
-  assert.equal(await page.locator('.story-card').count(),counts.stories);
-  for(const category of await page.evaluate(()=>[...new Set(stories.map(s=>s.category))])){
+  assert.equal(await page.locator('.story-card').count(),counts.hooks);
+  assert(await page.evaluate(()=>new Set(hooks.map(h=>h.id)).size===hooks.length&&hooks.every(h=>h.routes.every(r=>flows[r])&&['title','moment','phrase','followup','opens'].every(k=>h[k].trim()))));
+  assert.equal(await page.locator('#storyDetail,#storyPeriod').count(),0);
+  for(const category of await page.evaluate(()=>[...new Set(hooks.map(s=>s.category))])){
    await page.locator('#storyCategory').selectOption(category);assert((await page.locator('.story-card').count())>0);
    for(const text of await page.locator('.story-card .cat-badge').allTextContents())assert.equal(text,category);
   }
   await page.locator('#storyCategory').selectOption('');
-  for(const id of await page.evaluate(()=>stories.map(s=>s.id))){
-   await page.evaluate(id=>openStory(id),id);
-   assert.equal(await page.locator('.story-act').count(),3,id);
-   assert.match(await page.locator('#storyDetail').innerText(),/Issues ouvertes/);
-   await page.getByRole('button',{name:'Retour au catalogue',exact:true}).click();
+  for(const id of counts.flows){
+   await page.locator('#hookRoute').selectOption(id);
+   assert((await page.locator('.story-card').count())>0,id);
+   assert.equal(await page.locator('.story-card').count(),await page.evaluate(id=>hooks.filter(h=>h.routes.includes(id)).length,id));
   }
-  await page.locator('#storyPeriod').selectOption('future');assert.equal(await page.locator('.story-card').count(),4);
-  await page.locator('#storyPeriod').selectOption('1889');assert.equal(await page.locator('.story-card').count(),counts.playable);
-  await page.locator('#storySearch').fill('phénacétine');assert.equal(await page.locator('.story-card').count(),1);
-  await page.locator('.story-card').click();assert.match(await page.locator('#storyDetail').innerText(),/refuser/);
+  await page.locator('#hookRoute').selectOption('');
+  await page.locator('#storySearch').fill('stethoscope');assert.equal(await page.locator('.story-card').count(),1);
+  await page.locator('.hook-card summary').click();assert.match(await page.locator('.hook-card').innerText(),/sans insister/);
+  await page.locator('#storySearch').fill('zzzznotfound');assert.equal(await page.locator('.story-card').count(),0);
+  await page.locator('#storySearch').fill('');
+  await page.evaluate(()=>start('minor'));
+  assert.equal(await page.locator('.care-hook').count(),1);assert.equal(await page.locator('.care-hook').getAttribute('open'),null);
+  await page.locator('.care-hook>summary').click();
+  const hookBefore=await page.locator('.care-hook h3').innerText();
+  const careBefore=await page.evaluate(()=>JSON.stringify({answers,stepIndex,currentFlow}));
+  await page.getByRole('button',{name:'Autre accroche',exact:true}).click();
+  assert.notEqual(await page.locator('.care-hook h3').innerText(),hookBefore);
+  assert.equal(await page.evaluate(()=>JSON.stringify({answers,stepIndex,currentFlow})),careBefore);
   await page.evaluate(()=>showAtlas());
   for(const term of ['cubitus','omoplate','cœur','péroné']){
    await page.locator('#atlasSearch').fill(term);assert((await page.locator('#atlasSearchResults button').count())>0,term);
@@ -93,10 +103,10 @@ const fs=require('node:fs');
   assert.match(await page.locator('.reference-detail').innerText(),/Frissons/);await page.evaluate(()=>closeSceneReferences());
   for(const theme of ['dark','light'])for(const width of [2560,1920,390,320]){
    await page.setViewportSize({width,height:width<500?844:1440});await page.waitForTimeout(60);
-   await page.evaluate(theme=>{applyTheme(theme);setReadingSize('xlarge',false);showStories();openStory('phenacetin');},theme);
+   await page.evaluate(theme=>{applyTheme(theme);setReadingSize('xlarge',false);showStories();},theme);
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`story width ${width}`);
    assert(await page.locator('#readingSize').isVisible());assert(await page.locator('#themeToggle').isVisible());
-   await page.screenshot({path:`tmp/site-qa/stories-${width}-${theme}.png`,fullPage:true});
+   await page.screenshot({path:`tmp/site-qa/hooks-${width}-${theme}.png`,fullPage:true});
    await page.evaluate(()=>{setReadingSize('normal',false);start('gunshot');answers={conscious:'awake'};render();});
    const choices=page.locator('#flow .choice');
    if(width>=1920)for(const box of await choices.evaluateAll(nodes=>nodes.map(e=>e.getBoundingClientRect().bottom)))assert(box<1440);
