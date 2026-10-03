@@ -47,6 +47,16 @@ function renderCondensed(kind){
  root.classList.add('condensed-workspace');
  root.innerHTML=`<div class="topbar condensed-topbar"><div><span class="badge">Condensé</span>${urgencyBadge(careUrgency(surgery?'critical':route.urgency))}<h2>${condensedEscape(route.title)}</h2></div><div class="condensed-controls">${compactButton(kind)}<button class="material-btn" onclick="toggleMaterialPanel('${kind}')" aria-expanded="${materialPanelOpen}">Matériel nécessaire</button><button class="secondary" onclick="reassessCare()">Réévaluer le patient</button><button class="danger" onclick="${surgery?'showSurgery()':'showCases()'}">Changer de cas</button></div></div>${warning?'<p class="condensed-alert current-warning">Dernière observation inquiétante : suspendre le soin non prioritaire, réévaluer et organiser du renfort. Passer à une autre étape ne signifie pas une stabilisation.</p>':''}<p class="condensed-note">Choisir les observations pour adapter la suite. Les étapes à venir ne sont pas des gestes déjà réalisés.</p>${materialPanel(kind)}<div class="condensed-grid">${cards.join('')}</div><div class="nav"><button class="secondary" onclick="${surgery?'prevSurgery()':'prev()'}">Précédent</button><button class="next" onclick="${surgery?'nextSurgery()':'next()'}" ${rootChoiceMissing(route,surgery)?'disabled':''}>${(surgery?surgeryStepIndex:stepIndex)===route.steps.length-1?'Terminer':'Étape suivante'}</button></div>`;
  const incident=document.createElement('button');incident.className='incident-button';incident.textContent='Son état change';incident.onclick=()=>openIncident();root.querySelector('.condensed-controls').append(incident);
+ const memoButton=document.createElement('button');memoButton.className='secondary care-memo-toggle';memoButton.textContent=careMemoOpen?'Masquer le pense-bête':'Pense-bête';memoButton.setAttribute('aria-expanded',String(careMemoOpen));memoButton.onclick=toggleCareMemo;root.querySelector('.condensed-controls').prepend(memoButton);
+ const grid=root.querySelector('.condensed-grid');grid.insertAdjacentHTML('beforebegin',careMemoMarkup(kind));
+ if(careMemoOpen&&careMemoOnly){
+  const active=grid.querySelector('.is-current');
+  const choices=active?.querySelector('.condensed-choice');
+  const current=document.createElement('div');current.className='care-memo-current';
+  const activeIndex=surgery?saved.surgeryIndex:saved.index,position=stages.findIndex(stage=>stage.index===activeIndex)+1;
+  current.innerHTML=`<b>Étape actuelle : ${position} / ${stages.length} - ${condensedEscape(route.steps[activeIndex].title)}</b>${choices?choices.outerHTML:'<span>Les étapes détaillées restent accessibles en décochant « Pense-bête seul ».</span>'}`;
+  grid.before(current);grid.hidden=true;
+ }
 }
 function rootChoiceMissing(route,surgery){if(surgery)return false;const raw=document.createElement('div');raw.innerHTML=render(true);const choices=condensedStepChoices(raw);return choices.length>0&&!choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v));}
 function condensedChoice(index,value){

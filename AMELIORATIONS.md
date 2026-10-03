@@ -2,6 +2,7 @@
 
 ## Pendant une scène
 
+- Pense-bête d’Effie accessible dans le condensé, seul ou au-dessus des étapes : Observer, Agir, Produits facultatifs, Danger. Ligne de quatre cellules sur PC et empilement lisible sur mobile. Repères adaptés au soin, à la zone connue et aux observations inquiétantes ; aucun changement de réponses en ouvrant la vue.
 - Gravité visuelle réévaluée selon les observations, sans diagnostic automatique.
 - Conscience, respiration et saignement réévaluables à toute étape. Le rappel distingue l’état initial de la dernière observation.
 - Propositions d’opiacés retirées lorsque conscience, respiration ou saignement rendent le contexte inquiétant. Aucun produit obligatoire.

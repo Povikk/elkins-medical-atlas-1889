@@ -335,7 +335,7 @@ function toggleCompact(target){
 function compactButton(target){
   return `<button class="compact-toggle ${compactMode ? "on" : ""}" aria-pressed="${compactMode}" onclick="toggleCompact('${target}')">
     ${compactMode ? "Vue détaillée" : "Condensé"}
-  </button>`;
+  </button>${!compactMode?`<button class="secondary care-memo-launch" onclick="openCareMemo('${target==='surgery'?'surgery':'flow'}')">Pense-bête</button>`:''}`;
 }
 
 function show(id){

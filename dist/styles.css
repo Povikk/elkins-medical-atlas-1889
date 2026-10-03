@@ -1440,6 +1440,21 @@ html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{fo
 }
 
 /* Preparation content is separated from the quick care workspace. */
+.care-memo{margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.care-memo-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.care-memo-heading h3{margin:0;font-size:19px}.care-memo-heading h3 small{font:400 14px Arial,sans-serif;color:var(--muted);margin-left:12px}
+.care-memo-heading label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.care-memo-heading input{width:18px;height:18px;accent-color:var(--accent2)}
+.care-memo-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.care-memo-cell{padding:12px 14px;border-right:1px solid var(--line);min-width:0;text-align:left}
+.care-memo-cell:last-child{border-right:0}.care-memo-cell h4{margin:0 0 8px;font:700 14px Arial,sans-serif;color:var(--accent2)}
+.care-memo-cell p{margin:0;font-size:calc(16px * var(--reading-scale));line-height:1.5;overflow-wrap:anywhere}
+.care-memo-danger{background:color-mix(in srgb,var(--accent) 7%,var(--panel))}.care-memo-danger h4{color:var(--accent)}
+.care-memo-source{display:block;padding:8px 14px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
+.care-memo-current{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px;background:var(--panel);font-size:16px}
+.care-memo-current>span{font-size:14px;color:var(--muted)}
+.care-memo-current .condensed-choice{margin:0;max-width:450px;flex:1 1 260px}.care-memo-current select{width:100%;padding:9px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;font:inherit;min-width:0}
+@media(max-width:760px){.care-memo-row{grid-template-columns:1fr}.care-memo-cell{border-right:0;border-bottom:1px solid var(--line)}.care-memo-cell:last-child{border-bottom:0}.care-memo-heading h3 small{display:block;margin:5px 0 0}.care-memo-current .condensed-choice{max-width:100%;flex-basis:100%}}
 .care-report{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:20px 0;background:var(--panel)}
 .care-report>summary{font-size:calc(19px * var(--reading-scale));font-weight:700}
 .report-hint{font-size:14px;line-height:1.5}
