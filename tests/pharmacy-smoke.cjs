@@ -10,7 +10,7 @@ const path = require('node:path');
     for(const viewport of [{width:2560,height:1440},{width:390,height:844}]){
       await page.setViewportSize(viewport);
       await page.goto('http://127.0.0.1:4173/');
-      await page.evaluate(()=>showLexique());
+      await page.evaluate(()=>{showLexique();setLexTab('meds');});
       const total = await page.locator('#lexGrid .lex-card').count();
       assert(total >= 50);
       for(const theme of ['dark','light']){
@@ -47,7 +47,7 @@ const path = require('node:path');
       await page.getByRole('button',{name:'Symptômes',exact:true}).click();
       await page.locator('#lexSearch').fill('paleur');
       assert.match(await page.locator('#lexGrid').innerText(),/Pâleur/);
-      await page.evaluate(()=>showLexique());
+      await page.evaluate(()=>{showLexique();setLexTab('meds');});
       assert.equal(await page.locator('#lexGrid .lex-card').count(),total);
     }
     assert.deepEqual(errors,[]);

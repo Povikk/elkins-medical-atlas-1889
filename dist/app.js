@@ -338,6 +338,7 @@ function compactButton(target){
 }
 
 function show(id){
+  if(typeof hideLexQuickTooltip==='function')hideLexQuickTooltip();
   placeReadingControls();
   hideAnatomyTooltip();
   const target = document.getElementById(id);
@@ -380,7 +381,7 @@ function showCases(){
   show("cases");
 }
 function showLexique(){
-  lexTab = "meds";
+  lexTab = "quick";
   document.getElementById("lexCategory").value = "";
   document.getElementById("lexContext").value = "";
   const input = document.getElementById("lexSearch");
@@ -391,7 +392,7 @@ function showLexique(){
 }
 
 function setLexTab(tab){
-  if(!["meds","equipment","symptoms"].includes(tab)) return;
+  if(!["quick","meds","equipment","symptoms"].includes(tab)) return;
   lexTab = tab;
   const input = document.getElementById("lexSearch");
   if(input) input.value = "";
@@ -414,10 +415,12 @@ function updateLexTabs(){
   const helper = document.getElementById("lexHelpful");
   const search = document.getElementById("lexSearch");
   if(grid) grid.classList.remove("hidden");
+  if(grid) grid.classList.toggle('lex-quick-grid',lexTab==='quick');
   if(helper) helper.classList.toggle("hidden", lexTab !== "meds");
   if(search){
     search.classList.remove("hidden");
     const placeholders = {
+      quick:"Rechercher dans les essentiels : produit, geste, usage...",
       meds:"Rechercher un médicament, un usage ou une administration...",
       equipment:"Rechercher un instrument ou du matériel...",
       symptoms:"Rechercher un symptôme ou un signe..."
@@ -427,10 +430,13 @@ function updateLexTabs(){
 }
 
 function filterLexique(){
+  if(typeof hideLexQuickTooltip==='function')hideLexQuickTooltip();
   const input = document.getElementById("lexSearch");
   const normalize = value => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’']/g," ");
   const q = normalize(input ? input.value.trim() : "");
-  if(lexTab === "meds"){
+  if(lexTab === "quick"){
+    renderLexQuick(q);
+  } else if(lexTab === "meds"){
     const category = document.getElementById("lexCategory").value;
     const context = document.getElementById("lexContext").value;
     const list = lexique.filter(x =>

@@ -10,6 +10,7 @@ Ouvrir `index.html` pour accéder directement à la version actuelle. La version
 - `dist/styles.css` contient le thème et les règles responsive.
 - `dist/data.js` contient le Lexique, les parcours et le matériel.
 - `dist/app.js` contient la navigation et le rendu interactif.
+- `dist/lex-quick.js` ajoute l’onglet Essentiels, ouvert par défaut dans le Lexique : six cellules regroupant 22 repères RP du catalogue existant, avec fiches près de la souris. Clic pour fixer une fiche, Échap / fermeture / clic extérieur pour la quitter ; ouverture au toucher sur mobile. Aucun dosage, nouvelle recette ou stockage ajouté.
 - `dist/care.js` contient les consultations, métadonnées de matériel, réévaluation et aides de soin.
 - `dist/condensed.js` affiche le parcours complet sans dialogue RP, en réutilisant les actions et règles de branchement du rendu détaillé. Les observations ultérieures sont invalidées quand une réponse antérieure change ; les dernières observations vitales restent conservées.
 - `dist/care-memo.js` fournit le pense-bête d’Effie, accessible depuis le condensé : quatre cellules Observer / Agir / Produits facultatifs / Danger, seules ou au-dessus des étapes. Les choix restent accessibles en vue seule. Présentation inspirée des pages 2 et 3 du PDF fourni ; les consultations et chirurgies sont adaptées aux parcours existants. Les autres chapitres du PDF ne deviennent pas de nouveaux diagnostics ou prescriptions. Aucun protocole ou dosage ajouté.

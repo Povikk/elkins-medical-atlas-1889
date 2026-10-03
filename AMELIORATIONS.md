@@ -2,6 +2,8 @@
 
 ## Pendant une scène
 
+- Lexique : vue Essentiels en six cellules visuelles, avec 22 produits, matériels et gestes. Fiches explicatives au survol ou au toucher, préparation descriptive et précautions issues du catalogue. Lexique complet préservé dans ses onglets.
+
 - Vue détaillée resserrée : interlignes, listes, espaces et marges réduits sans diminuer la taille du texte. Vue condensée inchangée.
 - Perches retirées des interventions ; catégorie Accroches conservée séparément.
 - Fin du soin : deux lignes automatiques reprenant les choix et les soins suggérés, sans formulaire ni enregistrement. Côtés gauche / droit ajoutés aux zones pertinentes ; nombre de points non inventé.
