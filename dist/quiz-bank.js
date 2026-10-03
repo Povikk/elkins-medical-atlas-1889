@@ -40,8 +40,69 @@ const quizSituations = [
  ['Une extraction de corps étranger est évoquée. Quelle limite retenir ?', 'Seulement un objet accessible dans la scène, sans recherche aveugle', ['Tous les objets doivent être retirés immédiatement','Il faut sonder toute plaie en profondeur','L’absence de visibilité ne compte pas'], 'La technique d’extraction garde une limite d’accessibilité et ne donne aucune procédure réelle.'],
  ['Une écharpe de soutien est posée. Que décrit-elle ?', 'Un soutien du bras, pas la guérison d’une fracture', ['Une anesthésie','Une preuve que l’os est réparé','Un produit antiseptique'], 'Le soutien sert au confort narratif et au maintien, sans résultat médical garanti.'],
  ['Une trame possible est suggérée pendant un soin. Quelle place laisser au joueur ?', 'La possibilité de rebondir ou de refuser', ['Lui imposer un passé','Inventer sa maladie secrète','Exiger la prochaine scène'], 'Une accroche ouvre une possibilité de jeu sans décider de l’histoire du patient.'],
- ['Après le soin, quelle consigne est la plus utile au jeu ?', 'Surveiller l’évolution et revenir si l’état change', ['Promettre zéro complication','Garantir une guérison immédiate','Interdire toute nouvelle observation'], 'Le suivi reste une ouverture de scène et un repère de surveillance, pas une garantie.']
+ ['Après le soin, quelle consigne est la plus utile au jeu ?', 'Surveiller l’évolution et revenir si l’état change', ['Promettre zéro complication','Garantir une guérison immédiate','Interdire toute nouvelle observation'], 'Le suivi reste une ouverture de scène et un repère de surveillance, pas une garantie.'],
+ ['Au cabinet, un patient tousse depuis plusieurs jours. Quelle première question est utile ?', 'Depuis quand toussez-vous, et respirez-vous difficilement ?', ['Quelle dose voulez-vous sans examen ?','Vous avez forcément une maladie précise, n’est-ce pas ?','Souhaitez-vous une attelle pour cette toux ?'], 'La durée et la gêne respiratoire précisent le contexte. Une toux seule ne permet pas d’identifier un germe.'],
+ ['Un patient tousse et demande un adoucissant pour la gorge. Quel produit du lexique a cet usage historique ?', 'Préparation de réglisse', ['Scie chirurgicale','Attelle','Huile pour brûlures'], 'La réglisse figure dans des préparations de toux et de gorge. Elle ne traite pas une détresse respiratoire.'],
+ ['Le pharmacien propose des sels odorants pour une toux. Quelle confusion vérifies-tu ?', 'Sels odorants et chlorure d’ammonium ne sont pas le même produit', ['Tous les sels ont le même usage','Une odeur suffit à identifier le flacon','Un expectorant répare une côte'], 'Le chlorure d’ammonium est décrit comme expectorant historique, distinct des sels odorants et de l’ammoniaque.'],
+ ['Un patient demande de la morphine à boire comme du laudanum. Que précises-tu dans cette scène ?', 'La morphine de l’Atlas est une solution injectable, le laudanum une préparation orale', ['Les deux sont des bandes de tissu','La morphine est un baume cutané','Le laudanum est une attelle'], 'Le lexique distingue les formes et les voies. Les deux opiacés ont des risques, notamment respiratoires.'],
+ ['Tu prépares un soin avec un liquide volatil et une lampe à flamme. Quel point d’installation vérifies-tu ?', 'Ne pas rapprocher la flamme du produit volatil', ['Éclairer le flacon directement avec la flamme','Identifier le contenu par son odeur seulement','Considérer tout solvant comme de l’eau'], 'La lampe de cabinet doit éclairer l’examen sans rapprocher une flamme des produits volatils.'],
+ ['Un flacon n’a plus d’étiquette. Comment le pharmacien peut-il participer à la scène ?', 'Aider à identifier la préparation avant toute utilisation', ['Deviner à l’odeur et l’administrer','Le renommer morphine par défaut','Affirmer que tout liquide est antiseptique'], 'Le flacon étiqueté sert à identifier le contenu. La seule odeur ne suffit pas.'],
+ ['Tu arrives sur le terrain sans le matériel prévu. Que fais-tu pour garder une scène cohérente ?', 'Nommer le matériel disponible et demander du renfort pour le reste', ['Faire apparaître tous les instruments sans explication','Annoncer que le manque de matériel guérit le patient','Choisir une chirurgie au hasard'], 'Le sac de terrain contient ce qui a été réellement prévu. Le manque de matériel peut créer une demande d’aide.'],
+ ['Un blessé doit être transporté et plusieurs personnes sont présentes. Quel usage du brancard joues-tu ?', 'Répartir les rôles et annoncer le transport', ['Faire marcher le blessé par défaut','Annoncer que le transport résout la blessure','Utiliser le brancard comme médicament'], 'Le brancard est manipulé à plusieurs. Le déplacement ne décide pas de l’évolution médicale.'],
+ ['Tu ouvres une boîte d’instruments. Quelle vérification reste nécessaire ?', 'Vérifier les pièces disponibles et leur préparation', ['Supposer que la boîte garantit la stérilité','Considérer tout objet comme propre','Choisir un outil sans le regarder'], 'La boîte est un rangement, pas une garantie de stérilité.'],
+ ['Un assistant prépare une cuvette pour le soin. Quelle erreur évites-tu ?', 'Mélanger des produits au hasard', ['Installer le récipient près du linge','Préparer l’espace de travail','Distinguer les préparations disponibles'], 'Le bassin sert à préparer le travail. L’Atlas ne donne aucune recette de mélange.'],
+ ['Après une bagarre, le patient a un bleu et une petite coupure. Comment distingues-tu les zones ?', 'Soin sur peau intacte pour le bleu, soin de plaie pour la coupure', ['Arnica dans toutes les plaies','Suture obligatoire sur tous les bleus','Même produit imposé partout'], 'La présence d’une coupure change le repère local : un produit pour peau intacte ne devient pas un soin de plaie ouverte.'],
+ ['Une plaie propre doit être protégée après le soin. Que demandes-tu à ton assistant ?', 'Compresses et bandage', ['Trépan et scie chirurgicale','Huile de ricin et réglisse','Fer et quinquina'], 'Le pansement protège la plaie et le bandage la maintient, avec des consignes de surveillance.'],
+ ['Un patient décrit une aigreur d’estomac sans autre précision. Avant de choisir un produit, que fais-tu ?', 'Faire préciser le contexte et les autres symptômes', ['Déclarer que toute douleur abdominale est banale','Donner un purgatif pour toute douleur','Conclure immédiatement à une plaie interne'], 'Le bicarbonate est un antiacide historique, mais ne justifie pas de banaliser une douleur abdominale ou thoracique.'],
+ ['Un patient a une douleur abdominale inexpliquée et demande de l’huile de ricin. Que retiens-tu ?', 'Ce produit n’est pas proposé pour une douleur abdominale inexpliquée', ['Toute douleur exige un purgatif','Les graines brutes sont un équivalent à préparer','Le produit remplace l’examen'], 'La fiche distingue l’usage purgatif historique de cette situation et exclut les graines brutes, toxiques.'],
+ ['Un joueur demande si les nouvelles préparations de 1889 sont déjà disponibles dans votre ville. Que lui réponds-tu ?', 'Cela dépend de l’approvisionnement et de la pharmacie joués', ['Tous les produits sont partout disponibles','Leur nouveauté garantit leur sécurité','Leur présence dans le lexique garantit le stock'], 'Le catalogue donne des repères d’époque, pas un inventaire garanti de chaque cabinet.'],
+ ['Un patient frissonne et dit avoir de la fièvre. Quelle conclusion évites-tu ?', 'Attribuer une cause certaine à partir des frissons seuls', ['Demander depuis quand','Observer les autres signes','Écouter le contexte rapporté'], 'Les frissons ne donnent pas une cause unique à la fièvre.'],
+ ['Après une chute, le joueur décrit des fourmillements dans la main droite. Quelle précision conserves-tu ?', 'Zone, côté et évolution de la sensation', ['Une guérison déjà acquise','Une incapacité imposée de tout le corps','Le côté gauche par défaut'], 'L’engourdissement est une sensation décrite par le joueur. Il faut demander la zone et les changements.'],
+ ['Le patient se plaint de douleur, mais ne peut pas bien la décrire. Comment poses-tu ta question ?', 'Une question courte sur la zone et ce qui a changé', ['Un diagnostic imposé pour aller vite','Un long discours avant de l’écouter','Une promesse de disparition immédiate'], 'Les questions courtes gardent la scène lisible et laissent le joueur préciser ce qu’il ressent.'],
+ ['Tu envisages une réduction parce qu’un membre paraît déformé. Quel doute gardes-tu ?', 'Une fracture reste possible : la réduction n’est pas automatique', ['Toute déformation est forcément une luxation','L’attelle prouve que l’os est intact','La douleur suffit à choisir une manœuvre'], 'La technique de réduction est spécialisée et n’est pas appliquée automatiquement à une déformation.'],
+ ['Une douleur dentaire est la raison de la visite. Que ne décides-tu pas d’emblée ?', 'L’extraction de la dent', ['La zone douloureuse à faire préciser','Les symptômes rapportés à écouter','Le contexte à demander'], 'Le repère douleur dentaire commence par préciser la plainte, sans extraction automatique.']
 ];
+
+const quizObservationScenes={
+ 'Confusion':['Le patient répond de travers et paraît désorienté. Que vérifies-tu pour poursuivre la consultation ?','Faire simple et vérifier respiration et contexte : choc à la tête, fièvre ou produit pris.'],
+ 'Essoufflement':['Après un accident, le patient respire difficilement. Quelle priorité donnes-tu à la scène ?','Observer la respiration en priorité et rechercher le contexte thoracique ou une noyade.'],
+ 'Pâleur':['Le blessé devient pâle et faible. Quel élément cherches-tu à éclaircir ?','Rechercher les pertes de sang et réévaluer son état, sans conclure sur la pâleur seule.'],
+ 'Pouls faible':['Le pouls paraît très faible. Avec quelles observations complètes-tu ton examen ?','État général, pâleur et pertes de sang.'],
+ 'Pupilles serrées':['Les pupilles sont très petites, avec somnolence et respiration lente. Quelle piste de l’Atlas faut-il envisager ?','Une intoxication aux opiacés, à vérifier sans imposer le diagnostic.'],
+ 'Rougeur, chaleur, pus':['Une plaie présente rougeur, chaleur et pus. Quelle suite de scène envisages-tu ?','Une évaluation de la plaie infectée, avec nettoyage et éventuels gestes spécialisés selon le cas.'],
+ 'Sang craché':['Après une blessure au thorax, le patient crache du sang. Comment réagis-tu ?','Prendre le signe au sérieux et réévaluer la respiration et l’état général.'],
+ 'Somnolence inhabituelle':['Le patient peine soudain à rester éveillé. Dans quels contextes redoubles-tu de vigilance ?','Après un choc à la tête ou une possible intoxication.'],
+ 'Ventre dur':['Après une balle dans l’abdomen, le ventre paraît anormalement tendu. Que retiens-tu pour la suite ?','Un signe inquiétant à intégrer à l’évaluation de la blessure abdominale.'],
+ 'Vomissements':['Le patient vomit après un choc à la tête. Quelle attitude convient ?','Prendre le changement au sérieux et réévaluer, plutôt que banaliser le vomissement.'],
+ 'Frissons':['Le patient frissonne pendant la consultation. Que lui demandes-tu ?','Depuis quand, dans quel contexte et avec quels autres signes, sans attribuer une cause unique.'],
+ 'Sueurs inhabituelles':['Le patient transpire de façon inhabituelle. Que cherches-tu à savoir ?','Ce qu’il ressent et dans quel contexte les sueurs sont apparues.'],
+ 'Raideur':['Un mouvement paraît raide et douloureux. Comment poursuis-tu l’examen RP ?','Demander la zone et l’évolution sans forcer le mouvement.'],
+ 'Gonflement':['Une zone est gonflée après un incident. Quelles précisions demandes-tu ?','La zone, l’évolution du gonflement et les autres signes, sans diagnostic automatique.'],
+ 'Faiblesse':['Le patient se dit trop faible pour ses gestes habituels. Quelle question l’aide à préciser son état ?','Quels gestes arrivez-vous encore à faire, et lesquels sont devenus difficiles ?'],
+ 'Vision modifiée':['Le patient dit voir différemment depuis un choc. Comment vérifies-tu ce qu’il décrit ?','Lui demander ce qui a changé dans sa vision et à quel moment.'],
+ 'Toux':['Un patient vient te consulter pour une toux. Que lui demandes-tu d’abord ?','Depuis quand il tousse et si sa respiration est gênée.'],
+ 'Soif inhabituelle':['Le patient décrit une soif inhabituelle. Que vérifies-tu avant de lui proposer à boire ?','L’évolution, le contexte et sa capacité à avaler.'],
+ 'Douleur dentaire':['Le patient se plaint d’une dent. Comment commences-tu la consultation ?','Faire préciser la zone et les symptômes, sans décider d’emblée une extraction.'],
+ 'Engourdissement':['Le patient décrit des fourmillements. Que lui demandes-tu ?','La zone concernée et ce qui a changé, sans imposer le résultat d’un test.']
+};
+function quizScenePrompt(group,field,name,description){
+ if(group==='Produits')return ({
+  form:`Tu prépares « ${name} » pour une scène de soin en 1889. Sous quelle forme le présentes-tu ?`,
+  admin:`Tu dois jouer l’utilisation de « ${name} ». Quelle voie d’application correspond à cette préparation ?`,
+  use:`Tu disposes de « ${name} » dans ta pharmacie de 1889. Dans quel contexte de soin RP l’utiliserais-tu ?`,
+  warning:`Tu envisages « ${name} » pendant un soin. Quelle précaution dois-tu garder en tête ?`,
+  sensory:`Tu utilises « ${name} » et veux décrire ce que le patient pourrait percevoir. Quel détail convient, sans le garantir ?`,
+  composition:`Le patient te demande ce que contient « ${name} ». Quelle explication peux-tu lui donner en scène ?`
+ })[field];
+ if(group==='Techniques')return ({
+  form:`Tu vas jouer le geste « ${name} ». Quel matériel demandes-tu à ton assistant ?`,
+  admin:`Tu dois jouer « ${name} ». Comment décris-tu ton geste au patient ou à ton assistant ?`,
+  use:`Pendant une consultation, tu envisages « ${name} ». Dans quelle situation ce geste a-t-il sa place ?`,
+  warning:`Tu joues « ${name} ». Quelle limite évites-tu de dépasser dans la scène ?`
+ })[field];
+ if(group==='Matériel')return field==='desc'?`Ton assistant cherche l’objet suivant : ${description} Quel matériel lui demandes-tu ?`:`Tu as « ${name} » dans ton sac de médecin. Dans quel moment du soin l’utiliserais-tu ?`;
+ return field==='desc'?`Pendant ton examen RP, tu constates ceci : ${description} Comment nommes-tu cette observation ?`:quizObservationScenes[name]?.[0]||`Le patient présente « ${name} ». Que vérifies-tu pour poursuivre le soin ?`;
+}
 
 let quizBankCache = null;
 function buildQuizBank(){
@@ -58,15 +119,22 @@ function buildQuizBank(){
     let answersPool=pool.filter(value=>value!==correct);
     // Several oral/external descriptions can all be true: quiz the route family instead.
     let answer=correct;
+    if(field==='desc'&&(group==='Matériel'||group==='Observations')){
+     answer=clean(item.name);answersPool=items.filter(other=>other.name!==item.name&&clean(other.desc)!==correct).map(other=>clean(other.name));
+    }
+    if(group==='Observations'&&field==='rp'){
+     answer=quizObservationScenes[item.name]?.[1]||correct;
+     answersPool=['Conclure immédiatement à une maladie certaine avec ce seul signe.','Ignorer ce signe et terminer le soin sans réévaluer.','Choisir un médicament avant de demander le contexte.'];
+    }
     if(group==='Produits'&&field==='admin'){
      const route=/variable/i.test(correct)?'Variable selon la préparation':/hypoderm|inject/i.test(correct)?'Injection hypodermique':/inhal/i.test(correct)?'Voie inhalée':/orale/i.test(correct)?'Voie orale':'Application locale ou externe';
      answer=route;answersPool=['Variable selon la préparation','Injection hypodermique','Voie inhalée','Voie orale','Application locale ou externe'].filter(value=>value!==route);
     }
     const complement=field==='warning'?item.use:field==='use'?item.warning:null;
     bank.push({id:group+':'+index+':'+field,topic:group+':'+index,group,
-     prompt:`D’après la fiche « ${clean(item.name)} », ${label}`,
+     prompt:quizScenePrompt(group,field,clean(item.name),correct),
      correct:answer,pool:answersPool,
-     explanation:`${clean(item.name)} : ${correct}${/[.!?]$/.test(correct)?'':'.'}${complement?' '+clean(complement):''}`,
+     explanation:group==='Observations'&&field==='rp'?`${answer} ${clean(item.desc)} Ce signe oriente la scène, sans décider seul du diagnostic.`:`${clean(item.name)} : ${correct}${/[.!?]$/.test(correct)?'':'.'}${complement?' '+clean(complement):''}`,
      reference:clean(item.name)});
    });
   });
@@ -87,5 +155,20 @@ function buildQuizBank(){
   ['desc','quelle observation est décrite ?'],['rp','quel repère de scène est proposé ?']
  ]);
  quizSituations.forEach(([prompt,correct,wrong,explanation],index)=>bank.push({id:'Situation:'+index,topic:'Situation:'+index,group:'Situations',prompt,correct,pool:wrong,explanation,reference:'Parcours et repères RP de l’Atlas'}));
+ // Reverse recognition: identify the preparation from a scene rather than its name.
+ const products=lexique.filter(item=>item.category!=='Technique');
+ ['form','use','sensory'].forEach(field=>{
+  products.forEach((item,index)=>{
+   const clue=clean(item[field]);if(!clue)return;
+   // Broad/shared clues and descriptions naming the answer do not make good riddles.
+   if(products.filter(other=>clean(other[field])===clue).length!==1)return;
+   const words=clean(item.name).toLocaleLowerCase('fr').split(/[\s/]+/).filter(word=>word.length>4);
+   if(words.some(word=>clue.toLocaleLowerCase('fr').includes(word)))return;
+   if(clue.length<30)return;
+   const scene=field==='form'?`Ton assistant te décrit cette préparation : « ${clue} ». Quel produit cherche-t-il ?`:field==='use'?`Dans ta pharmacie de 1889, tu cherches le produit dont l’usage est décrit ainsi : « ${clue} ». Lequel correspond à cette description ?`:`Pendant la préparation d’un soin, tu reconnais ce détail : « ${clue} ». À quel produit de l’Atlas correspond ce repère ?`;
+   const others=products.filter(other=>other.name!==item.name&&clean(other[field])!==clue);
+   bank.push({id:'Produits:'+index+':recognize-'+field,topic:'Produits:'+index,group:'Produits',prompt:scene,correct:clean(item.name),pool:others.map(other=>clean(other.name)),explanation:`Il s’agit de ${clean(item.name)}. ${clean(item.use)} ${clean(item.warning)}`,reference:clean(item.name)});
+  });
+ });
  quizBankCache=bank;return bank;
 }

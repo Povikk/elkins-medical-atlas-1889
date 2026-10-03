@@ -6,6 +6,8 @@ const assert=require('node:assert/strict');
  await page.locator('[data-shell-view="quiz"]').click();
  const audit=await page.evaluate(()=>{const bank=buildQuizBank();return {count:bank.length,ids:new Set(bank.map(q=>q.id)).size,prompts:new Set(bank.map(q=>q.prompt)).size,bad:bank.filter(q=>!q.correct||!q.explanation||new Set(q.pool).size<3||q.pool.includes(q.correct)).map(q=>q.id),groups:bank.reduce((a,q)=>(a[q.group]=(a[q.group]||0)+1,a),{})};});
  console.log('Bank audit',audit);assert(audit.count>=400);assert.equal(audit.ids,audit.count);assert.equal(audit.prompts,audit.count);assert.deepEqual(audit.bad,[]);
+ assert.equal(await page.evaluate(()=>buildQuizBank().filter(q=>/d’après la fiche|repère de scène est proposé|dans le manuel/i.test(q.prompt)).length),0);
+ const cough=await page.evaluate(()=>buildQuizBank().find(q=>q.reference==='Toux'&&q.id.endsWith(':rp')));assert.match(cough.prompt,/patient.*toux/i);assert.match(cough.correct,/depuis quand.*respiration/i);
  await page.getByRole('button',{name:'Commencer une série',exact:true}).click();
  assert(await page.locator('#quizNext').isDisabled());
  const firstIds=await page.evaluate(()=>quizSession.questions.map(q=>q.id));
