@@ -49,34 +49,44 @@ function rpDialogue(items){
  const alternative=/nettoy|antisept/.test(title)?'« Je prépare le nettoyage de cette zone. Prévenez-moi si le contact vous gêne. »':/sutur|fermer/.test(title)?'« Je vérifie les bords de la plaie avant de décider de sa fermeture. »':/panser|protéger/.test(title)?'« Je prépare la protection de cette zone. Dites-moi si elle vous gêne une fois posée. »':/douleur|soulager/.test(title)?'« Avant de poursuivre, décrivez-moi la douleur avec vos mots. »':/respir|surveill/.test(title)?'« Je reste près de vous pour observer votre respiration et vos réactions. »':`« Je vais ${stepAction}. Dites-moi si quelque chose vous gêne à cet instant. »`;
  if(!items?.length || /^« Très bien, je (continue|passe)/.test(items[0]))pool=[alternative,casePhrase()];
  pool.push(alternative);
+ const question=/douleur|soulager/.test(title)?'« La douleur est-elle supportable, ou vous empêche-t-elle de rester tranquille ? »':/nettoy|antisept/.test(title)?'« Est-ce le contact du linge ou la plaie elle-même qui vous fait mal ? »':/sutur|fermer/.test(title)?'« Est-ce que cela tire davantage à un endroit précis ? »':/panser|protéger/.test(title)?'« Le pansement vous gêne-t-il quelque part ? »':/respir/.test(title)?'« Avez-vous du mal à reprendre votre souffle ? »':/saign/.test(title)?'« Vous sentez-vous faible ou étourdi pendant que je m’occupe du saignement ? »':'« Qu’est-ce qui vous gêne le plus à cet instant ? »';
+ pool.push(question,`« Je vous annonce chaque geste avant de ${stepAction}. Si quelque chose vous inquiète, nous en parlons. »`,`« Pendant que je m’occupe de cette étape, restez dans cette position et signalez-moi tout changement. »`);
  if(state==='asleep' || state==='unresponsive'){
    audience=assistant?'À l’assistant':'Annonce RP / demande de renfort';
    const action=activeStepTitle.toLowerCase();
    const instruction=/saign|ligatur/.test(action)?'Gardez la pression sur la zone pendant que je contrôle le saignement.':/panser|fermer|sutur/.test(action)?'Gardez les compresses prêtes pendant que je protège la plaie.':'Surveillez sa respiration et prévenez-moi si son état change.';
-   pool=assistant?[`« Je vais ${stepAction}. ${instruction} »`,`« Avant de ${stepAction}, je vérifie ses réactions. Gardez sa respiration sous surveillance. »`]:[`« Pour ${stepAction}, j’ai besoin de renfort afin de garder ce patient sous surveillance. »`,`« Je vérifie sa respiration et ses réactions avant de ${stepAction}. J’ai besoin d’aide pour poursuivre. »`];
+   pool=assistant?[`« Je vais ${stepAction}. ${instruction} »`,`« Dites-moi si sa respiration ou ses réactions changent pendant ce geste. »`,`« Préparez ce dont j’ai besoin pour ${stepAction} ; je garde le patient sous observation. »`,`« Avant de poursuivre cette étape, faisons le point : répond-il à la voix ? »`]:[`« Pour ${stepAction}, j’ai besoin de renfort afin de garder ce patient sous surveillance. »`,`« Je suspends le geste : sa respiration et ses réactions passent en premier. »`,`« Que quelqu’un reste auprès du patient pendant que je prépare la suite. »`,`« Je ne poursuis pas cette étape sans pouvoir assurer sa surveillance. »`];
  }else if(state==='confused'){
    audience='Au patient, phrases courtes';
-   pool=[`« Je suis le médecin. Je vais ${stepAction}. Pouvez-vous me regarder ? »`,`« Nous faisons une chose à la fois : je vais ${stepAction}. Dites-moi si vous pouvez me répondre. »`,alternative];
+   pool=[`« Je suis le médecin. Je vais ${stepAction}. »`,'« Pouvez-vous me regarder et me dire votre nom ? »','« Vous n’avez pas besoin de tout raconter maintenant. Une réponse courte suffit. »',`« Je vous préviens avant le prochain geste. Dites-moi si vous avez mal. »`,alternative];
  }else if(state==='panic'){
    audience='Au patient paniqué';
-   pool=[`« Je vais ${stepAction}. Je vous explique le geste avant de commencer ; dites-moi ce qui vous inquiète. »`,`« Nous prenons les choses une à une. Pour le moment, je vais ${stepAction} et je reste auprès de vous. »`,alternative];
+   pool=[`« Je vais ${stepAction}. Je vous explique le geste avant de commencer. »`,'« Qu’est-ce qui vous inquiète le plus : le geste, la douleur ou autre chose ? »','« Je reste auprès de vous. Vous pouvez me dire ce qui vous gêne, sans chercher vos mots. »',`« Laissez-moi préparer le nécessaire ; je vous annonce ensuite ce que je fais. »`,alternative];
  }else if(state==='recovery'){
    audience='Réveil joué, sans résultat automatique';
-   pool=assistant?['À l’assistant : « Restez auprès de lui et surveillez sa respiration pendant qu’il reprend ses esprits. »','Au patient, seulement s’il se réveille : « Ne vous relevez pas. Nous allons encore vous surveiller. »']:['« Je reste auprès du patient et demande du renfort pour poursuivre la surveillance. »','Au patient, seulement s’il se réveille : « Vous êtes toujours auprès de nous. Ne vous relevez pas. »'];
- }else if(state==='awake')audience='Au patient conscient';
+   pool=assistant?['À l’assistant : « Restez auprès de lui et surveillez sa respiration pendant qu’il reprend ses esprits. »','Au patient, seulement s’il se réveille : « Ne vous relevez pas. Nous allons encore vous surveiller. »','Au patient, seulement s’il peut répondre : « Pouvez-vous me dire comment vous vous sentez ? »','À l’assistant : « Prévenez-moi de tout changement, même après les premières réponses. »']:['« Je reste auprès du patient et demande du renfort pour poursuivre la surveillance. »','Au patient, seulement s’il se réveille : « Vous êtes toujours auprès de nous. Ne vous relevez pas. »','Au patient, seulement s’il peut répondre : « Qu’est-ce qui vous gêne à cet instant ? »','« Le réveil ne termine pas la surveillance : je reste près du patient. »'];
+ }else{
+   if(state==='awake')audience='Au patient conscient';
+   // Show different intentions together; keep authored alternatives in the pool.
+   pool=[pool[0],question,...pool.slice(1)];
+ }
  pool=[...new Set(pool.filter(Boolean))];
  const firstBlock=rpPhraseBlocks.length===0;
  const stepKey=rpDialogueStepKey();
  const index=rpPhraseBlocks.push({pool,position:0,stepKey})-1;
  const ended=activeRouteKind==='surgery'?surgeryEnded:interventionEnded;
- return `${ended || !firstBlock?'':rpGesture()}<div class="rp-lines rp-dialogue"><div class="rp-dialogue-heading"><span>${audience}</span><button type="button" class="secondary" onclick="alternateRpPhrase(${index},this)">Autre formulation</button></div><div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase" aria-live="polite">${pool[0]}</span></div></div>`;
+ return `${ended || !firstBlock?'':rpGesture()}<div class="rp-lines rp-dialogue"><div class="rp-dialogue-heading"><span>${audience}</span><button type="button" class="secondary" onclick="alternateRpPhrase(${index},this)">Autre formulation</button></div><div class="rp-phrase-list" aria-live="polite">${rpPhraseRows(rpPhraseBlocks[index])}</div></div>`;
 }
 function alternateRpPhrase(index,button){
  const block=rpPhraseBlocks[index];
  const root=document.getElementById(activeRouteKind==='surgery'?'surgeryFlow':'flow');
  if(!block || block.stepKey!==rpDialogueStepKey() || !button.isConnected || !root?.contains(button))return;
  block.position=(block.position+1)%block.pool.length;
- button.closest('.rp-dialogue').querySelector('.rp-current-phrase').textContent=block.pool[block.position];
+ button.closest('.rp-dialogue').querySelector('.rp-phrase-list').innerHTML=rpPhraseRows(block);
+}
+function rpPhraseRows(block){
+ const count=Math.min(compactMode?1:3,block.pool.length);
+ return Array.from({length:count},(_,offset)=>block.pool[(block.position+offset)%block.pool.length]).map(phrase=>`<div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase">${phrase}</span></div>`).join('');
 }
 function rpDialogueStepKey(){
  return activeRouteKind==='surgery'?`surgery:${currentSurgery}:${surgeryStepIndex}:${surgeryEnded}`:`flow:${currentFlow}:${stepIndex}:${interventionEnded}`;
