@@ -7,6 +7,7 @@ let incidentKind = "";
 
 function sceneToolbar(kind){
   return `<div class="scene-tools">
+    <button type="button" class="secondary" onclick="reassessCare()">Réévaluer le patient</button>
     <button type="button" class="secondary" onclick="openSceneReferences()">Références</button>
     <button type="button" class="incident-button" onclick="openIncident()">Son état change</button>
   </div>`;
@@ -20,28 +21,13 @@ function shouldSkipStep(step){
 function sceneMaterialMarkup(kind){
   const surgery=kind==='surgery';
   const step=surgery?surgeries[currentSurgery].steps[surgeryStepIndex]:flows[currentFlow].steps[stepIndex];
-  const title=step.title.toLowerCase();
-  let probable=[...(surgery?surgeryMaterials[currentSurgery]:interventionMaterials[currentFlow])];
+  let probable=[...((surgery?surgeryMaterials[currentSurgery]:interventionMaterials[currentFlow]) || [])];
   if(!surgery){
     if(answers.needsSuture===false || answers.needsSuture==='avoid')probable=probable.filter(x=>!/suture/i.test(x));
     if(answers.bullet && answers.bullet!=='in')probable=probable.filter(x=>!/forceps/i.test(x));
     if(['mild','moderate','unsafe'].includes(answers.rpPain) || answers.horsePain==='mild' || answers.fracturePain==='mild')probable=probable.filter(x=>!/seringue/i.test(x));
   }
-  let now=[...(step.material || [])];
-  const add=(...items)=>now.push(...items);
-  if(/saign|ligatur/.test(title) || step.dynamicUnknownBleeding && ['major','minor'].includes(answers.unknownBleeding))add('Compresses / linge propre');
-  if(/nettoy|panser|pansement|protéger|fermer|drain/.test(title))add('Compresses / linge propre');
-  if(/panser|pansement|protéger|drain/.test(title))add('Bandage / pansement');
-  if(step.dynamicSuture && answers.needsSuture===true)add('Aiguille et fil de suture','Pince','Ciseaux','Compresses');
-  if(step.dynamic && currentFlow==='gunshot' && answers.bullet==='in')add('Forceps, uniquement si le projectile est accessible','Compresses');
-  if(step.dynamicHorseCare && (answers.horseVisible==='deformity' || answers.horseMove==='none'))add('Attelle','Bandages','Tissu rembourré');
-  if(/immobiliser/.test(title))add('Attelle','Bandages','Tissu rembourré');
-  if(/anesth/.test(title) || surgery && surgeryStepIndex===1 && (step.meds || []).some(r=>/chloroforme|éther/i.test(r[0])))add('Linge / compresse ou dispositif prévu pour l’anesthésie retenue');
-  if(surgery && /opérer|explorer|accéder|décomprimer|traiter la lésion|ligatur|extraire|nettoyer chirurgicalement/.test(title))add(...probable.filter(x=>!/chloroforme|éther|suture|pansement|bandage/i.test(x)));
-  if(surgery && /fermer/.test(title))add('Aiguille et fil de suture, seulement si fermeture adaptée','Pansement');
-  const products=(step.med || step.meds || []).map(r=>r[0]);
-  if((products.some(x=>/morphine/i.test(x)) || step.dynamicHorsePain || step.dynamicSuture && answers.needsSuture===true) && !['mild','moderate','unsafe'].includes(answers.rpPain) && answers.horsePain!=='moderate')add('Seringue, seulement si la morphine est retenue');
-  now=[...new Set(now)];
+  const now=careMaterialForStep(step,kind);
   const list=items=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
   return `<div class="material-panel"><h3>Matériel nécessaire</h3><h4>Pour cette étape</h4>${now.length?list(now):'<p>Aucun instrument particulier indiqué à cette étape : observation et préparation selon la scène.</p>'}<details><summary>Éventuellement pour la suite</summary>${list(probable)}<p class="muted">À préparer selon les choix à venir, pas à utiliser systématiquement. Les produits sont des alternatives, pas une liste à administrer.</p></details></div>`;
 }
@@ -60,7 +46,7 @@ function patientQuestion(step){
   };
   const question = questions[keys[0]];
   if(!question) return '';
-  const unable = /unconscious|not_breathing|unknown/.test(answers.conscious || '') || incidentKind;
+  const unable = ['asleep','unresponsive','uncertain'].includes(rpPatientState()) || incidentKind;
   return `<div class="patient-question"><b>${unable ? 'Si le patient ne peut pas répondre' : 'À demander au joueur'}</b><p>${unable ? "Observe les signes visibles ou utilise une réponse incertaine. Ne lui impose pas une sensation." : question}</p></div>`;
 }
 function flowRouteNote(){
@@ -100,10 +86,11 @@ function endingMarkup(kind){
   if(!surgery && answers.needsSuture === true) variant='Des points ont été proposés dans le parcours : mentionne-les seulement si tu les as joués.';
   if(!surgery && answers.needsSuture === false) variant='Pas de points nécessaires selon tes choix : conclure sur le nettoyage et la protection.';
   if(!surgery && answers.needsSuture === 'avoid') variant='Fermeture simple écartée : ne pas annoncer une plaie refermée.';
-  const unresolved=!surgery && (/unconscious|not_breathing|unknown/.test(answers.conscious || '') || ['unconscious','not_breathing'].includes(answers.headState) || ['unconscious','not_breathing'].includes(answers.poisonState) || ['no','weak'].includes(answers.breathing) || answers.unknownWake !== 'awake' && currentFlow==='unknown');
+  const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || answers.latestBleeding==='major';
   return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : 'Intervention terminée'}</h2>
     <p class="muted">Conclusion à adapter aux gestes et à l'évolution réellement joués. Aucun dossier n'est créé.</p>
     ${rpChoicesMarkup()}
+    ${sceneToolbar(kind)}
     ${unresolved ? '<div class="route-note">Un signe inquiétant a été choisi dans ce parcours. La fin des étapes ne signifie pas que le patient peut repartir : réévalue son état dans la scène.</div>' : ''}
     <h3>Pour conclure la scène</h3><p>${notes[0]}</p>${variant ? `<p>${variant}</p>` : ''}
     ${sayLines([notes[1]])}<h3>Consignes RP</h3><p>${notes[2]}</p><h3>À surveiller / motif de retour</h3><p>${notes[3]}</p>
@@ -128,8 +115,8 @@ function renderSceneReferences(){
   document.querySelectorAll('[data-scene-ref]').forEach(button=>{button.classList.toggle('active',button.dataset.sceneRef===referenceTab);button.setAttribute('aria-pressed',String(button.dataset.sceneRef===referenceTab));});
   const normalize=text=>String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const query=normalize(document.getElementById('sceneReferenceSearch').value.trim());
-  const list=referenceTab==='meds' ? lexique : referenceTab==='equipment' ? equipmentLexicon : Object.entries(anatomyPlates).flatMap(([key,plate])=>plate.hotspots.map(spot=>({...spot,plate:plate.title})));
-  const matches=list.map((item,index)=>({item,index})).filter(({item})=>normalize([item.name,item.label,item.tags,item.use,item.role,item.plate].join(' ')).includes(query)).sort((a,b)=>(a.item.name || a.item.label).localeCompare(b.item.name || b.item.label,'fr'));
+  const list=referenceTab==='meds' ? lexique : referenceTab==='equipment' ? equipmentLexicon : referenceTab==='symptoms'?symptomLexicon:Object.entries(anatomyPlates).flatMap(([key,plate])=>plate.hotspots.map(spot=>({...spot,plate:plate.title})));
+  const matches=list.map((item,index)=>({item,index})).filter(({item})=>normalize([item.name,item.label,item.tags,item.category,item.use,item.role,item.plate,item.desc,item.rp].join(' ')).includes(query)).sort((a,b)=>(a.item.name || a.item.label).localeCompare(b.item.name || b.item.label,'fr'));
   document.getElementById('sceneReferenceContent').innerHTML=matches.length ? `<div class="reference-picker">${matches.map(({item,index})=>`<button type="button" class="secondary" onclick="showSceneReferenceItem(${index})">${item.name || item.label}${item.plate ? ` <small>(${item.plate})</small>` : ''}</button>`).join('')}</div>` : '<p>Aucun résultat.</p>';
 }
 function showSceneReferenceItem(index){
@@ -140,6 +127,9 @@ function showSceneReferenceItem(index){
   } else if(referenceTab==='equipment'){
     const item=equipmentLexicon[index];if(!item)return;
     html=`<h3>${item.name}</h3><p>${item.desc}</p><p><b>Usage RP :</b> ${item.use}</p>`;
+  } else if(referenceTab==='symptoms'){
+    const item=symptomLexicon[index];if(!item)return;
+    html=`<h3>${item.name}</h3><p>${item.desc}</p><p><b>Observation RP :</b> ${item.rp}</p><small>Un signe isolé ne décide pas du diagnostic.</small>`;
   } else {
     const items=Object.values(anatomyPlates).flatMap(plate=>plate.hotspots.map(spot=>({plate,spot})));
     if(!items[index])return;
@@ -162,6 +152,10 @@ function openIncident(){
 }
 function selectIncident(kind){
   incidentKind=kind;
+  careObservationDirty=true;
+  if(kind==='conscious')answers.latestState='unresponsive';
+  if(kind==='breathing')answers.latestBreathing='weak';
+  if(kind==='bleeding')answers.latestBleeding='major';
   const data={
     conscious:['Réévaluer avant de poursuivre',['Suspendre le soin en cours.','Vérifier réaction à la voix, respiration et saignement visible.','Demander à un assistant de rester auprès du patient.'],'« Il ne me répond plus. Je vérifie sa respiration avant de continuer. »'],
     breathing:['La respiration devient prioritaire',['Suspendre le soin en cours.','Observer la respiration et dégager ce qui gêne le cou ou la poitrine.','Reprendre le parcours respiratoire si nécessaire.'],'« Arrêtez un instant, sa respiration a changé. Je m’en occupe d’abord. »'],
@@ -169,17 +163,17 @@ function selectIncident(kind){
   }[kind];
   document.getElementById('incidentContent').innerHTML=`<h3>${data[0]}</h3><ul>${data[1].map(text=>`<li>${text}</li>`).join('')}</ul><div class="rp-lines">${data[2]}</div><p>La suite dépend de ce qui est effectivement joué, pas d'un résultat automatique.</p><div class="choices"><button type="button" class="choice" onclick="resolveIncident()">État stabilisé dans la scène : reprendre</button><button type="button" class="choice" onclick="escalateIncident()">Toujours inquiétant : réorienter</button></div>`;
 }
-function closeIncident(){incidentKind='';document.getElementById('incidentDialog').close();}
+function closeIncident(){incidentKind='';document.getElementById('incidentDialog').close();if(careObservationDirty){careObservationDirty=false;refreshCare();}}
 function resolveIncident(){
   // No automatic recovery assigned to the patient. Resume the same step, reassess pain.
   answers.rpPain='unknown';
-  closeIncident();
-  if(!document.getElementById('surgeryFlow').classList.contains('hidden')) renderSurgery();else render();
+  closeIncident();reassessCare();
 }
 function escalateIncident(){
   const bleeding=incidentKind==='bleeding';
   document.getElementById('incidentContent').innerHTML=`<p>Ne reprends pas le soin tant que l'état reste inquiétant. Tu peux garder cette fenêtre pour jouer la surveillance, ou quitter volontairement le parcours actuel.</p><button type="button" class="next" onclick="closeIncident();${bleeding ? "openSurgery('major_bleeding')" : "start('unknown')"}">${bleeding ? 'Passer à Hémorragie majeure' : 'Passer à Patient inconscient / cause inconnue'}</button><p class="muted">Changer de parcours remet ses réponses à zéro. Fermer cette fenêtre conserve le soin actuel, sans affirmer que le patient va mieux.</p>`;
 }
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('incidentDialog').addEventListener('close',()=>{incidentKind='';});
+  document.getElementById('incidentDialog').addEventListener('cancel',()=>{if(careObservationDirty){careObservationDirty=false;refreshCare();}});
+  document.getElementById('incidentDialog').addEventListener('close',()=>{incidentKind='';if(careObservationDirty){careObservationDirty=false;refreshCare();}});
 });

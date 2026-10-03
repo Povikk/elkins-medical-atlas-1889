@@ -1,0 +1,37 @@
+# Bilan des améliorations
+
+## Pendant une scène
+
+- Gravité visuelle réévaluée selon les observations, sans diagnostic automatique.
+- Conscience, respiration et saignement réévaluables à toute étape. Le rappel distingue l’état initial de la dernière observation.
+- Propositions d’opiacés retirées lorsque conscience, respiration ou saignement rendent le contexte inquiétant. Aucun produit obligatoire.
+- Mode compact conservant toutes les intentions d’action dans trois points condensés, avec une seule phrase.
+- Matériel de l’étape fondé sur des métadonnées explicites et les choix, non sur le titre. Matériel potentiel de la suite séparé.
+- Réponses incertaines ajoutées pour chute de cheval, noyade, tête, intoxication et petite plaie.
+- Actions, geste et dialogue réunis. Composition et repères détaillés des produits repliables.
+- Rappel prioritaire court, choix secondaires repliables.
+- Contexte de moyens limités, demandes de renfort et tâches concrètes pour l’assistant.
+- Confirmation avant de quitter un parcours en cours par la navigation principale.
+- Réorientations pertinentes explicites, jamais automatiques.
+- Phrases particulières supplémentaires pour saignement, inspection, nettoyage, immobilisation, brûlure et pansement. Les alternatives existantes et l’anti-répétition restent présents.
+- Aucun retour du mode en scène, aucun compte à rebours médical, aucune guérison ou complication générée.
+
+## Contenu utile
+
+- Six consultations courtes : contrôle, fièvre, toux, fatigue, troubles digestifs, douleur dentaire.
+- 12 références de matériel supplémentaires, soit 21 au total, avec geste de préparation RP.
+- 10 signes supplémentaires, soit 20 au total, distinguant sensations rapportées et observations.
+- Disponibilité locale distinguée de l’existence historique d’un produit.
+- Trois planches et 45 noms préservés. Recherche avec accents et synonymes, question RP, références et raccourci de parcours thématique.
+- Clic pour garder une fiche anatomique ouverte. Fermeture explicite ou Échap ; aucun panneau permanent à droite.
+- 32 trames : 28 propositions compatibles avec 1889 et 4 repères postérieurs clairement hors jeu.
+- Chaque trame possède une accroche, des rôles, trois temps, des gestes, des questions, des issues ouvertes et des limites. Les faits historiques cités disposent de sources ; les situations inventées sont signalées.
+
+## Ergonomie et confidentialité
+
+- Taille de texte réglable préservée dans les deux thèmes.
+- Contrôles de lecture et de thème placés dans l’en-tête mobile, hors de la navigation basse.
+- Navigation à six entrées, accès aux trames depuis l’accueil et la barre latérale.
+- Application autonome sans backend ni base de données. Aucune sauvegarde de patient ou d’intervention. Seules les préférences de thème et de taille sont stockées localement.
+
+Les tests vérifient des parcours représentatifs et les régressions connues. Ils ne constituent pas une validation médicale des techniques historiques, qui restent exclusivement des repères de jeu.

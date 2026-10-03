@@ -45,7 +45,7 @@ const assert=require('node:assert/strict');
  await page.evaluate(()=>setRpContext('place','office','surgery'));
  assert.match(await page.locator('#surgeryFlow .rp-gesture').innerText(),/table de soin/);
  await page.evaluate(()=>{start('minor');});
- assert.deepEqual(await page.evaluate(()=>rpContext),{place:'',team:'',mood:''});
+ assert.deepEqual(await page.evaluate(()=>rpContext),{place:'',team:'',mood:'',resources:''});
  await page.screenshot({path:'tmp/site-qa/rp-context-desktop.png'});
  await page.setViewportSize({width:390,height:844});
  await page.locator('#flow .rp-context summary').click();

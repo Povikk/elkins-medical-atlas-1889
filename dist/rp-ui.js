@@ -1,26 +1,30 @@
 // Ephemeral scene choices only. No storage, patient record or automatic outcome.
-let rpContext={place:'',team:'',mood:''};
+let rpContext={place:'',team:'',mood:'',resources:''};
 let rpContextOpen=false;
 let rpPhraseBlocks=[];
 let rpPhraseHistory=new Map();
 let rpPhraseOrder=new Map();
-function resetRpScene(){rpContext={place:'',team:'',mood:''};rpContextOpen=false;rpPhraseBlocks=[];rpPhraseHistory.clear();rpPhraseOrder.clear();}
+function resetRpScene(){rpContext={place:'',team:'',mood:'',resources:''};rpContextOpen=false;rpPhraseBlocks=[];rpPhraseHistory.clear();rpPhraseOrder.clear();}
 function setReadingSize(value,persist=true){
  const size=['normal','large','xlarge'].includes(value)?value:'normal';
  document.documentElement.dataset.readingSize=size;
  document.getElementById('readingSize').value=size;
  if(persist)try{localStorage.setItem('elkins-reading-size',size);}catch(error){}
 }
+function placeReadingControls(){
+ const control=document.querySelector('.reading-setting'),theme=document.getElementById('themeToggle');
+ if(innerWidth<=760){document.getElementById('siteHeader').append(theme,control);}
+ else{document.querySelector('.sidebar-note').before(theme,control);}
+}
 document.addEventListener('DOMContentLoaded',()=>{
  let size='normal';try{size=localStorage.getItem('elkins-reading-size') || 'normal';}catch(error){}
  setReadingSize(size,false);
  const mobile=matchMedia('(max-width:760px)');
- const placeControl=()=>{const control=document.querySelector('.reading-setting');mobile.matches?document.getElementById('siteHeader').append(control):document.getElementById('themeToggle').after(control);};
- placeControl();mobile.addEventListener('change',placeControl);
+ placeReadingControls();mobile.addEventListener('change',placeReadingControls);
 });
 function rpChoicesMarkup(){
- const fields={conscious:'État',headState:'État',poisonState:'État',unknownBreathing:'Respiration initiale',breathing:'Respiration',unknownBleeding:'Saignement',unknownWake:'Dernière réaction',gunArea:'Zone',knifeSeverity:'Plaie',horseArea:'Zone',horsePain:'Douleur',fracturePain:'Douleur',horseVisible:'Aspect',horseMove:'Mouvement',fightIssue:'Signe principal',bullet:'Projectile',needsSuture:'Fermeture',burnSeverity:'Brûlure',rpPain:'Douleur réévaluée'};
- const manual={horseMove:{normal:'Normal',painful:'Douloureux',limited:'Limité',none:'Impossible'},rpPain:{mild:'Légère',moderate:'Modérée',strong:'Forte',unsafe:'Conscience / respiration inquiétante',unknown:'Non évaluée'}};
+ const fields={conscious:'État initial',headState:'État initial',poisonState:'État initial',unknownBreathing:'Respiration initiale',breathing:'Respiration initiale',unknownBleeding:'Saignement',unknownWake:'Dernière réaction',gunArea:'Zone',knifeArea:'Zone',knifeSeverity:'Plaie',horseArea:'Zone',horsePain:'Douleur',fracturePain:'Douleur',horseVisible:'Aspect',horseMove:'Mouvement',fightIssue:'Signe principal',bullet:'Projectile',needsSuture:'Fermeture',burnSeverity:'Brûlure',rpPain:'Douleur réévaluée',consultEvolution:'Évolution'};
+ const manual={horseMove:{normal:'Normal',painful:'Douloureux',limited:'Limité',none:'Impossible',unknown:'Non évalué'},rpPain:{mild:'Légère',moderate:'Modérée',strong:'Forte',unsafe:'Conscience / respiration inquiétante',unknown:'Non évaluée'}};
  const steps=activeRouteKind==='surgery'?surgeries[currentSurgery]?.steps:flows[currentFlow]?.steps;
  const choices=(steps || []).flatMap(step=>step.choices || []);
  const chips=Object.entries(fields).flatMap(([key,label])=>{
@@ -29,7 +33,7 @@ function rpChoicesMarkup(){
    if(!text)return [];
    return [`<span><b>${label} :</b> ${text}</span>`];
  });
- return chips.length?`<div class="rp-choice-recap" aria-label="Rappel des choix observés"><small>Choix du parcours</small>${chips.join('')}</div>`:'';
+ return conciseCareRecap(chips);
 }
 function rpContextMarkup(kind){
  const select=(key,label,options)=>`<label>${label}<select data-rp-context="${key}" onchange="setRpContext('${key}',this.value,'${kind}')"><option value="">Non précisé</option>${options.map(([value,text])=>`<option value="${value}" ${rpContext[key]===value?'selected':''}>${text}</option>`).join('')}</select></label>`;
@@ -37,14 +41,16 @@ function rpContextMarkup(kind){
  return `<details class="rp-context" ${rpContextOpen?'open':''} ontoggle="if(this.isConnected)rpContextOpen=this.open"><summary>Contexte facultatif${summary?' : '+summary:''}</summary><div class="rp-context-fields">${select('place','Lieu',[['field','Terrain'],['office','Cabinet']])}${select('team','Aide',[['solo','Seul'],['assistant','Avec un assistant']])}${select('mood','Attitude jouée',[['panic','Paniqué'],['calm','Calme']])}<button type="button" class="secondary" onclick="resetRpContext('${kind}')">Effacer le contexte</button></div><p class="muted">N'indique que ce qui est joué. Ces choix ne décident ni du diagnostic ni de l'évolution.</p>${rpContext.team==='solo'?'<p>Seul : si un geste demande un assistant, demander du renfort avant de poursuivre. Le contexte ne rend pas une opération lourde réalisable seul.</p>':''}</details>`;
 }
 function setRpContext(key,value,kind){
- const allowed={place:['','field','office'],team:['','solo','assistant'],mood:['','panic','calm']};
+ const allowed={place:['','field','office'],team:['','solo','assistant'],mood:['','panic','calm'],resources:['','limited','ready']};
  if(!allowed[key]?.includes(value))return;
  rpContext[key]=value;rpContextOpen=true;
  const y=scrollY;kind==='surgery'?renderSurgery():render();
  document.querySelector(`[data-rp-context="${key}"]`)?.focus({preventScroll:true});scrollTo(0,y);
 }
-function resetRpContext(kind){rpContext={place:'',team:'',mood:''};rpContextOpen=true;kind==='surgery'?renderSurgery():render();}
+function resetRpContext(kind){rpContext={place:'',team:'',mood:'',resources:''};rpContextOpen=true;kind==='surgery'?renderSurgery():render();}
 function rpPatientState(){
+ if(answers.latestBreathing==='no')return 'unresponsive';
+ if(answers.latestState)return {awake:rpContext.mood==='panic'?'panic':'awake',confused:'confused',unresponsive:'unresponsive',unknown:'uncertain'}[answers.latestState];
  if(sleepingSurgery())return 'asleep';
  if(activeRouteKind==='surgery' && surgeries[currentSurgery]?.steps[surgeryStepIndex]?.recovery)return 'recovery';
  const state=answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:undefined);

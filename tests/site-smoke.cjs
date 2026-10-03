@@ -50,7 +50,7 @@ async function finishSurgery(page, id) {
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   check((await page.locator("html").getAttribute("data-theme")) === "dark", "Le mode sombre n'est pas le thème par défaut");
   check(await page.getByRole("heading", { name: "Elkins & Elkins Medical Atlas" }).isVisible(), "Titre absent");
-  check(await page.locator("#home button").count() === 5, "Accueil incomplet");
+  check(await page.locator("#home button").count() === 6, "Accueil incomplet");
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Débordement horizontal en 2K");
   await page.screenshot({ path: path.join(outputDir, "desktop-2k.png"), fullPage: true });
 

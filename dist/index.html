@@ -30,6 +30,7 @@
       <button type="button" class="side-nav-item" data-shell-view="lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
       <button type="button" class="side-nav-item" data-shell-view="surgery" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
       <button type="button" class="side-nav-item" data-shell-view="atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
+      <button type="button" class="side-nav-item" data-shell-view="stories" onclick="showStories()"><span aria-hidden="true">▤</span>Trames & découvertes</button>
     </nav>
     <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
     <label class="reading-setting" for="readingSize">Taille du texte
@@ -76,6 +77,7 @@
           <strong>Atlas anatomique</strong>
           <span>Squelette, muscles et organes avec repères interactifs</span>
         </button>
+        <button class="home-btn" onclick="showStories()"><strong>Trames & découvertes</strong><span>Préparer une intrigue, une visite ou une correspondance d’époque</span></button>
       </div>
     </section>
 
@@ -217,12 +219,17 @@
     </section>
 
     <section id="surgeryFlow" class="hidden"></section>
+    <section id="stories" class="hidden">
+      <div class="topbar"><div><h2>Trames & découvertes</h2><p class="muted">Préparer du jeu, pas prescrire un soin. Les développements restent facultatifs.</p></div><button class="secondary" onclick="goHome()">Accueil</button></div>
+      <div class="story-filters"><label>Rechercher<input id="storySearch" type="search" placeholder="Une idée, un métier, un produit…" oninput="renderStories()"></label><label>Thème<select id="storyCategory" onchange="renderStories()"><option value="">Tous les thèmes</option></select></label><label>Cadre<select id="storyPeriod" onchange="renderStories()"><option value="">Tout le catalogue</option><option value="1889">Jouable en 1889</option><option value="future">Repères postérieurs, hors jeu en 1889</option></select></label></div>
+      <p id="storyCount" class="muted" role="status"></p><div id="storyList" class="story-grid"></div><div id="storyDetail" hidden></div>
+    </section>
 
     <section id="atlas" class="hidden">
       <div class="topbar">
         <div>
           <h2 style="margin:0">Atlas anatomique</h2>
-          <div class="muted" style="margin-top:4px">Les noms soulignés sont interactifs : survole-les pour voir leur fiche complète. Sur mobile, touche un nom.</div>
+          <div class="muted" style="margin-top:4px">Survole un nom souligné pour le comprendre. Clique pour garder sa fiche ouverte ; Échap ou « Fermer la fiche » la referme. Sur mobile, touche le nom.</div>
         </div>
         <button class="danger" onclick="goHome()">Accueil</button>
       </div>
@@ -231,6 +238,7 @@
         <button type="button" class="atlas-tab" data-anatomy-tab="muscles" role="tab" aria-selected="false" onclick="selectAnatomyPlate('muscles')">Muscles</button>
         <button type="button" class="atlas-tab" data-anatomy-tab="organs" role="tab" aria-selected="false" onclick="selectAnatomyPlate('organs')">Organes</button>
       </div>
+      <label class="atlas-search-label" for="atlasSearch">Trouver un nom ou un synonyme</label><input id="atlasSearch" class="search" type="search" placeholder="Crâne, cubitus, cœur…" oninput="searchAtlas(this.value)"><div id="atlasSearchResults" class="atlas-search-results"></div>
       <div class="atlas-layout">
         <div>
           <div id="anatomyStage" class="anatomy-stage"></div>
@@ -252,7 +260,7 @@
     <dialog id="sceneReferenceDialog" class="scene-dialog" aria-labelledby="sceneReferenceTitle">
       <div class="dialog-heading"><h2 id="sceneReferenceTitle">Références du soin</h2><button type="button" class="secondary" onclick="closeSceneReferences()">Fermer</button></div>
       <p class="muted">Consulte une fiche sans quitter l'étape en cours.</p>
-      <div class="scene-tools"><button class="secondary" data-scene-ref="meds" onclick="setSceneReferenceTab('meds')">Produits</button><button class="secondary" data-scene-ref="equipment" onclick="setSceneReferenceTab('equipment')">Matériel</button><button class="secondary" data-scene-ref="anatomy" onclick="setSceneReferenceTab('anatomy')">Anatomie</button></div>
+      <div class="scene-tools"><button class="secondary" data-scene-ref="meds" onclick="setSceneReferenceTab('meds')">Produits</button><button class="secondary" data-scene-ref="equipment" onclick="setSceneReferenceTab('equipment')">Matériel</button><button class="secondary" data-scene-ref="symptoms" onclick="setSceneReferenceTab('symptoms')">Signes</button><button class="secondary" data-scene-ref="anatomy" onclick="setSceneReferenceTab('anatomy')">Anatomie</button></div>
       <input id="sceneReferenceSearch" type="search" aria-label="Chercher une référence" placeholder="Chercher une référence" oninput="renderSceneReferences()">
       <div id="sceneReferenceContent"></div>
     </dialog>
@@ -274,6 +282,8 @@
 <script src="icons.js"></script>
 <script src="scene.js"></script>
 <script src="rp-ui.js"></script>
+<script src="care.js"></script>
+<script src="stories.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

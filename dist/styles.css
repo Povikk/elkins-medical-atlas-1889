@@ -1438,3 +1438,42 @@ html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{fo
  .reading-setting select{width:auto;min-width:130px}
  .rp-choice-recap{gap:5px 10px}
 }
+
+/* Preparation content is separated from the quick care workspace. */
+.story-filters{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+.story-filters label{display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px;color:var(--muted)}
+.story-filters input,.story-filters select,#atlasSearch{width:100%;min-height:44px;padding:10px 12px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:inherit}
+.story-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.story-card{display:flex;flex-direction:column;text-align:left;align-items:start;gap:10px;padding:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;line-height:1.55;font-size:calc(16px * var(--reading-scale))}
+.story-card strong{font-family:Georgia,serif;font-size:calc(23px * var(--reading-scale));line-height:1.2}
+.story-card small{margin-top:auto;color:var(--muted)}
+.story-card:hover{border-color:var(--accent2)}
+.story-article{max-width:1100px;margin:20px auto;text-align:left;font-size:calc(17px * var(--reading-scale));line-height:1.6}
+.story-detail-heading{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.story-hook{font-size:calc(19px * var(--reading-scale))}
+.story-act,.story-quick{border:1px solid var(--line);border-radius:10px;padding:18px;margin:12px 0;background:var(--panel)}
+.story-act h3{margin-top:0}.story-phrase{color:var(--ink);font-style:italic}
+.story-history,.inline-material,.surgery-indication,.route-links{padding:12px 16px;margin:8px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel);grid-column:1/-1}
+.product-details{margin-top:10px}.product-details>div{margin-top:10px}
+summary{cursor:pointer;color:var(--ink)}
+.assistant-note{border-left:3px solid var(--accent2);padding:10px 14px;margin:8px 0;grid-column:1/-1;background:var(--panel);font-size:calc(15px * var(--reading-scale))}
+.reassessment{border:1px solid var(--line);border-radius:8px;margin:14px 0;padding:12px;display:flex;flex-wrap:wrap;gap:8px}
+.reassessment legend{padding:0 5px}.reassessment [aria-pressed="true"]{border-color:var(--accent2);background:var(--panel2);outline:2px solid var(--accent2)}
+.rp-choice-recap details{flex-basis:100%;font-size:calc(13px * var(--reading-scale))}.rp-choice-recap details>span{display:inline-block;margin:7px 14px 0 0}
+.consultations-heading{margin:28px 0 12px}
+.anatomy-tooltip.pinned{pointer-events:auto;border:2px solid var(--accent2)}
+.anatomy-tooltip details{font-size:14px}.anatomy-tooltip .scene-tools{display:flex;flex-wrap:wrap}
+#atlasSearchResults{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+[hidden]{display:none!important}
+@media(min-width:761px){
+ #flow>.scene-tools,#surgeryFlow>.scene-tools{margin:4px 0 6px}
+}
+@media(max-width:760px){
+ #siteHeader,body.compact-header #siteHeader{padding-right:16px;align-items:start;gap:10px}
+ #siteHeader>.sidebar-theme{position:static;inset:auto;margin:0 0 0 auto;flex:0 0 auto;max-width:145px}
+ .side-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+ .side-nav-item{font-size:10px!important;padding:7px 2px!important;min-width:0;overflow-wrap:anywhere}
+ .story-grid{grid-template-columns:1fr}.story-card{padding:16px}
+ .story-filters{display:grid;grid-template-columns:1fr}.story-filters label{min-width:0}
+ .story-article{margin:12px 0}.story-act{padding:14px}
+}

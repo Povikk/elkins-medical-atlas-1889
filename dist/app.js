@@ -107,18 +107,21 @@ anatomyTooltip.setAttribute("role","tooltip");
 anatomyTooltip.hidden = true;
 document.body.append(anatomyTooltip);
 anatomyTooltip.addEventListener("pointerenter",()=>clearTimeout(anatomyHideTimer));
-anatomyTooltip.addEventListener("pointerleave",()=>hideAnatomyTooltip());
+anatomyTooltip.addEventListener("pointerleave",()=>{if(!anatomyPinned)hideAnatomyTooltip();});
 
 function hideAnatomyTooltip(){
+  anatomyPinned=false;anatomyTooltip.classList.remove('pinned');
   clearTimeout(anatomyHideTimer);
   anatomyTooltip.hidden = true;
   document.querySelectorAll('[aria-describedby="anatomyTooltip"]').forEach(el=>el.removeAttribute("aria-describedby"));
 }
 function scheduleAnatomyHide(){
+  if(anatomyPinned)return;
   clearTimeout(anatomyHideTimer);
   anatomyHideTimer = setTimeout(hideAnatomyTooltip,180);
 }
 function positionAnatomyTooltip(event,button){
+  if(anatomyPinned && event?.type==='pointermove')return;
   if(anatomyTooltip.hidden) return;
   const rect = button.getBoundingClientRect();
   const x = event && event.type !== "focus" && event.type !== "focusin" ? event.clientX : rect.right;
@@ -131,6 +134,7 @@ function positionAnatomyTooltip(event,button){
   anatomyTooltip.style.top = `${Math.max(10,Math.min(top,innerHeight-box.height-10))}px`;
 }
 function revealAnatomyTooltip(key,index,event,button){
+  if(anatomyPinned && event && event.type!=='focus')return;
   if(event?.pointerType === "touch") return;
   const spot = anatomyPlates[key]?.hotspots[index];
   if(!spot) return;
@@ -154,13 +158,14 @@ function anatomyStageMarkup(plate,key,zoom=false){
         onpointerleave="scheduleAnatomyHide()"
         onfocus="revealAnatomyTooltip('${key}',${index},event,this)"
         onblur="scheduleAnatomyHide()"
-        onclick="revealAnatomyTooltip('${key}',${index},null,this)"></button>`).join("")}</div>`;
+        onclick="pinAnatomyTooltip('${key}',${index},this)"></button>`).join("")}</div>`;
 }
 document.addEventListener("keydown",event=>{if(event.key === "Escape") hideAnatomyTooltip();});
 document.addEventListener("pointerdown",event=>{
   if(!event.target.closest(".anatomy-label,.anatomy-tooltip")) hideAnatomyTooltip();
 });
 window.addEventListener("scroll",event=>{
+  if(anatomyPinned)return;
   if(anatomyTooltip.contains(event.target)) return;
   if(anatomyKeyboardTooltip && document.activeElement?.matches(".anatomy-label")){
     positionAnatomyTooltip(null,document.activeElement);
@@ -172,7 +177,7 @@ function anatomyInfoMarkup(plate, hotspot){
   return `<span class="badge">${plate.title}</span><strong>${hotspot.label}</strong>
     <p><b>Rôle :</b> ${hotspot.role}</p>
     <p><b>À observer en RP :</b> ${hotspot.observe}</p>
-    <p class="anatomy-caution"><b>Prudence :</b> ${hotspot.caution}</p>`;
+    <p class="anatomy-caution"><b>Prudence :</b> ${hotspot.caution}</p>${atlasExtras(hotspot)}`;
 }
 
 function selectAnatomyPlate(key){
@@ -257,6 +262,7 @@ function renderSurgery(){
     <div class="topbar">
       <div>
         <span class="badge">Chirurgie lourde</span>
+        ${urgencyBadge(careUrgency('critical'))}
         <h2 style="margin:8px 0 0">${s.title}</h2>
         <div class="muted">${s.duration}</div>
       </div>
@@ -266,7 +272,7 @@ function renderSurgery(){
         <button class="danger" onclick="showSurgery()">Changer de chirurgie</button>
       </div>
     </div>
-    <div class="section"><b>Quand l'utiliser :</b> ${s.intro}</div>
+    <details class="surgery-indication"><summary>Quand utiliser cette chirurgie</summary><p>${s.intro}</p></details>
     <div class="progress"><div style="width:${pct}%"></div></div>
       ${rpChoicesMarkup()}
     ${materialPanel("surgery")}
@@ -282,6 +288,7 @@ function renderSurgery(){
     html += sayLines(["« Très bien, je passe à l’étape suivante. Restez tranquille. »"]);
   }
   if(step.meds) html += meds(step.meds);
+  html += careStepExtras(step);
 
   html += `<div class="nav">
     <button class="secondary" onclick="prevSurgery()">Précédent</button>
@@ -289,6 +296,7 @@ function renderSurgery(){
   </div>`;
 
   document.getElementById("surgeryFlow").innerHTML = html;
+  finalizeCareLayout(document.getElementById('surgeryFlow'));
 }
 
 function nextSurgery(){
@@ -328,10 +336,15 @@ function compactButton(target){
 }
 
 function show(id){
+  placeReadingControls();
   hideAnatomyTooltip();
   const target = document.getElementById(id);
   if(!target) return;
-  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
+  if(id!=='flow'&&id!=='surgeryFlow'){
+    answers={};flowHistory=[];currentFlow=null;currentSurgery=null;materialPanelOpen=false;resetRpScene();
+    document.getElementById('flow').innerHTML='';document.getElementById('surgeryFlow').innerHTML='';
+  }
+  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
   target.classList.remove("hidden");
   const shellView = id === "flow" ? "cases" : id === "surgeryFlow" ? "surgery" : id;
   document.querySelectorAll("[data-shell-view]").forEach(button=>{
@@ -340,7 +353,7 @@ function show(id){
     if(active) button.setAttribute("aria-current","page");
     else button.removeAttribute("aria-current");
   });
-  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow"];
+  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories"];
   document.body.classList.toggle("compact-header", compactSections.includes(id));
   window.scrollTo({top:0,behavior:"auto"});
 }
@@ -450,6 +463,7 @@ function renderLexique(list){
       <small><b>Usage RP :</b> ${x.use}</small>
       <details class="lex-details"><summary>Détails et précautions</summary>
         ${x.composition ? `<small><b>Composition :</b> ${x.composition}</small>` : ""}
+        <small><b>Disponibilité en 1889 :</b> ${x.availability}</small>
         ${x.sensory || sensoryCue(x.name) ? `<small><b>Sensations / odeur :</b> ${x.sensory || sensoryCue(x.name)[1]}</small>` : ""}
         <small><b>Attention :</b> ${x.warning || "Référence historique uniquement. Aucun dosage ni recette ; ne pas transposer aux soins réels."}</small>
         ${x.sources ? `<small><b>Sources :</b> ${x.sources.map(s=>`<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title}</a>`).join(" · ")}</small>` : ""}
@@ -510,7 +524,7 @@ function next(fromChoice=false){
 }
 function prev(){
   const previous=flowHistory.pop();
-  if(previous){stepIndex=previous.index;answers=previous.answers;interventionEnded=false;render();}
+  if(previous){const latest=Object.fromEntries(Object.entries(answers).filter(([key])=>key.startsWith('latest')));stepIndex=previous.index;answers={...previous.answers,...latest};interventionEnded=false;render();}
   else showCases();
 }
 function section(title,items,cls=""){
@@ -521,7 +535,7 @@ function section(title,items,cls=""){
     if(title === "Matériel"){
       return `<div class="section ${cls}">${heading}<div class="compact-inline">${items.join(" · ")}</div></div>`;
     }
-    const limited = items.slice(0,3);
+    const limited = compactActions(title,items);
     return `<div class="section ${cls}">${heading}<ul>${limited.map(row).join("")}</ul></div>`;
   }
   return `<div class="section ${cls}">${heading}<ul>${items.map(row).join("")}</ul></div>`;
@@ -584,9 +598,14 @@ function sensoryNote(name){
 }
 
 function meds(rows){
+  const unsafeOral=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak','unknown'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing);
+  const withheldOral=unsafeOral && rows.some(r=>/orale|à boire|boisson/i.test(r[2]));
+  if(withheldOral)rows=rows.filter(r=>!/orale|à boire|boisson/i.test(r[2]));
   const opioids = rows.some(r=>/morphine|laudanum/i.test(r[0]));
   const assessment = opioids ? painAssessment() : "";
   const selected = answers.rpPain;
+  const unavailable=opioids && careProductBlocked();
+  if(unavailable)rows=rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(opioids && selected === "mild") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(opioids && selected === "moderate") rows = rows.filter(r=>!/morphine/i.test(r[0]));
   if(opioids && selected === "unsafe") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
@@ -595,6 +614,7 @@ function meds(rows){
       <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
       <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
       ${assessment}
+      ${unavailable||withheldOral?'<p class="route-note">Réévaluer conscience et respiration avant un opiacé. Aucune proposition orale tant que le patient ne peut pas répondre et avaler.</p>':''}
       ${rows.map(r=>`
         <div class="compact-med ${categoryClass(medCategory(r[0], r[3]))}">
           <strong>${emojiIcon(lexEmoji({name:r[0],form:r[1],admin:r[2],category:medCategory(r[0],r[3])}))} ${r[0]} <span class="cat-badge">${medCategory(r[0], r[3])}</span></strong>
@@ -609,6 +629,7 @@ function meds(rows){
     <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
     <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
     ${assessment}
+    ${unavailable||withheldOral?'<p class="route-note">Réévaluer conscience et respiration avant un opiacé. Aucune proposition orale tant que le patient ne peut pas répondre et avaler.</p>':''}
     ${rows.map(r=>`
       <div class="med-item ${categoryClass(medCategory(r[0], r[3]))}">
         <strong style="font-size:17px">${emojiIcon(lexEmoji({name:r[0],form:r[1],admin:r[2],category:medCategory(r[0],r[3])}))} ${r[0]}</strong>
@@ -727,7 +748,7 @@ function render(){
     <div class="topbar">
       <div>
         <span class="badge">${flow.title}</span>
-        ${urgencyBadge(flow.urgency)}
+        ${urgencyBadge(careUrgency(flow.urgency))}
         <h2 style="margin:8px 0 0">${position} / ${route.length} - ${step.title}</h2>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -738,15 +759,16 @@ function render(){
     </div>
     <div class="progress"><div style="width:${pct}%"></div></div>
     ${rpChoicesMarkup()}
-    ${compactMode ? "" : `<div class="quick-note">Objectif RP : aller à l'essentiel. Si une étape ne correspond pas à la scène, choisis l'option la plus proche et avance.</div>`}
     ${materialPanel("flow")}
     ${sceneToolbar("flow")}
     ${rpContextMarkup("flow")}
     ${flowRouteNote()}
+    ${careStepExtras(step)}
   `;
 
   if(step.dynamicUnknownBreathing){
-    if(answers.unknownBreathing === "no"){
+    const breathing=answers.latestBreathing || answers.unknownBreathing;
+    if(breathing === "no"){
       html += section("À faire",[
         "Dégager le cou et la poitrine.",
         "Vérifier rapidement qu'aucun objet visible n'obstrue la bouche.",
@@ -754,14 +776,14 @@ function render(){
         "Ne chercher la cause qu'une fois la respiration reprise dans la scène."
       ]);
       html += sayLines(["« Il ne respire pas. Aidez-moi à dégager sa poitrine. »","« Je tente de relancer sa respiration. »"]);
-    } else if(answers.unknownBreathing === "weak"){
+    } else if(breathing === "weak"){
       html += section("À faire",[
         "Garder les voies respiratoires dégagées.",
         "Surveiller chaque respiration.",
         "Préparer une respiration artificielle si elle s'arrête."
       ]);
       html += sayLines(["« Restez avec moi. Respirez doucement. »"]);
-    } else if(answers.unknownBreathing === "unknown"){
+    } else if(breathing === "unknown"){
       html += section("À faire",[
         "Se concentrer uniquement sur la respiration pendant quelques instants.",
         "Observer poitrine, bouche et souffle avant toute autre étape.",
@@ -804,13 +826,14 @@ function render(){
     }
 
   } else if(step.dynamicUnknownCause){
-    if(answers.unknownWake === "awake"){
+    const wake=answers.latestState || answers.unknownWake;
+    if(wake === "awake"){
       html += section("À faire",[
         "Poser seulement trois questions rapides : où avez-vous mal, que s'est-il passé, avez-vous reçu un coup à la tête ?",
         "Choisir ensuite l'intervention correspondant au symptôme principal."
       ]);
       html += sayLines(["« Dites-moi simplement où vous avez le plus mal. »","« Qu'est-ce qui s'est passé juste avant ? »"]);
-    } else if(answers.unknownWake === "confused"){
+    } else if(wake === "confused"){
       html += section("À faire",[
         "Garder le patient allongé.",
         "Suspecter en priorité chute, traumatisme crânien ou intoxication selon la scène.",
@@ -902,7 +925,8 @@ function render(){
     }
 
   } else if(step.dynamicConscious){
-    if(answers.conscious === "not_breathing"){
+    const observed=answers.latestBreathing==='no'?'not_breathing':answers.latestState?{awake:'awake',confused:'confused',unresponsive:'unconscious_breathing',unknown:'unknown'}[answers.latestState]:answers.conscious;
+    if(observed === "not_breathing"){
       html += section("Priorité : respiration artificielle",[
         "Allonger le patient sur le dos et dégager le cou et la poitrine.",
         "Vérifier rapidement la bouche et retirer seulement ce qui obstrue visiblement.",
@@ -928,7 +952,7 @@ function render(){
         "Contrôler immédiatement les grosses hémorragies.",
         "Attendre qu’il reprenne suffisamment connaissance avant de lui demander ce qui s’est passé."
       ]);
-    } else if(answers.conscious === "unconscious_breathing"){
+    } else if(observed === "unconscious_breathing"){
       html += section("À faire",[
         "Le patient respire : ne pas commencer une respiration artificielle.",
         "Dégager ce qui gêne le cou et la respiration.",
@@ -945,7 +969,7 @@ function render(){
       html += meds([
         ["Sels odorants / ammoniaque","Vapeurs / sels","Présentés brièvement sous le nez","Stimulation d’un patient évanoui qui respire"]
       ]);
-    } else if(answers.conscious === "confused"){
+    } else if(observed === "confused"){
       html += section("À faire",[
         "Garder le patient allongé ou assis.",
         "Vérifier qu’il respire correctement et qu’il ne saigne pas abondamment.",
@@ -958,7 +982,7 @@ function render(){
         "« Ne cherchez pas à vous lever. »",
         "« Dites-moi seulement où vous avez mal. »"
       ]);
-    } else if(answers.conscious === "unknown"){
+    } else if(observed === "unknown"){
       html += section("À faire",[
         "Tu n'as pas encore assez d'informations.",
         "Vérifier respiration, réaction à la voix et gros saignement.",
@@ -977,7 +1001,8 @@ function render(){
       ]);
     }
   } else if(step.dynamicBreathing){
-    if(answers.breathing === "no"){
+    const breathing=answers.latestBreathing || answers.breathing;
+    if(breathing === "no"){
       html += section("Méthode de Silvester",[
         "Allonger le patient sur le dos.",
         "Dégager le cou et la poitrine.",
@@ -986,7 +1011,9 @@ function render(){
         "Répéter régulièrement jusqu’à reprise d’une respiration dans la scène."
       ]);
       html += sayLines(["« Il ne respire pas. Aidez-moi à dégager sa poitrine. »","« Je tente de faire reprendre les mouvements respiratoires. »"]);
-    } else if(answers.breathing === "weak"){
+    } else if(breathing === 'unknown'){
+      html += section('À faire',['La respiration n’a pas été évaluée : observer avant de choisir un geste.','Demander du renfort et utiliser Réévaluer pour indiquer la dernière observation.']);
+    } else if(breathing === "weak"){
       html += section("À faire",[
         "Garder les voies respiratoires dégagées.",
         "Stimuler le patient et surveiller chaque respiration.",
@@ -1001,20 +1028,23 @@ function render(){
       ]);
     }
   } else if(step.dynamicHead){
-    if(answers.headState === "not_breathing"){
+    const headState=answers.latestBreathing==='no'?'not_breathing':answers.latestState?{awake:'awake',confused:'confused',unresponsive:'unconscious',unknown:'unknown'}[answers.latestState]:answers.headState;
+    if(headState === 'unknown'){
+      html += section('À faire',['Vérifier réactions, respiration et saignement avant toute conclusion.','Ne pas assimiler une observation incertaine à un patient cohérent.']);
+    } else if(headState === "not_breathing"){
       html += section("Priorité",[
         "La respiration passe avant l’examen de la tête.",
         "Utiliser la méthode de Silvester comme respiration artificielle d’époque.",
         "Après reprise, immobiliser et reprendre l’examen neurologique."
       ]);
-    } else if(answers.headState === "unconscious"){
+    } else if(headState === "unconscious"){
       html += section("À faire",[
         "Le patient respire : le garder immobile.",
         "Contrôler les saignements visibles.",
         "Le stimuler doucement sans le relever.",
         "Surveiller sa respiration jusqu’au réveil."
       ]);
-    } else if(answers.headState === "confused"){
+    } else if(headState === "confused"){
       html += section("À faire",[
         "Garder le patient au repos.",
         "Poser seulement des questions simples.",
@@ -1054,13 +1084,16 @@ function render(){
       ]);
     }
   } else if(step.dynamicPoison){
-    if(answers.poisonState === "not_breathing"){
+    const poisonState=answers.latestBreathing==='no'?'not_breathing':answers.latestState?{awake:'awake',confused:'sleepy',unresponsive:'unconscious',unknown:'unknown'}[answers.latestState]:answers.poisonState;
+    if(poisonState === 'unknown'){
+      html += section('À faire',['Évaluer conscience et respiration avant de poursuivre.','Chercher le récipient ou un témoin sans supposer le produit ingéré.']);
+    } else if(poisonState === "not_breathing"){
       html += section("Priorité : respiration",[
         "Allonger le patient et dégager le cou et la poitrine.",
         "Utiliser la méthode de Silvester si la respiration paraît absente.",
         "Continuer jusqu’à reprise d’une respiration dans la scène."
       ]);
-    } else if(answers.poisonState === "unconscious"){
+    } else if(poisonState === "unconscious"){
       html += section("À faire",[
         "Le patient respire : le surveiller sans interruption.",
         "Le stimuler doucement.",
@@ -1189,6 +1222,7 @@ function render(){
         <button class="choice" onclick='applyChoice({"horseMove":"painful"})'>Il bouge mais ça fait mal</button>
         <button class="choice" onclick='applyChoice({"horseMove":"limited"})'>Il bouge très peu / difficilement</button>
         <button class="choice" onclick='applyChoice({"horseMove":"none"})'>Impossible de bouger</button>
+        <button class="choice" onclick='applyChoice({"horseMove":"unknown"})'>Non testé / impossible à évaluer</button>
       </div></div>`;
     }
 
@@ -1198,7 +1232,9 @@ function render(){
     const move = answers.horseMove;
     const pain = answers.horsePain;
 
-    if(vis === "deformity" || move === "none"){
+    if([vis,move,area].includes('unknown')){
+      html += section('À faire',['L’examen reste incomplet : ne pas annoncer une simple contusion.','Ne pas forcer le mouvement ; préciser les signes accessibles dans la scène.','Organiser une nouvelle évaluation et du renfort si nécessaire.']);
+    } else if(vis === "deformity" || move === "none"){
       html += section("À faire",[
         "Considérer une fracture ou luxation possible.",
         "Immobiliser dans la position la plus stable.",
@@ -1267,7 +1303,9 @@ function render(){
     const pain = answers.horsePain;
     const conscious = answers.conscious;
 
-    if(answers.horseArea === "none" && pain === "mild"){
+    if(pain==='unknown'){
+      html += section('À faire',['La douleur n’est pas évaluée : pas de produit choisi par défaut.','Demander une description si le patient peut répondre, sinon surveiller ses réactions.']);
+    } else if(answers.horseArea === "none" && pain === "mild"){
       html += section("Optionnel",[
         "Aucun antidouleur n’est forcément nécessaire si la gêne est minime.",
         "Un soin local (préparation à l’arnica, teinture alcoolique ou pommade, application locale) suffit souvent pour une petite contusion."
@@ -1352,6 +1390,7 @@ function render(){
   }
 
   document.getElementById("flow").innerHTML=html;
+  finalizeCareLayout(document.getElementById('flow'));
 }
 function renderEnd(){
   interventionEnded=true;
