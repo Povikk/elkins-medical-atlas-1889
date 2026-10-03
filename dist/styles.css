@@ -1414,3 +1414,27 @@ body{font-size:17px}
 .material-panel h4{margin:10px 0 4px}
 .material-panel details{margin-top:8px}
 .material-panel ul{gap:6px 22px}
+
+/* Reading preferences affect useful content, not the navigation or plate geometry. */
+:root{--reading-scale:1;--reading-body:17px}
+html[data-reading-size="large"]{--reading-scale:1.18}
+html[data-reading-size="xlarge"]{--reading-scale:1.36}
+.reading-setting{display:flex;flex-direction:column;gap:6px;color:var(--ink);font-size:14px;margin:8px 0}
+.reading-setting select{width:100%;min-height:42px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font:inherit}
+.rp-choice-recap{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 2px;color:var(--muted);font-size:calc(14px * var(--reading-scale));line-height:1.45}
+.rp-choice-recap small{font:inherit;color:var(--ink)}
+.rp-choice-recap span{overflow-wrap:anywhere}
+.rp-choice-recap b{font-weight:500}
+html[data-reading-size]:not([data-reading-size="normal"]) :is(.section,.rp-lines,.choice,.lex-card,.reference-card,.reference-detail,.material-panel,.patient-question){font-size:calc(var(--reading-body) * var(--reading-scale))}
+html[data-reading-size]:not([data-reading-size="normal"]) :is(.med,.compact-inline,.rp-gesture,.sensory-note,.pain-assessment p,.product-context p){font-size:calc(16px * var(--reading-scale))}
+html[data-reading-size]:not([data-reading-size="normal"]) :is(.assessment-options button,.rp-dialogue-heading,.rp-dialogue-heading button,.reference-link,.lex-card small,.reference-card small){font-size:calc(14px * var(--reading-scale))}
+html[data-reading-size]:not([data-reading-size="normal"]) :is(.section h3,.lex-card h3,.reference-card h3){font-size:calc(23px * var(--reading-scale))}
+html[data-reading-size]:not([data-reading-size="normal"]) :is(.med-item>strong,.compact-med>strong){font-size:calc(17px * var(--reading-scale))!important}
+html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{font-size:calc(13px * var(--reading-scale))}
+@media(max-width:760px){
+ :root{--reading-body:16px}
+ #siteHeader,body.compact-header #siteHeader{flex-wrap:wrap;gap:8px}
+ .reading-setting{flex:0 0 100%;flex-direction:row;align-items:center;margin:0;gap:10px}
+ .reading-setting select{width:auto;min-width:130px}
+ .rp-choice-recap{gap:5px 10px}
+}

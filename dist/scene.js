@@ -103,6 +103,7 @@ function endingMarkup(kind){
   const unresolved=!surgery && (/unconscious|not_breathing|unknown/.test(answers.conscious || '') || ['unconscious','not_breathing'].includes(answers.headState) || ['unconscious','not_breathing'].includes(answers.poisonState) || ['no','weak'].includes(answers.breathing) || answers.unknownWake !== 'awake' && currentFlow==='unknown');
   return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : 'Intervention terminée'}</h2>
     <p class="muted">Conclusion à adapter aux gestes et à l'évolution réellement joués. Aucun dossier n'est créé.</p>
+    ${rpChoicesMarkup()}
     ${unresolved ? '<div class="route-note">Un signe inquiétant a été choisi dans ce parcours. La fin des étapes ne signifie pas que le patient peut repartir : réévalue son état dans la scène.</div>' : ''}
     <h3>Pour conclure la scène</h3><p>${notes[0]}</p>${variant ? `<p>${variant}</p>` : ''}
     ${sayLines([notes[1]])}<h3>Consignes RP</h3><p>${notes[2]}</p><h3>À surveiller / motif de retour</h3><p>${notes[3]}</p>

@@ -2,7 +2,35 @@
 let rpContext={place:'',team:'',mood:''};
 let rpContextOpen=false;
 let rpPhraseBlocks=[];
-function resetRpScene(){rpContext={place:'',team:'',mood:''};rpContextOpen=false;rpPhraseBlocks=[];}
+let rpPhraseHistory=new Map();
+let rpPhraseOrder=new Map();
+function resetRpScene(){rpContext={place:'',team:'',mood:''};rpContextOpen=false;rpPhraseBlocks=[];rpPhraseHistory.clear();rpPhraseOrder.clear();}
+function setReadingSize(value,persist=true){
+ const size=['normal','large','xlarge'].includes(value)?value:'normal';
+ document.documentElement.dataset.readingSize=size;
+ document.getElementById('readingSize').value=size;
+ if(persist)try{localStorage.setItem('elkins-reading-size',size);}catch(error){}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ let size='normal';try{size=localStorage.getItem('elkins-reading-size') || 'normal';}catch(error){}
+ setReadingSize(size,false);
+ const mobile=matchMedia('(max-width:760px)');
+ const placeControl=()=>{const control=document.querySelector('.reading-setting');mobile.matches?document.getElementById('siteHeader').append(control):document.getElementById('themeToggle').after(control);};
+ placeControl();mobile.addEventListener('change',placeControl);
+});
+function rpChoicesMarkup(){
+ const fields={conscious:'État',headState:'État',poisonState:'État',unknownBreathing:'Respiration initiale',breathing:'Respiration',unknownBleeding:'Saignement',unknownWake:'Dernière réaction',gunArea:'Zone',knifeSeverity:'Plaie',horseArea:'Zone',horsePain:'Douleur',fracturePain:'Douleur',horseVisible:'Aspect',horseMove:'Mouvement',fightIssue:'Signe principal',bullet:'Projectile',needsSuture:'Fermeture',burnSeverity:'Brûlure',rpPain:'Douleur réévaluée'};
+ const manual={horseMove:{normal:'Normal',painful:'Douloureux',limited:'Limité',none:'Impossible'},rpPain:{mild:'Légère',moderate:'Modérée',strong:'Forte',unsafe:'Conscience / respiration inquiétante',unknown:'Non évaluée'}};
+ const steps=activeRouteKind==='surgery'?surgeries[currentSurgery]?.steps:flows[currentFlow]?.steps;
+ const choices=(steps || []).flatMap(step=>step.choices || []);
+ const chips=Object.entries(fields).flatMap(([key,label])=>{
+   if(!Object.prototype.hasOwnProperty.call(answers,key))return [];
+   const text=manual[key]?.[answers[key]] || choices.find(choice=>choice.set?.[key]===answers[key])?.label;
+   if(!text)return [];
+   return [`<span><b>${label} :</b> ${text}</span>`];
+ });
+ return chips.length?`<div class="rp-choice-recap" aria-label="Rappel des choix observés"><small>Choix du parcours</small>${chips.join('')}</div>`:'';
+}
 function rpContextMarkup(kind){
  const select=(key,label,options)=>`<label>${label}<select data-rp-context="${key}" onchange="setRpContext('${key}',this.value,'${kind}')"><option value="">Non précisé</option>${options.map(([value,text])=>`<option value="${value}" ${rpContext[key]===value?'selected':''}>${text}</option>`).join('')}</select></label>`;
  const summary=[{field:'place',labels:{field:'Terrain',office:'Cabinet'}},{field:'team',labels:{solo:'Seul',assistant:'Avec un assistant'}},{field:'mood',labels:{panic:'Patient paniqué',calm:'Patient calme'}}].map(item=>item.labels[rpContext[item.field]]).filter(Boolean).join(' · ');
@@ -80,6 +108,14 @@ function rpDialogue(items){
  }
  const firstBlock=rpPhraseBlocks.length===0;
  const stepKey=rpDialogueStepKey();
+ // Keep every alternative, but show phrases not already displayed in other steps first.
+ // Cache each context's order so re-rendering and going back do not shuffle it.
+ const orderKey=JSON.stringify([stepKey,state,rpContext,answers,items]);
+ if(!rpPhraseOrder.has(orderKey)){
+   const used=new Set([...rpPhraseHistory].filter(([key])=>key!==stepKey).flatMap(([,phrases])=>[...phrases]));
+   pool=pool.map((phrase,index)=>({phrase,index,used:used.has(phrase)})).sort((a,b)=>Number(a.used)-Number(b.used) || a.index-b.index).map(item=>item.phrase);
+   rpPhraseOrder.set(orderKey,pool);
+ }else pool=rpPhraseOrder.get(orderKey);
  const index=rpPhraseBlocks.push({pool,position:0,stepKey})-1;
  return `${ended || !firstBlock?'':rpGesture()}<div class="rp-lines rp-dialogue"><div class="rp-dialogue-heading"><span>${audience}</span><button type="button" class="secondary" onclick="alternateRpPhrase(${index},this)">Autre formulation</button></div><div class="rp-phrase-list" aria-live="polite">${rpPhraseRows(rpPhraseBlocks[index])}</div></div>`;
 }
@@ -92,7 +128,10 @@ function alternateRpPhrase(index,button){
 }
 function rpPhraseRows(block){
  const count=Math.min(compactMode?1:3,block.pool.length);
- return Array.from({length:count},(_,offset)=>block.pool[(block.position+offset)%block.pool.length]).map(phrase=>`<div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase">${phrase}</span></div>`).join('');
+ const phrases=Array.from({length:count},(_,offset)=>block.pool[(block.position+offset)%block.pool.length]);
+ if(!rpPhraseHistory.has(block.stepKey))rpPhraseHistory.set(block.stepKey,new Set());
+ phrases.forEach(phrase=>rpPhraseHistory.get(block.stepKey).add(phrase));
+ return phrases.map(phrase=>`<div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase">${phrase}</span></div>`).join('');
 }
 function rpDialogueStepKey(){
  return activeRouteKind==='surgery'?`surgery:${currentSurgery}:${surgeryStepIndex}:${surgeryEnded}`:`flow:${currentFlow}:${stepIndex}:${interventionEnded}`;

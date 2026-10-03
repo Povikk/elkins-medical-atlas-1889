@@ -268,6 +268,7 @@ function renderSurgery(){
     </div>
     <div class="section"><b>Quand l'utiliser :</b> ${s.intro}</div>
     <div class="progress"><div style="width:${pct}%"></div></div>
+      ${rpChoicesMarkup()}
     ${materialPanel("surgery")}
     ${sceneToolbar("surgery")}
     ${rpContextMarkup("surgery")}
@@ -736,6 +737,7 @@ function render(){
       </div>
     </div>
     <div class="progress"><div style="width:${pct}%"></div></div>
+    ${rpChoicesMarkup()}
     ${compactMode ? "" : `<div class="quick-note">Objectif RP : aller à l'essentiel. Si une étape ne correspond pas à la scène, choisis l'option la plus proche et avance.</div>`}
     ${materialPanel("flow")}
     ${sceneToolbar("flow")}

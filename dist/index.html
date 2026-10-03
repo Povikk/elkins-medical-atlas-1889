@@ -32,6 +32,11 @@
       <button type="button" class="side-nav-item" data-shell-view="atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
     </nav>
     <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
+    <label class="reading-setting" for="readingSize">Taille du texte
+      <select id="readingSize" onchange="setReadingSize(this.value)">
+        <option value="normal">Normal</option><option value="large">Grand</option><option value="xlarge">Très grand</option>
+      </select>
+    </label>
     <div class="sidebar-note">
       <span class="eyebrow">USAGE RP</span>
       <strong>Rapide et autonome</strong>
