@@ -83,13 +83,7 @@ const fs=require('node:fs');
   await page.locator('#storySearch').fill('zzzznotfound');assert.equal(await page.locator('.story-card').count(),0);
   await page.locator('#storySearch').fill('');
   await page.evaluate(()=>start('minor'));
-  assert.equal(await page.locator('.care-hook').count(),1);assert.equal(await page.locator('.care-hook').getAttribute('open'),null);
-  await page.locator('.care-hook>summary').click();
-  const hookBefore=await page.locator('.care-hook h3').innerText();
-  const careBefore=await page.evaluate(()=>JSON.stringify({answers,stepIndex,currentFlow}));
-  await page.getByRole('button',{name:'Autre accroche',exact:true}).click();
-  assert.notEqual(await page.locator('.care-hook h3').innerText(),hookBefore);
-  assert.equal(await page.evaluate(()=>JSON.stringify({answers,stepIndex,currentFlow})),careBefore);
+  assert.equal(await page.locator('.care-hook').count(),0);
   await page.evaluate(()=>showAtlas());
   for(const term of ['cubitus','omoplate','cœur','péroné']){
    await page.locator('#atlasSearch').fill(term);assert((await page.locator('#atlasSearchResults button').count())>0,term);

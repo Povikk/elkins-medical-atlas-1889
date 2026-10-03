@@ -2,6 +2,10 @@
 
 ## Pendant une scène
 
+- Vue détaillée resserrée : interlignes, listes, espaces et marges réduits sans diminuer la taille du texte. Vue condensée inchangée.
+- Perches retirées des interventions ; catégorie Accroches conservée séparément.
+- Fin du soin : résumé simple en mots-clés pour les constatations et les soins / prescriptions réellement renseignés, sans prompt ni enregistrement automatique.
+
 - Pense-bête d’Effie accessible dans le condensé, seul ou au-dessus des étapes : Observer, Agir, Produits facultatifs, Danger. Ligne de quatre cellules sur PC et empilement lisible sur mobile. Repères adaptés au soin, à la zone connue et aux observations inquiétantes ; aucun changement de réponses en ouvrant la vue.
 - Gravité visuelle réévaluée selon les observations, sans diagnostic automatique.
 - Conscience, respiration et saignement réévaluables à toute étape. Le rappel distingue l’état initial de la dernière observation.

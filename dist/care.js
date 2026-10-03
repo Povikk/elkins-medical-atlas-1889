@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function finalizeCareLayout(root){
- const hookMarkup=careHookMarkup();if(hookMarkup){const nav=root.querySelector(':scope > .nav');if(nav)nav.insertAdjacentHTML('beforebegin',hookMarkup);}
  // Keep the first actions, gestures and speech together before choices and optional detail.
  const gesture=root.querySelector(':scope > .rp-gesture'),dialogue=root.querySelector(':scope > .rp-dialogue');
  const action=[...root.querySelectorAll(':scope > .section')].find(s=>s.querySelector('ul')&&!s.querySelector('.med-item,.compact-med')&&!s.querySelector('.choices')&&!/Matériel/.test(s.querySelector('h3')?.textContent || ''));

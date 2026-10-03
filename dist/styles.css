@@ -1530,6 +1530,35 @@ summary{cursor:pointer;color:var(--ink)}
 .anatomy-tooltip details{font-size:14px}.anatomy-tooltip .scene-tools{display:flex;flex-wrap:wrap}
 #atlasSearchResults{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 [hidden]{display:none!important}
+/* Detailed care: keep the reading size, remove excess vertical whitespace. */
+:is(#flow,#surgeryFlow):not(.condensed-workspace){row-gap:5px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.section{padding:10px 14px;line-height:1.4;margin:0}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .section h3{margin-bottom:5px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .section ul{margin-top:4px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .section li{margin:3px 0}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.rp-lines{padding:8px 14px;line-height:1.4}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .rp-line{margin:3px 0;line-height:1.38}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .rp-dialogue-heading{margin-bottom:4px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.rp-gesture{margin:0;padding:6px 14px;line-height:1.35}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.rp-context{margin:0;padding:7px 14px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.scene-tools{margin:2px 0;gap:6px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>.care-memo{margin:3px 0 5px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-heading{padding:6px 12px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-cell{padding:8px 12px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-cell h4{margin-bottom:4px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-cell p{line-height:1.35}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-source{padding:5px 12px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .choices{margin-top:6px;gap:8px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .choice{padding:10px 14px;min-height:48px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace)>:is(.care-hook,.inline-material,.surgery-indication,.route-links,.assistant-note,.patient-question,.route-note){margin:2px 0;padding:7px 14px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .rp-choice-recap{padding:3px 2px;line-height:1.35}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .pain-assessment{margin:5px 0;padding:8px 12px}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) :is(.med,.compact-inline){line-height:1.4}
+:is(#flow,#surgeryFlow):not(.condensed-workspace) .sensory-note{margin-top:5px;padding-top:5px;line-height:1.35}
+@media(max-width:760px){
+ :is(#flow,#surgeryFlow):not(.condensed-workspace)>:is(.section,.rp-lines,.rp-gesture,.rp-context,.scene-tools,.care-memo){margin-bottom:6px}
+ :is(#flow,#surgeryFlow):not(.condensed-workspace) .scene-tools button{min-height:44px}
+}
 @media(min-width:761px){
  #flow>.scene-tools,#surgeryFlow>.scene-tools{margin:4px 0 6px}
 }

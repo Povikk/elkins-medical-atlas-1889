@@ -13,10 +13,10 @@ Ouvrir `index.html` pour accéder directement à la version actuelle. La version
 - `dist/care.js` contient les consultations, métadonnées de matériel, réévaluation et aides de soin.
 - `dist/condensed.js` affiche le parcours complet sans dialogue RP, en réutilisant les actions et règles de branchement du rendu détaillé. Les observations ultérieures sont invalidées quand une réponse antérieure change ; les dernières observations vitales restent conservées.
 - `dist/care-memo.js` fournit le pense-bête d’Effie, accessible depuis le condensé : quatre cellules Observer / Agir / Produits facultatifs / Danger, seules ou au-dessus des étapes. Les choix restent accessibles en vue seule. Présentation inspirée des pages 2 et 3 du PDF fourni ; les consultations et chirurgies sont adaptées aux parcours existants. Les autres chapitres du PDF ne deviennent pas de nouveaux diagnostics ou prescriptions. Aucun protocole ou dosage ajouté.
-- `dist/report.js` prépare un prompt à copier manuellement dans ChatGPT en fin de parcours : motif et deux champs simples (constatations ; soins, prescriptions et notes, y compris le nombre de points). Le prompt demande exactement deux textes RP au ton de 1889 sans inventer de faits. Il remplace le compte rendu local. Aucun appel distant ni stockage automatique.
+- `dist/report.js` prépare un résumé local en mots-clés à la fin du soin : motif et constatations médicales ; soins, traitements et prescriptions renseignés. Nombre de points et notes libres peuvent être indiqués. Le résultat est modifiable et copiable, sans prompt, appel distant ni stockage automatique. Aucun soin proposé dans le parcours n’est considéré comme effectué.
 
 Le pense-bête est affiché par défaut dans les parcours détaillés et condensés. Les boutons de matériel en haut et de changement de chirurgie sont retirés ; le matériel indiqué dans les étapes reste disponible.
-- `dist/hooks.js` contient les 60 accroches, leurs filtres et la suggestion facultative pendant les soins.
+- `dist/hooks.js` contient les 60 accroches et leurs filtres, uniquement dans la catégorie Accroches. Aucune suggestion de perche dans les interventions.
 - `dist/rp-ui.js` contient les formulations, le contexte temporaire et la taille du texte.
 - `dist/scene.js` contient les références rapides, incidents et conclusions.
 - `dist/atlas-labels.js` contient les 45 zones nommées des trois planches.
