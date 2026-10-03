@@ -30,6 +30,7 @@
 
 ## Ergonomie et confidentialité
 
+- Compte rendu facultatif en fin d’intervention, de consultation ou de chirurgie. Renseignements libres, suture confirmée et nombre de points pour balle/couteau, génération manuelle, résultat modifiable et copie volontaire. Aucun geste, produit, résultat, délai ou nombre de points inventé ; aucun enregistrement automatique. Le brouillon est effacé en quittant le parcours ou en rechargeant la page.
 - Taille de texte réglable préservée dans les deux thèmes.
 - Contrôles de lecture et de thème placés dans l’en-tête mobile, hors de la navigation basse.
 - Navigation à six entrées, accès aux accroches depuis l’accueil et la barre latérale.

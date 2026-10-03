@@ -12,6 +12,7 @@ Ouvrir `index.html` pour accéder directement à la version actuelle. La version
 - `dist/app.js` contient la navigation et le rendu interactif.
 - `dist/care.js` contient les consultations, métadonnées de matériel, réévaluation et aides de soin.
 - `dist/condensed.js` affiche le parcours complet sans dialogue RP, en réutilisant les actions et règles de branchement du rendu détaillé. Les observations ultérieures sont invalidées quand une réponse antérieure change ; les dernières observations vitales restent conservées.
+- `dist/report.js` rédige manuellement un compte rendu RP en fin de parcours : motif, constatations, soins confirmés, prescriptions, notes libres et points de suture pour balle/couteau. Le brouillon reste uniquement en mémoire, sans stockage ni requête réseau. Seule une confirmation explicite de suture permet de mentionner des points posés. La génération utilise des modèles locaux, sans intelligence artificielle distante.
 - `dist/hooks.js` contient les 60 accroches, leurs filtres et la suggestion facultative pendant les soins.
 - `dist/rp-ui.js` contient les formulations, le contexte temporaire et la taille du texte.
 - `dist/scene.js` contient les références rapides, incidents et conclusions.

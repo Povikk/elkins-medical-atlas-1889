@@ -4,7 +4,7 @@ let rpContextOpen=false;
 let rpPhraseBlocks=[];
 let rpPhraseHistory=new Map();
 let rpPhraseOrder=new Map();
-function resetRpScene(){rpContext={place:'',team:'',mood:'',resources:''};rpContextOpen=false;rpPhraseBlocks=[];rpPhraseHistory.clear();rpPhraseOrder.clear();}
+function resetRpScene(){rpContext={place:'',team:'',mood:'',resources:''};rpContextOpen=false;rpPhraseBlocks=[];rpPhraseHistory.clear();rpPhraseOrder.clear();if(typeof resetReportDraft==='function')resetReportDraft();}
 function setReadingSize(value,persist=true){
  const size=['normal','large','xlarge'].includes(value)?value:'normal';
  document.documentElement.dataset.readingSize=size;

@@ -94,6 +94,7 @@ function endingMarkup(kind){
     ${unresolved ? '<div class="route-note">Un signe inquiétant a été choisi dans ce parcours. La fin des étapes ne signifie pas que le patient peut repartir : réévalue son état dans la scène.</div>' : ''}
     <h3>Pour conclure la scène</h3><p>${notes[0]}</p>${variant ? `<p>${variant}</p>` : ''}
     ${sayLines([notes[1]])}<h3>Consignes RP</h3><p>${notes[2]}</p><h3>À surveiller / motif de retour</h3><p>${notes[3]}</p>
+    ${reportMarkup(kind)}
     <div class="nav"><button class="secondary" onclick="${surgery ? 'surgeryEnded=false;renderSurgery()' : 'interventionEnded=false;render()'}">Revoir la dernière étape</button><button class="next" onclick="${surgery ? 'showSurgery()' : 'showCases()'}">${surgery ? 'Autre chirurgie' : 'Nouvelle intervention'}</button><button class="secondary" onclick="goHome()">Accueil</button></div></div>`;
 }
 

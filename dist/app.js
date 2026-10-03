@@ -343,6 +343,9 @@ function show(id){
   hideAnatomyTooltip();
   const target = document.getElementById(id);
   if(!target) return;
+  // Only one care workspace owns form controls and IDs at a time.
+  if(id==='flow')document.getElementById('surgeryFlow').innerHTML='';
+  if(id==='surgeryFlow')document.getElementById('flow').innerHTML='';
   if(id!=='flow'&&id!=='surgeryFlow'){
     answers={};flowHistory=[];currentFlow=null;currentSurgery=null;materialPanelOpen=false;resetRpScene();
     document.getElementById('flow').innerHTML='';document.getElementById('surgeryFlow').innerHTML='';

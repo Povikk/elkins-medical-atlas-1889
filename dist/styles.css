@@ -1440,6 +1440,23 @@ html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{fo
 }
 
 /* Preparation content is separated from the quick care workspace. */
+.care-report{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:20px 0;background:var(--panel)}
+.care-report>summary{font-size:calc(19px * var(--reading-scale));font-weight:700}
+.report-hint{font-size:14px;line-height:1.5}
+.report-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.report-field{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:14px;font-weight:600;color:var(--ink)}
+.report-wide{grid-column:1/-1}
+.care-report input,.care-report textarea,.care-report select{width:100%;min-width:0;border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--paper);color:var(--ink);font:400 calc(16px * var(--reading-scale))/1.5 Arial,sans-serif}
+.care-report textarea{resize:vertical;min-height:100px}
+.report-sutures{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-wrap:wrap;gap:12px}
+.report-sutures legend{padding:0 6px;font-size:16px}
+.report-sutures label{display:flex;flex-direction:column;gap:7px;flex:1;min-width:180px;font-size:14px}
+.report-sutures small{flex-basis:100%;color:var(--muted);font-size:13px}
+.report-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:16px 0 8px}
+.report-actions small,#report-status{font-size:14px;line-height:1.5;color:var(--muted)}
+#report-result{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+#report-text{font-family:Georgia,serif;min-height:280px;line-height:1.7}
+@media(max-width:760px){.report-fields{grid-template-columns:1fr}.care-report{padding:12px;scroll-margin-top:130px}.report-sutures label{min-width:0;flex-basis:100%}.scene-ending:has(.care-report[open])>.nav{position:static;flex-wrap:wrap}.scene-ending:has(.care-report[open])>.nav button{flex:1 1 140px}}
 .condensed-workspace:not(.hidden){display:block!important;max-width:none!important}
 .condensed-topbar{gap:12px;margin-bottom:8px}
 .condensed-topbar h2{font-size:calc(25px * var(--reading-scale));margin:6px 0 0}
