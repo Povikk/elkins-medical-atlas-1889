@@ -45,31 +45,39 @@ function rpDialogue(items){
  let audience='Au patient, s’il peut répondre';
  let pool=[...(items || []),casePhrase()].filter(Boolean);
  const title=activeStepTitle.toLowerCase();
- const alternative=/nettoy|antisept/.test(title)?'« Je prépare le nettoyage de cette zone. Prévenez-moi si le contact vous gêne. »':/sutur|fermer/.test(title)?'« Je vérifie les bords de la plaie avant de décider de sa fermeture. »':/panser|protéger/.test(title)?'« Je prépare la protection de cette zone. Dites-moi si elle vous gêne une fois posée. »':/douleur|soulager/.test(title)?'« Avant de poursuivre, décrivez-moi la douleur avec vos mots. »':/respir|surveill/.test(title)?'« Je reste près de vous pour observer votre respiration et vos réactions. »':'« Avant de continuer, dites-moi ce que vous ressentez à cet instant. »';
+ const stepAction=/nettoy|antisept/.test(title)?'préparer le nettoyage de cette zone':/sutur|fermer/.test(title)?'vérifier la plaie avant sa fermeture':/panser|protéger/.test(title)?'préparer la protection de la zone blessée':/douleur|soulager/.test(title)?'évaluer la douleur avant de choisir un produit':/saign|ligatur/.test(title)?'contrôler le saignement':/respir/.test(title)?'vérifier la respiration':/immobil|fracture/.test(title)?'préparer le soutien du membre':/blessure|zone|localis/.test(title)?'repérer la zone blessée':/explor|projectile|extrai/.test(title)?'évaluer ce qui est accessible dans la plaie':/anesth/.test(title)?'préparer l’anesthésie et sa surveillance':/réveil|surveill/.test(title)?'surveiller la respiration et les réactions':/état|conscien|stabil/.test(title)?'vérifier la conscience, la respiration et le saignement':`faire le point sur l’étape ${title}`;
+ const alternative=/nettoy|antisept/.test(title)?'« Je prépare le nettoyage de cette zone. Prévenez-moi si le contact vous gêne. »':/sutur|fermer/.test(title)?'« Je vérifie les bords de la plaie avant de décider de sa fermeture. »':/panser|protéger/.test(title)?'« Je prépare la protection de cette zone. Dites-moi si elle vous gêne une fois posée. »':/douleur|soulager/.test(title)?'« Avant de poursuivre, décrivez-moi la douleur avec vos mots. »':/respir|surveill/.test(title)?'« Je reste près de vous pour observer votre respiration et vos réactions. »':`« Je vais ${stepAction}. Dites-moi si quelque chose vous gêne à cet instant. »`;
+ if(!items?.length || /^« Très bien, je (continue|passe)/.test(items[0]))pool=[alternative,casePhrase()];
  pool.push(alternative);
  if(state==='asleep' || state==='unresponsive'){
    audience=assistant?'À l’assistant':'Annonce RP / demande de renfort';
    const action=activeStepTitle.toLowerCase();
    const instruction=/saign|ligatur/.test(action)?'Gardez la pression sur la zone pendant que je contrôle le saignement.':/panser|fermer|sutur/.test(action)?'Gardez les compresses prêtes pendant que je protège la plaie.':'Surveillez sa respiration et prévenez-moi si son état change.';
-   pool=assistant?[`« ${instruction} »`,'« Il ne peut pas répondre pour le moment. Je vérifie ses réactions avant de poursuivre. »']:["« J'ai besoin de renfort pour poursuivre en gardant ce patient sous surveillance. »","« Je suspends le geste pour vérifier sa respiration et ses réactions. »"];
+   pool=assistant?[`« Je vais ${stepAction}. ${instruction} »`,`« Avant de ${stepAction}, je vérifie ses réactions. Gardez sa respiration sous surveillance. »`]:[`« Pour ${stepAction}, j’ai besoin de renfort afin de garder ce patient sous surveillance. »`,`« Je vérifie sa respiration et ses réactions avant de ${stepAction}. J’ai besoin d’aide pour poursuivre. »`];
  }else if(state==='confused'){
    audience='Au patient, phrases courtes';
-   pool=['« Je suis le médecin. Je reste auprès de vous. Pouvez-vous me regarder ? »','« Nous allons faire une chose à la fois. Dites-moi si vous pouvez me répondre. »',alternative];
+   pool=[`« Je suis le médecin. Je vais ${stepAction}. Pouvez-vous me regarder ? »`,`« Nous faisons une chose à la fois : je vais ${stepAction}. Dites-moi si vous pouvez me répondre. »`,alternative];
  }else if(state==='panic'){
    audience='Au patient paniqué';
-   pool=['« Je vous explique ce que je vais faire avant chaque geste. Dites-moi ce qui vous inquiète. »','« Nous prenons les choses une à une. Je reste auprès de vous pendant le soin. »',alternative];
+   pool=[`« Je vais ${stepAction}. Je vous explique le geste avant de commencer ; dites-moi ce qui vous inquiète. »`,`« Nous prenons les choses une à une. Pour le moment, je vais ${stepAction} et je reste auprès de vous. »`,alternative];
  }else if(state==='recovery'){
    audience='Réveil joué, sans résultat automatique';
    pool=assistant?['À l’assistant : « Restez auprès de lui et surveillez sa respiration pendant qu’il reprend ses esprits. »','Au patient, seulement s’il se réveille : « Ne vous relevez pas. Nous allons encore vous surveiller. »']:['« Je reste auprès du patient et demande du renfort pour poursuivre la surveillance. »','Au patient, seulement s’il se réveille : « Vous êtes toujours auprès de nous. Ne vous relevez pas. »'];
  }else if(state==='awake')audience='Au patient conscient';
  pool=[...new Set(pool.filter(Boolean))];
  const firstBlock=rpPhraseBlocks.length===0;
- const index=rpPhraseBlocks.push({pool,position:0})-1;
+ const stepKey=rpDialogueStepKey();
+ const index=rpPhraseBlocks.push({pool,position:0,stepKey})-1;
  const ended=activeRouteKind==='surgery'?surgeryEnded:interventionEnded;
  return `${ended || !firstBlock?'':rpGesture()}<div class="rp-lines rp-dialogue"><div class="rp-dialogue-heading"><span>${audience}</span><button type="button" class="secondary" onclick="alternateRpPhrase(${index},this)">Autre formulation</button></div><div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase" aria-live="polite">${pool[0]}</span></div></div>`;
 }
 function alternateRpPhrase(index,button){
- const block=rpPhraseBlocks[index];if(!block)return;
+ const block=rpPhraseBlocks[index];
+ const root=document.getElementById(activeRouteKind==='surgery'?'surgeryFlow':'flow');
+ if(!block || block.stepKey!==rpDialogueStepKey() || !button.isConnected || !root?.contains(button))return;
  block.position=(block.position+1)%block.pool.length;
  button.closest('.rp-dialogue').querySelector('.rp-current-phrase').textContent=block.pool[block.position];
+}
+function rpDialogueStepKey(){
+ return activeRouteKind==='surgery'?`surgery:${currentSurgery}:${surgeryStepIndex}:${surgeryEnded}`:`flow:${currentFlow}:${stepIndex}:${interventionEnded}`;
 }
