@@ -1457,6 +1457,7 @@ html[data-reading-size]:not([data-reading-size="normal"]) .sensory-note>small{fo
 @media(max-width:760px){.care-memo-row{grid-template-columns:1fr}.care-memo-cell{border-right:0;border-bottom:1px solid var(--line)}.care-memo-cell:last-child{border-bottom:0}.care-memo-heading h3 small{display:block;margin:5px 0 0}.care-memo-current .condensed-choice{max-width:100%;flex-basis:100%}}
 .care-report{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:20px 0;background:var(--panel)}
 .care-report>summary{font-size:calc(19px * var(--reading-scale));font-weight:700}
+.care-auto-summary h3{margin:0 0 8px}.care-auto-summary p{margin:6px 0;line-height:1.4;overflow-wrap:anywhere}.care-auto-summary small{display:block;font-size:14px;color:var(--muted);line-height:1.4}
 .report-hint{font-size:14px;line-height:1.5}
 .report-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .report-field{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:14px;font-weight:600;color:var(--ink)}

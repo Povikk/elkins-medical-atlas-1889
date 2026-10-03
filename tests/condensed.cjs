@@ -12,16 +12,16 @@ const assert=require('node:assert/strict');
   await page.getByRole('button',{name:'Vue détaillée',exact:true}).click();
   assert.equal(await page.evaluate(()=>JSON.stringify({answers,stepIndex,flowHistory})),JSON.stringify(JSON.parse(before),['answers','stepIndex','flowHistory']));
   await page.getByRole('button',{name:'Condensé',exact:true}).click();
-  await page.evaluate(()=>{answers={conscious:'awake',headState:'awake',poisonState:'sleepy',unknownWake:'awake',unknownBreathing:'yes',unknownBleeding:'minor',breathing:'yes',gunArea:'arm',bullet:'out',needsSuture:true,knifeArea:'arm',knifeSeverity:'shallow',horseArea:'arm',horsePain:'moderate',horseVisible:'bruise',horseMove:'painful',fracturePain:'moderate',fightIssue:'bruise',burnSeverity:'minor',consultEvolution:'stable'};render();});
+  await page.evaluate(()=>{answers={conscious:'awake',headState:'awake',poisonState:'sleepy',unknownWake:'awake',unknownBreathing:'yes',unknownBleeding:'minor',breathing:'yes',gunArea:'arm',gunAreaSide:'left',gunAreaPart:'arm',bullet:'out',needsSuture:true,knifeArea:'arm',knifeSeverity:'shallow',horseArea:'arm',horseAreaSide:'left',horseAreaPart:'arm',horsePain:'moderate',horseVisible:'bruise',horseMove:'painful',fracturePain:'moderate',fightIssue:'bruise',burnSeverity:'minor',consultEvolution:'stable'};render();});
   layouts.push({id,bottom:await page.locator('.condensed-grid').evaluate(e=>e.getBoundingClientRect().bottom)});
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  }
- await page.evaluate(()=>{start('gunshot');compactMode=true;answers={conscious:'awake',gunArea:'arm',bullet:'out',needsSuture:true,latestState:'awake'};stepIndex=10;render();});
+ await page.evaluate(()=>{start('gunshot');compactMode=true;answers={conscious:'awake',gunArea:'arm',gunAreaSide:'left',gunAreaPart:'arm',bullet:'out',needsSuture:true,latestState:'awake'};stepIndex=10;render();});
  await page.locator('[data-step-index="8"] .condensed-choice select').selectOption('1');
  assert.equal(await page.evaluate(()=>answers.needsSuture),false);assert.equal(await page.locator('[data-step-index="9"]').count(),0);
  assert.equal(await page.evaluate(()=>answers.latestState),'awake');
  await page.getByRole('button',{name:'Vue détaillée',exact:true}).click();assert.equal(await page.evaluate(()=>answers.needsSuture),false);
- await page.evaluate(()=>{start('horse');compactMode=true;answers={conscious:'awake',horseArea:'arm',horsePain:'moderate',horseVisible:'bruise',horseMove:'painful'};stepIndex=7;render();});
+ await page.evaluate(()=>{start('horse');compactMode=true;answers={conscious:'awake',horseArea:'arm',horseAreaSide:'left',horseAreaPart:'arm',horsePain:'moderate',horseVisible:'bruise',horseMove:'painful'};stepIndex=7;render();});
  await page.locator('[data-step-index="2"] .condensed-choice select').selectOption('0');
  assert.equal(await page.evaluate(()=>answers.horseMove),undefined);
  for(const id of await page.evaluate(()=>Object.keys(surgeries))){await page.evaluate(id=>{openSurgery(id);compactMode=true;renderSurgery();},id);assert.equal(await page.locator('#surgeryFlow .condensed-step').count(),await page.evaluate(()=>surgeries[currentSurgery].steps.length));layouts.push({id,bottom:await page.locator('#surgeryFlow .condensed-grid').evaluate(e=>e.getBoundingClientRect().bottom)});}

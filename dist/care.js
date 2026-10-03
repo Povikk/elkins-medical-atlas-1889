@@ -223,3 +223,23 @@ function finalizeCareLayout(root){
  root.querySelectorAll(':scope > .route-links,:scope > .assistant-note').forEach(note=>{const nav=root.querySelector(':scope > .nav');if(nav)nav.before(note);});
  root.querySelectorAll(':scope > .section').forEach(panel=>{if(panel.querySelector('h3')?.textContent==='Matériel'){const details=document.createElement('details');details.className='inline-material';const summary=document.createElement('summary');summary.textContent='Matériel de cette étape';details.append(summary,...panel.querySelectorAll('ul'));panel.replaceWith(details);}});
 }
+
+// Keep anatomical branch values stable; the side is a separate observation.
+for(const [id,key] of [['gunshot','gunArea'],['knife','knifeArea'],['horse','horseArea']]){
+ const step=flows[id].steps.find(s=>s.choices?.some(c=>Object.hasOwn(c.set,key)));
+ step.choices=step.choices.flatMap(choice=>{
+  const area=choice.set[key];
+  const names={arm:'Bras / épaule',leg:id==='horse'?'Jambe / cheville':'Jambe',limb:'Membre',ribs:'Côtes / poitrine'};
+  if(!names[area])return [{...choice,set:{...choice.set,[`${key}Side`]:null}}];
+  const zones=area==='limb'?[['arm','Bras'],['leg','Jambe']]:[[area,names[area]]];
+  return zones.flatMap(([zone,label])=>[
+   {label:`${label} : gauche`,set:{...choice.set,[`${key}Side`]:'left',[`${key}Part`]:zone}},
+   {label:`${label} : droite`,set:{...choice.set,[`${key}Side`]:'right',[`${key}Part`]:zone}},
+   {label:`${label} : côté non précisé`,set:{...choice.set,[`${key}Side`]:null,[`${key}Part`]:zone}}
+  ]);
+ });
+}
+for(const [id,index,key] of [['fracture',3,'fractureArea'],['minor',0,'minorArea']]){
+ flows[id].steps[index].choices=['Bras','Jambe','Main','Pied'].flatMap((label,i)=>['left','right'].map(side=>({label:`${label} : ${side==='left'?'gauche':'droite'}`,set:{[key]:['arm','leg','hand','foot'][i],[`${key}Side`]:side}})));
+ flows[id].steps[index].choices.push({label:'Autre zone / non précisée',set:{[key]:'unknown',[`${key}Side`]:null}});
+}

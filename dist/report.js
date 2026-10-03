@@ -1,38 +1,60 @@
-// Short manual RP summary. Memory only, no network call or saved patient record.
-let reportDraft=null;
-function resetReportDraft(){reportDraft=null;}
+// Two short lines derived from explicit choices. No automatic patient record.
+function resetReportDraft(){}
 function reportEscape(text){return String(text||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function reportDraftFor(kind){
- const id=kind==='surgery'?currentSurgery:currentFlow,key=`${kind}:${id}`;
- if(!reportDraft||reportDraft.key!==key)reportDraft={key,kind,motif:(kind==='surgery'?surgeries[id]:flows[id]).title,details:'',care:'',text:'',edited:false,stale:false,open:false};
- return reportDraft;
+function reportFindings(kind){
+ const surgery=kind==='surgery',route=surgery?surgeries[currentSurgery]:flows[currentFlow];
+ const result=[route.title];
+ const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
+ const options=route.steps.flatMap(s=>s.choices||[]);
+ for(const key of keys){
+  if(!Object.hasOwn(answers,key))continue;
+  if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
+  if(['breathing','unknownBreathing'].includes(key)&&answers.latestBreathing)continue;
+  if(key==='unknownBleeding'&&answers.latestBleeding)continue;
+  const choice=options.find(c=>Object.hasOwn(c.set,key)&&Object.entries(c.set).every(([k,v])=>answers[k]===v));
+  if(key==='needsSuture'){result.push(answers[key]===true?'Plaie nette, fermeture envisagée':answers[key]===false?'Fermeture non nécessaire selon le choix':'Fermeture simple écartée');}
+  else if(choice)result.push(choice.label);
+ }
+ const movement={normal:'Mouvement conservé selon le choix',painful:'Mouvement douloureux',limited:'Mouvement limité',none:'Mouvement impossible',unknown:'Mouvement non évalué'};
+ if(movement[answers.horseMove])result.push(movement[answers.horseMove]);
+ const pain={mild:'Douleur réévaluée : légère',moderate:'Douleur réévaluée : modérée',strong:'Douleur réévaluée : forte',unknown:'Douleur non réévaluée',unsafe:'État vital à réévaluer avant antalgique'};
+ if(pain[answers.rpPain])result.push(pain[answers.rpPain]);
+ const latest={latestState:{awake:'Conscient à la dernière réévaluation',confused:'Confus à la dernière réévaluation',unresponsive:'Ne répond pas à la dernière réévaluation',unknown:'Conscience non déterminée'},latestBreathing:{yes:'Respiration présente sans gêne décrite',weak:'Respiration faible / difficile',no:'Respiration non constatée',unknown:'Respiration non déterminée'},latestBleeding:{major:'Saignement important',none:'Pas de saignement important observé',unknown:'Saignement non déterminé'}};
+ for(const [key,labels] of Object.entries(latest))if(labels[answers[key]])result.push(labels[answers[key]]);
+ return [...new Set(result)].join(' ; ')+'.';
+}
+function reportSuggestedCare(kind){
+ if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle.';
+ const id=currentFlow,items=[];
+ const unsafe=careProductBlocked();
+ if(['gunshot','knife','minor'].includes(id)){
+  if(id!=='minor')items.push('Contrôle du saignement si nécessaire');
+  items.push('Nettoyage de la plaie','Pansement');
+  if(answers.needsSuture===true)items.push('Suture si appropriée : nombre de points à préciser');
+  if(id==='gunshot'&&answers.bullet==='in')items.push('Évaluer le projectile retenu, sans extraction systématique');
+  if(id==='knife'&&answers.knifeSeverity==='deep'||id==='gunshot'&&['head','chest','abdomen'].includes(answers.gunArea))items.push('Orientation / renfort selon la scène');
+ }else if(id==='fracture')items.push('Soutien et immobilisation du membre','Pansement si plaie');
+ else if(id==='horse'){
+  if(answers.horseVisible==='wound')items.push('Nettoyage','Pansement');
+  if(answers.horseVisible==='deformity'||['limited','none'].includes(answers.horseMove))items.push('Soutien / immobilisation','Réévaluation du membre');
+  else items.push('Repos de la zone douloureuse','Réévaluation avant mobilisation');
+ }else if(id==='fight')items.push(answers.fightIssue==='cut'?'Nettoyage et pansement':'Soin local si pertinent','Réévaluation si tête ou côtes');
+ else if(id==='burn')items.push('Protection de la brûlure','Surveillance du souffle si fumée / visage');
+ else if(id==='drowning')items.push('Priorité respiratoire','Réchauffement','Surveillance');
+ else if(id==='head')items.push('Calme','Surveillance de la conscience');
+ else if(id==='poison')items.push('Identifier le produit si possible','Surveillance respiratoire','Pas de remède automatique');
+ else if(id==='unknown')items.push('Réévaluation de la conscience, du souffle et du saignement','Recherche de la cause après les priorités');
+ else items.push('Soins selon les signes décrits','Contrôle de l’évolution');
+ if(unsafe)items.push('Réévaluation / renfort si état inquiétant');
+ items.push('Repos','Surveillance','Contrôle selon la scène');
+ return [...new Set(items)].join(' ; ')+'.';
 }
 function reportMarkup(kind){
- const d=reportDraftFor(kind);
- return `<details class="care-report" ${d.open?'open':''} ontoggle="if(this.isConnected&&reportDraft)reportDraft.open=this.open"><summary>Résumé du soin en mots-clés</summary><p class="muted report-hint">Note les faits joués en quelques mots. Rien n’est enregistré.</p><div class="report-fields"><label class="report-field report-wide" for="report-motif">Motif de l’intervention / consultation<input id="report-motif" maxlength="500" value="${reportEscape(d.motif)}" oninput="updateReportField('motif',this.value)"></label>${['details','care'].map((key,i)=>`<label class="report-field" for="report-${key}">${i?'Soins, traitements et prescriptions donnés':'Constatations médicales'}<textarea id="report-${key}" rows="3" maxlength="4000" placeholder="${i?'Ex. : 3 points de suture ; bandage ; repos ; contrôle demain':'Ex. : Douleur au dos ; contusion ; pas de fracture apparente'}" oninput="updateReportField('${key}',this.value)">${reportEscape(d[key])}</textarea></label>`).join('')}</div><small>Nombre de points et produits uniquement s’ils ont été réellement utilisés. Les étapes proposées ne confirment pas les soins effectués.</small><div class="report-actions"><button class="next" type="button" onclick="generateReport()">${d.text?'Actualiser le résumé':'Créer le résumé'}</button><span id="report-status" role="status">${d.stale?'Les renseignements ont changé : actualise le résumé.':''}</span></div><div id="report-result" ${d.text?'':'hidden'}><label class="report-field" for="report-text">Résumé modifiable<textarea id="report-text" rows="4" oninput="updateReportText(this.value)">${reportEscape(d.text)}</textarea></label><div class="report-actions"><button class="secondary" type="button" onclick="copyReport()">Copier le résumé</button></div></div></details>`;
+ return `<section class="care-report care-auto-summary" aria-label="Récapitulatif des choix"><h3>Récapitulatif</h3><p><b>Constatations :</b> <span id="report-findings">${reportEscape(reportFindings(kind))}</span></p><p><b>Soins suggérés :</b> <span id="report-care">${reportEscape(reportSuggestedCare(kind))}</span></p><small>Repères RP à adapter aux gestes réellement joués. Les suggestions ne confirment pas un soin effectué. Aucun enregistrement.</small><div class="report-actions"><button class="secondary" type="button" onclick="copyReport()">Copier les deux lignes</button><span id="report-status" role="status"></span></div></section>`;
 }
-function updateReportField(key,value){
- if(!reportDraft||!['motif','details','care'].includes(key))return;
- reportDraft[key]=value;reportDraft.stale=!!reportDraft.text;
- const status=document.getElementById('report-status');if(status)status.textContent=reportDraft.stale?'Les renseignements ont changé : actualise le résumé.':'';
-}
-function reportKeywords(text){return String(text||'').trim().replace(/[\u2013\u2014]/g,'-').split(/[;\r\n]+/).map(s=>s.trim()).filter(Boolean).join(' ; ');}
-function reportCompose(d){
- const findings=[reportKeywords(d.motif),reportKeywords(d.details)].filter(Boolean).join(' ; ');
- return `Constatations médicales : ${findings}\nSoins, traitements et prescriptions : ${reportKeywords(d.care)||'Non renseignés'}`;
-}
-function generateReport(){
- if(!reportDraft)return;
- const motif=document.getElementById('report-motif');if(!reportDraft.motif.trim()){motif.setCustomValidity('Indique le motif de la visite.');motif.reportValidity();motif.setCustomValidity('');return;}
- if(reportDraft.edited&&!confirm('Actualiser remplacera tes modifications du résumé. Continuer ?'))return;
- reportDraft.text=reportCompose(reportDraft);reportDraft.edited=false;reportDraft.stale=false;
- document.getElementById('report-text').value=reportDraft.text;document.getElementById('report-result').hidden=false;
- document.getElementById('report-status').textContent='Résumé prêt à relire et copier.';
- document.querySelector('.report-actions .next').textContent='Actualiser le résumé';
-}
-function updateReportText(value){if(reportDraft){reportDraft.text=value;reportDraft.edited=true;}}
 async function copyReport(){
- const output=document.getElementById('report-text'),status=document.getElementById('report-status');if(!output?.value.trim())return;
- try{await navigator.clipboard.writeText(output.value);status.textContent='Résumé copié.';}
- catch(error){output.focus();output.select();status.textContent='Copie automatique indisponible : le texte est sélectionné, utilise Ctrl+C ou Copier.';}
+ const text=`Constatations : ${document.getElementById('report-findings').textContent}\nSoins suggérés : ${document.getElementById('report-care').textContent}`;
+ const status=document.getElementById('report-status');
+ try{await navigator.clipboard.writeText(text);status.textContent='Récapitulatif copié.';}
+ catch(error){status.textContent='Copie automatique indisponible : sélectionne les deux lignes pour les copier.';}
 }
