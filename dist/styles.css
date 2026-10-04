@@ -1654,3 +1654,20 @@ summary{cursor:pointer;color:var(--ink)}
  :is(#flow,#surgeryFlow):not(.condensed-workspace) .care-memo-source{padding:4px 10px;}
  .care-control-strip button{min-height:36px;padding:6px 10px;}
 }
+.patient-bar{display:flex;flex-direction:column;align-items:stretch;gap:4px;}
+.patient-list-title{font-size:.8rem;color:var(--muted);padding:0 5px;}
+.patient-bar .patient-buttons{display:flex;flex-direction:column;flex-wrap:nowrap;max-height:156px;overflow-y:auto;overflow-x:hidden;gap:2px;flex-basis:auto;padding:2px;}
+.patient-row{display:flex;align-items:center;min-width:0;position:relative;border-radius:6px;}
+.patient-bar .patient-button{flex:1 1 auto;min-width:0;max-width:100%;border:0;border-radius:5px;text-align:left;overflow:hidden;text-overflow:ellipsis;background:transparent;}
+.patient-row:has(.active){background:var(--panel-strong,var(--panel));}
+.patient-bar .patient-button.active{box-shadow:inset 3px 0 var(--accent2);}
+.patient-row-actions{display:flex;flex:0 0 auto;gap:1px;opacity:0;}
+.patient-row:hover .patient-row-actions,.patient-row:focus-within .patient-row-actions{opacity:1;}
+.patient-bar .patient-row-actions button{border:0;background:transparent;padding:3px 6px;min-width:28px;}
+.patient-bar .patient-add{align-self:start;background:transparent;border:0;font-size:.875rem;padding:4px 7px;}
+.patient-bar .patient-label-input{width:100%;max-width:100%;min-width:0;flex:1 1 auto;}
+.patient-row:has(.patient-label-input){flex-wrap:wrap;}
+.patient-row:has(.patient-label-input) .patient-row-actions{display:none;}
+.patient-bar .patient-name-reset{font-size:.75rem;padding:2px 5px;}
+@media(min-width:761px){.sidebar>.patient-bar{flex-wrap:nowrap;}.sidebar .patient-buttons{flex-basis:auto;flex-wrap:nowrap;}.sidebar .patient-list-title{color:var(--sidebar-muted,var(--sidebar-ink));}.sidebar .patient-button.active{box-shadow:inset 3px 0 var(--lime);}}
+@media(hover:none),(max-width:760px){.patient-row-actions{opacity:1;}.patient-bar .patient-row-actions button{min-width:44px;min-height:44px;}.patient-bar .patient-buttons{max-height:132px;}}

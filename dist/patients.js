@@ -1,5 +1,6 @@
 // Transient patient workspaces only. No localStorage, sessionStorage or records.
 const patientSessions=[{number:1,state:null}];
+let nextPatientNumber=2;
 let activePatientNumber=1;
 let patientSwitchInProgress=false;
 function patientCareView(){
@@ -17,24 +18,36 @@ function rememberPatientBeforeNavigation(id){
 }
 function renderPatientBar(){
  const bar=document.getElementById('patientBar');
- bar.innerHTML=`<div class="patient-buttons">${patientSessions.map(p=>`<button type="button" class="patient-button ${p.number===activePatientNumber?'active':''}" aria-pressed="${p.number===activePatientNumber}" title="Patient ${p.number} : double-clic pour renommer" onclick="selectPatient(${p.number})" ondblclick="editPatientLabel()">${reportEscape(p.label||'Patient '+p.number)}</button>`).join('')}</div><button type="button" aria-label="Renommer le patient actif" title="Renommer le patient actif" onclick="editPatientLabel()">&#9998; Nom</button><button type="button" aria-label="Réinitialiser le nom du patient actif" title="Revenir à Patient ${activePatientNumber}, sans effacer les soins" onpointerdown="event.preventDefault()" onclick="resetPatientLabel()">Réinitialiser</button><button type="button" class="patient-add" aria-label="Ajouter un patient" title="Ajouter un patient" onclick="addPatient()">+</button>`;
+ bar.innerHTML=`<span class="patient-list-title">Patients</span><div class="patient-buttons">${patientSessions.map(p=>`<div class="patient-row" data-patient="${p.number}"><button type="button" class="patient-button ${p.number===activePatientNumber?'active':''}" aria-pressed="${p.number===activePatientNumber}" title="Patient ${p.number} : double-clic pour renommer" onclick="selectPatient(${p.number})" ondblclick="editPatientLabel(${p.number})">${reportEscape(p.label||'Patient '+p.number)}</button><div class="patient-row-actions"><button type="button" aria-label="${p.number===activePatientNumber?'Renommer le patient actif':'Renommer Patient '+p.number}" title="Renommer" onclick="editPatientLabel(${p.number})">&#9998;</button><button type="button" aria-label="Supprimer Patient ${p.number}" title="Supprimer" onclick="removePatient(${p.number})">×</button></div></div>`).join('')}</div><button type="button" class="patient-add" aria-label="Ajouter un patient" onclick="addPatient()">+ Ajouter</button>`;
 }
 function resetPatientLabel(){
  patientSessions.find(p=>p.number===activePatientNumber).label='';renderPatientBar();
 }
-function editPatientLabel(){
+function editPatientLabel(number=activePatientNumber){
  if(document.querySelector('.patient-label-input')){document.querySelector('.patient-label-input').focus();return;}
- const patient=patientSessions.find(p=>p.number===activePatientNumber);
- const button=document.querySelector('#patientBar button[aria-pressed="true"]');
+ const patient=patientSessions.find(p=>p.number===number);if(!patient)return;
+ const button=document.querySelector(`[data-patient="${number}"] .patient-button`);
  const input=document.createElement('input');input.className='patient-label-input';input.maxLength=40;
  input.setAttribute('aria-label','Surnom du patient');input.placeholder='Patient '+patient.number;input.value=patient.label||'';
  let finished=false;
  const finish=save=>{if(finished)return;finished=true;if(save)patient.label=input.value.trim().replace(/\s+/g,' ').slice(0,40);renderPatientBar();document.querySelector('#patientBar button[aria-pressed="true"]')?.focus({preventScroll:true});};
  input.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();finish(e.key==='Enter');}});
  input.addEventListener('blur',()=>finish(true));button.replaceWith(input);input.focus({preventScroll:true});input.select();
+ const reset=document.createElement('button');reset.type='button';reset.className='patient-name-reset';reset.textContent='Réinitialiser';reset.setAttribute('aria-label','Réinitialiser le nom du patient');reset.addEventListener('pointerdown',e=>e.preventDefault());reset.addEventListener('click',()=>{input.value='';finish(true);});input.after(reset);
 }
 function addPatient(){
- const number=patientSessions.length+1;patientSessions.push({number,state:null});selectPatient(number);
+ const number=nextPatientNumber++;patientSessions.push({number,state:null});selectPatient(number);
+}
+function removePatient(number){
+ capturePatientState();
+ const index=patientSessions.findIndex(p=>p.number===number);if(index<0)return;
+ const patient=patientSessions[index];
+ if(patient.state&&!confirm(`Supprimer ${patient.label||'Patient '+number} et son parcours temporaire ? Cette suppression ne peut pas être annulée.`))return;
+ if(number===activePatientNumber){
+  if(patientSessions.length===1)patientSessions.push({number:nextPatientNumber++,state:null});
+  const replacement=patientSessions[index+1]||patientSessions[index-1];selectPatient(replacement.number);
+ }
+ patientSessions.splice(index,1);renderPatientBar();
 }
 function selectPatient(number){
  const patient=patientSessions.find(p=>p.number===number);if(!patient)return;
@@ -64,6 +77,8 @@ function selectPatient(number){
    window.scrollTo({top:s.scroll,behavior:'auto'});
   }
   renderPatientBar();
+  const list=document.querySelector('.patient-buttons'),row=document.querySelector(`[data-patient="${number}"]`);
+  if(list&&row){const bounds=list.getBoundingClientRect(),item=row.getBoundingClientRect();if(item.bottom>bounds.bottom)list.scrollTop+=item.bottom-bounds.bottom;if(item.top<bounds.top)list.scrollTop-=bounds.top-item.top;}
   document.querySelector(`#patientBar button[aria-pressed="true"]`)?.focus({preventScroll:true});
  }finally{patientSwitchInProgress=false;}
 }
