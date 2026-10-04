@@ -26,13 +26,13 @@ function reportFindings(kind){
  return [...new Set(result)].join(' ; ')+'.';
 }
 function reportSuggestedCare(kind){
- if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle.';
+ if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle. Si une suture a été effectuée : repasser dans 24 h pour contrôler la plaie et le pansement ; retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h.';
  const id=currentFlow,items=[];
  const unsafe=careProductBlocked();
  if(['gunshot','knife','minor'].includes(id)){
   if(id!=='minor')items.push('Contrôle du saignement si nécessaire');
   items.push('Nettoyage de la plaie','Pansement');
-  if(answers.needsSuture===true)items.push('Suture si appropriée : nombre de points à préciser');
+  if(answers.needsSuture===true)items.push('Suture si appropriée : nombre de points à préciser','Repasser dans 24 h pour contrôler la plaie et le pansement si la suture a été effectuée','Retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h');
   if(id==='gunshot'&&answers.bullet==='in')items.push('Évaluer le projectile retenu, sans extraction systématique');
   if(id==='knife'&&answers.knifeSeverity==='deep'||id==='gunshot'&&['head','chest','abdomen'].includes(answers.gunArea))items.push('Orientation / renfort selon la scène');
  }else if(id==='animal'){
