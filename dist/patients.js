@@ -17,9 +17,13 @@ function rememberPatientBeforeNavigation(id){
 }
 function renderPatientBar(){
  const bar=document.getElementById('patientBar');
- bar.innerHTML=`<div class="patient-buttons">${patientSessions.map(p=>`<button type="button" class="patient-button ${p.number===activePatientNumber?'active':''}" aria-pressed="${p.number===activePatientNumber}" title="Patient ${p.number}" onclick="selectPatient(${p.number})">${reportEscape(p.label||'Patient '+p.number)}</button>`).join('')}</div><button type="button" aria-label="Renommer le patient actif" title="Renommer le patient actif" onclick="editPatientLabel()">&#9998;</button><button type="button" class="patient-add" aria-label="Ajouter un patient" title="Ajouter un patient" onclick="addPatient()">+</button>`;
+ bar.innerHTML=`<div class="patient-buttons">${patientSessions.map(p=>`<button type="button" class="patient-button ${p.number===activePatientNumber?'active':''}" aria-pressed="${p.number===activePatientNumber}" title="Patient ${p.number} : double-clic pour renommer" onclick="selectPatient(${p.number})" ondblclick="editPatientLabel()">${reportEscape(p.label||'Patient '+p.number)}</button>`).join('')}</div><button type="button" aria-label="Renommer le patient actif" title="Renommer le patient actif" onclick="editPatientLabel()">&#9998; Nom</button><button type="button" aria-label="Réinitialiser le nom du patient actif" title="Revenir à Patient ${activePatientNumber}, sans effacer les soins" onpointerdown="event.preventDefault()" onclick="resetPatientLabel()">Réinitialiser</button><button type="button" class="patient-add" aria-label="Ajouter un patient" title="Ajouter un patient" onclick="addPatient()">+</button>`;
+}
+function resetPatientLabel(){
+ patientSessions.find(p=>p.number===activePatientNumber).label='';renderPatientBar();
 }
 function editPatientLabel(){
+ if(document.querySelector('.patient-label-input')){document.querySelector('.patient-label-input').focus();return;}
  const patient=patientSessions.find(p=>p.number===activePatientNumber);
  const button=document.querySelector('#patientBar button[aria-pressed="true"]');
  const input=document.createElement('input');input.className='patient-label-input';input.maxLength=40;
@@ -63,4 +67,9 @@ function selectPatient(number){
   document.querySelector(`#patientBar button[aria-pressed="true"]`)?.focus({preventScroll:true});
  }finally{patientSwitchInProgress=false;}
 }
-document.addEventListener('DOMContentLoaded',renderPatientBar);
+function placePatientBar(){
+ const bar=document.getElementById('patientBar');
+ if(innerWidth>760)document.querySelector('.side-nav').before(bar);
+ else document.getElementById('mainContent').prepend(bar);
+}
+document.addEventListener('DOMContentLoaded',()=>{renderPatientBar();placePatientBar();matchMedia('(max-width:760px)').addEventListener('change',placePatientBar);});

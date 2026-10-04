@@ -238,6 +238,14 @@ function finalizeCareLayout(root){
  });
  root.querySelectorAll(':scope > .route-links,:scope > .assistant-note').forEach(note=>{const nav=root.querySelector(':scope > .nav');if(nav)nav.before(note);});
  root.querySelectorAll(':scope > .section').forEach(panel=>{if(panel.querySelector('h3')?.textContent==='Matériel'){const details=document.createElement('details');details.className='inline-material';const summary=document.createElement('summary');summary.textContent='Matériel de cette étape';details.append(summary,...panel.querySelectorAll('ul'));panel.replaceWith(details);}});
+ // Keep all authored information; change its placement rather than hide it.
+ if(action&&dialogue){
+  const layout=document.createElement('div');layout.className='care-step-layout';
+  const speech=document.createElement('div');speech.className='care-step-speech';
+  action.before(layout);layout.append(action,speech);if(gesture)speech.append(gesture);speech.append(dialogue);
+ }
+ const tools=root.querySelector(':scope > .scene-tools'),context=root.querySelector(':scope > .rp-context');
+ if(tools&&context){const strip=document.createElement('div');strip.className='care-control-strip';tools.before(strip);strip.append(tools,context);}
 }
 
 // Keep anatomical branch values stable; the side is a separate observation.
