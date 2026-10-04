@@ -392,7 +392,7 @@ function showLexique(){
 }
 
 function setLexTab(tab){
-  if(!["quick","meds","equipment","symptoms"].includes(tab)) return;
+  if(!["quick","meds","techniques","equipment","symptoms"].includes(tab)) return;
   lexTab = tab;
   const input = document.getElementById("lexSearch");
   if(input) input.value = "";
@@ -404,7 +404,7 @@ function updateLexTabs(){
   document.getElementById("lexFilters").classList.toggle("hidden", lexTab !== "meds");
   const categorySelect = document.getElementById("lexCategory");
   if(categorySelect.options.length === 1){
-    [...new Set(lexique.map(x=>x.category || "Autre"))].sort((a,b)=>a.localeCompare(b,"fr")).forEach(category=>{
+    [...new Set(lexique.filter(x=>x.category!=='Technique').map(x=>x.category || "Autre"))].sort((a,b)=>a.localeCompare(b,"fr")).forEach(category=>{
       categorySelect.add(new Option(category,category));
     });
   }
@@ -422,6 +422,7 @@ function updateLexTabs(){
     const placeholders = {
       quick:"Rechercher dans les essentiels : produit, geste, usage...",
       meds:"Rechercher un médicament, un usage ou une administration...",
+      techniques:"Rechercher une technique, un geste ou une indication...",
       equipment:"Rechercher un instrument ou du matériel...",
       symptoms:"Rechercher un symptôme ou un signe..."
     };
@@ -436,11 +437,13 @@ function filterLexique(){
   const q = normalize(input ? input.value.trim() : "");
   if(lexTab === "quick"){
     renderLexQuick(q);
+  } else if(lexTab === "techniques"){
+    renderTechniques(q);
   } else if(lexTab === "meds"){
     const category = document.getElementById("lexCategory").value;
     const context = document.getElementById("lexContext").value;
     const list = lexique.filter(x =>
-      (!category || x.category === category) && (!context || x.context === context) &&
+      x.category!=='Technique' && (!category || x.category === category) && (!context || x.context === context) &&
       normalize([x.name,x.tags,x.category,x.type,x.form,x.admin,x.use,x.context].join(" ")).includes(q)
     );
     document.getElementById("lexCount").textContent = `${list.length} / ${lexique.length} fiches`;
@@ -1113,7 +1116,10 @@ function render(capture=false){
       html += sayLines(["« Gardez les yeux ouverts. Regardez-moi. »","« Qu’avez-vous pris ? »"]);
     }
   } else if(step.dynamic && currentFlow==="gunshot"){
-    if(answers.bullet==="in"){
+    if(answers.bullet==="graze"){
+      html += section("À faire",["Nettoyer doucement l’atteinte superficielle et protéger avec un pansement propre.","Aucun projectile à rechercher et aucune suture pour cette éraflure constatée.","Évaluer la douleur ; ménager la zone et surveiller toute aggravation."]);
+      html += sayLines(["« Le projectile a effleuré la peau. Je nettoie et je protège cette éraflure. »"]);
+    } else if(answers.bullet==="in"){
       html += section("À faire",[
         "Si le projectile est visible et facilement accessible, préparer une extraction simple.",
         "Éviter de fouiller profondément dans la plaie.",

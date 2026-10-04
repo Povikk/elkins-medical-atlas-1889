@@ -13,6 +13,7 @@ function sceneToolbar(kind){
   </div>`;
 }
 function shouldSkipStep(step){
+  if(currentFlow==='gunshot' && answers.bullet==='graze' && (step.dynamicSuture || step.title==='La plaie peut-elle être suturée ?')) return true;
   if(step.dynamicSuture && answers.needsSuture === false) return true;
   if(step.dynamicHorsePain && answers.horsePain === 'mild') return true;
   if(currentFlow === 'fracture' && step.title === 'Soulager la douleur' && answers.fracturePain === 'mild') return true;

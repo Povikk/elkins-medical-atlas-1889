@@ -24,6 +24,7 @@ function careMemoData(kind){
  const surgery=kind==='surgery';let title=surgery?surgeries[currentSurgery].title:flows[currentFlow].title;
  let row=surgery?['Indication · conscience · souffle · saignement','Préparer assistants et matériel ; jouer l’acte justifié ; surveiller','Anesthésie seulement si justifiée ; surveillance continue','La fin du geste ne vaut ni réveil ni guérison']:careMemoRows[currentFlow];
  row=[...row];
+ if(!surgery&&currentFlow==='gunshot'&&answers.bullet==='graze'){row[1]='Éraflure : nettoyage superficiel ; protection ; pas d’extraction ni de suture';row[2]='Douleur évaluée ; pas d’opiacé automatique';}
  if(!surgery&&currentFlow==='gunshot'&&answers.gunArea==='abdomen'){title='Balle : abdomen';row=['Ventre · pâleur · réactions · vomissements','Repos ; surveillance ; orientation chirurgicale si justifiée','Anesthésie uniquement pour la chirurgie justifiée','Hémorragie / atteinte interne ; aucun produit ne répare la lésion'];}
  if(!surgery&&currentFlow==='gunshot'&&answers.gunArea==='chest'){title='Balle : thorax';row=['Souffle · sang craché · réactions','Limiter les mouvements ; surveiller ; organiser du renfort','Ne pas banaliser un opiacé si le souffle est inquiétant','Détresse respiratoire ; aucun médicament ne répare le poumon'];}
  if(!surgery&&currentFlow==='burn'&&answers.burnSeverity==='airway'){row[1]='Priorité au souffle ; réévaluer et organiser du renfort';row[2]='Aucun produit ne remplace le soutien respiratoire';}

@@ -309,9 +309,10 @@ const flows = {
       },
       {
         title:"Examiner la plaie",
-        do:["Nettoyer autour de la blessure.","Chercher une plaie de sortie.","Ne pas fouiller inutilement."],
-        say:["« Je vais regarder si la balle est ressortie. »","« Ça va piquer un peu pendant le nettoyage. »","« Ne bougez pas pendant que j’examine la plaie. »"],
+        do:["Observer les zones atteintes : simple éraflure ou plaie pénétrante ?","Si la plaie est pénétrante, rechercher une entrée et une sortie sans sonder.","Ne pas conclure à une atteinte superficielle sur la seule taille de la plaie."],
+        say:["« Je vérifie si le projectile a seulement effleuré la peau ou pénétré. »","« Dites-moi où vous avez mal. »","« Ne bougez pas pendant que j’examine la plaie. »"],
         choices:[
+          {label:"Éraflure par balle, atteinte superficielle constatée", set:{bullet:"graze",needsSuture:false}},
           {label:"La balle est ressortie", set:{bullet:"out"}},
           {label:"La balle semble encore présente", set:{bullet:"in"}},
           {label:"Impossible à déterminer", set:{bullet:"unknown"}},

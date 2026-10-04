@@ -43,7 +43,6 @@ function animalChoicesForStep(step){
   if(animalIsVenom())return choices.filter(c=>Object.hasOwn(c.set,'animalVenomSigns'));
   return choices.filter(c=>Object.hasOwn(c.set,'animalDepth')&&(animalHasWound()||c.set.animalDepth!=='deep')).map(c=>!animalHasWound()&&c.set.animalDepth==='surface'?{...c,label:'Gêne locale, sans déformation ni gêne de mouvement décrites'}:c);
  }
- if(step.dynamicAnimal==='context'&&['venom','reptile'].includes(animalProfile().family))return choices.filter(c=>c.set.animalExposure!=='known');
  return choices;
 }
 flows.animal={title:'Attaque d’animal',urgency:'serious',steps:[
@@ -65,7 +64,7 @@ flows.animal={title:'Attaque d’animal',urgency:'serious',steps:[
   animalChoice('Marques locales, aucun autre signe rapporté',{animalVenomSigns:'local'}),animalChoice('Douleur / gonflement qui progressent',{animalVenomSigns:'progressing'}),animalChoice('Malaise, réactions ou respiration qui se dégradent',{animalVenomSigns:'danger'}),animalChoice('Évolution non déterminée',{animalVenomSigns:'unknown'})
  ]),dynamicAnimal:'aspect'},
  {title:'Circonstances de l’attaque',dynamicAnimal:'context',choices:[
-  animalChoice('Animal sauvage / inconnu ou non retrouvé',{animalExposure:'wild'}),animalChoice('Animal identifié, comportement inhabituel',{animalExposure:'unusual'}),animalChoice('Animal identifié, sans anomalie rapportée',{animalExposure:'known'}),animalChoice('Circonstances non déterminées',{animalExposure:'unknown'})
+  animalChoice('Rencontre en milieu sauvage, déroulement rapporté',{animalExposure:'wild'}),animalChoice('Attaque sans provocation ou comportement inhabituel rapportés',{animalExposure:'unusual'}),animalChoice('Réaction défensive après approche, surprise ou poursuite',{animalExposure:'known'}),animalChoice('Circonstances non déterminées',{animalExposure:'unknown'})
  ],care:{material:[]}},
  {title:'Soin local adapté',dynamicAnimal:'clean',care:{material:['Eau propre disponible','Compresses','Pansement propre'],assistant:'Préparez le linge et le pansement ; ne mélangez pas des antiseptiques et ne sondez pas la plaie.'}},
  {title:'Soulager la douleur',dynamicAnimal:'pain',care:{products:animalAnalgesics,material:[],assistant:'Surveillez conscience et respiration si un antalgique a réellement été administré.'}},
@@ -85,7 +84,7 @@ function animalRiskNote(){
  if(animalIsVenom())return 'Venin possible : organiser une prise en charge urgente et une surveillance continue, même si les marques sont petites. Aucun sérum antivenimeux disponible dans ce parcours de 1889.';
  if(animalProfile().family==='reptile')return 'Alligator : pas de risque de rage transmis par ce reptile. Surveiller plutôt lésions profondes, souillures et conséquences d’une immersion éventuelle.';
  if(!animalHasWound())return 'Sans plaie ouverte ni exposition à la salive rapportées, ne pas inventer une morsure. Réévaluer les conséquences du choc et de la chute.';
- return answers.animalExposure==='known'?'Animal identifié : cela n’exclut pas à lui seul un risque de rage. Reprendre les circonstances et l’exposition à la salive avec un praticien compétent.':'Animal sauvage, inconnu, comportement inhabituel ou circonstances incertaines : faire évaluer rapidement une éventuelle exposition à la rage, même si la plaie paraît petite.';
+ return answers.animalExposure==='known'?'Une réaction défensive n’exclut pas à elle seule un risque de rage. Faire évaluer l’exposition à la salive avec un praticien compétent.':'Faire évaluer rapidement une éventuelle exposition à la rage, même si la plaie paraît petite ; les circonstances ne suffisent pas à exclure ce risque.';
 }
 function animalMemoRow(row){
  if(answers.animalSpecies&&answers.animalSpecies!=='unknown')row[0]=animalProfile().name+' · souffle · sang · zones atteintes';
