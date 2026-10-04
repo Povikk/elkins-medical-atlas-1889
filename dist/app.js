@@ -1370,8 +1370,8 @@ function render(capture=false){
 
   if(step.choices){
     html += patientQuestion(step);
-    html += `<div class="section"><h3>Choisis ce qui correspond à la scène</h3><div class="choices">`;
-    step.choices.forEach(c=>{
+    html += `<div class="section"><h3>Choisis ce qui correspond à la scène</h3><div class="choices${step.animalSpeciesPicker?' animal-species-choices':''}">`;
+    (step.dynamicAnimal?animalChoicesForStep(step):step.choices).forEach(c=>{
       html += `<button class="choice" onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
     });
     html += `</div></div>`;

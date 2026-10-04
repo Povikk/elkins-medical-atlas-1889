@@ -5,8 +5,8 @@ function reportFindings(kind){
  const surgery=kind==='surgery',route=surgery?surgeries[currentSurgery]:flows[currentFlow];
  const result=[route.title];
  const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
- const options=route.steps.flatMap(s=>s.choices||[]);
- keys.push('animalInjury','animalArea','animalBleeding','animalDepth','animalExposure');
+ const options=route.steps.flatMap(s=>!surgery&&currentFlow==='animal'?animalChoicesForStep(s):s.choices||[]);
+ keys.push('animalSpecies','animalInjury','animalArea','animalBleeding','animalDepth','animalVenomSigns','animalExposure');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
@@ -35,10 +35,14 @@ function reportSuggestedCare(kind){
   if(id==='gunshot'&&answers.bullet==='in')items.push('Évaluer le projectile retenu, sans extraction systématique');
   if(id==='knife'&&answers.knifeSeverity==='deep'||id==='gunshot'&&['head','chest','abdomen'].includes(answers.gunArea))items.push('Orientation / renfort selon la scène');
  }else if(id==='animal'){
-  items.push('Contrôle du saignement si nécessaire','Nettoyage adapté des plaies accessibles','Protection / pansement','Pas de fermeture automatique');
+  if(animalIsVenom())return 'Protection simple ; calme et limitation des efforts ; surveillance continue ; prise en charge urgente / transport ; aucun sérum antivenimeux proposé en 1889. Gestes à confirmer, pas des soins automatiquement effectués.';
+  items.push('Contrôle du saignement si nécessaire');
+  if(animalHasWound())items.push('Nettoyage adapté des plaies accessibles','Protection / pansement','Pas de fermeture automatique');
+  else items.push('Évaluation du choc et de la fonction','Repos / soutien selon les signes','Pas de soin de plaie sans plaie observée');
   if(answers.animalDepth==='crush')items.push('Soutien du membre si atteint');
   if(animalNeedsAssessment())items.push('Évaluation spécialisée de la blessure');
-  items.push('Évaluation du risque de rage selon animal et circonstances','Contrôle rapproché');
+  if(animalProfile().family!=='reptile'&&animalHasWound())items.push('Évaluation du risque de rage selon animal et circonstances');
+  items.push('Contrôle rapproché');
  }else if(id==='fracture')items.push('Soutien et immobilisation du membre','Pansement si plaie');
  else if(id==='horse'){
   if(answers.horseVisible==='wound')items.push('Nettoyage','Pansement');

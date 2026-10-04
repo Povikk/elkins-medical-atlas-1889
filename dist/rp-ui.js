@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 function rpChoicesMarkup(){
  const fields={conscious:'État initial',headState:'État initial',poisonState:'État initial',unknownBreathing:'Respiration initiale',breathing:'Respiration initiale',unknownBleeding:'Saignement',unknownWake:'Dernière réaction',gunArea:'Zone',knifeArea:'Zone',knifeSeverity:'Plaie',horseArea:'Zone',horsePain:'Douleur',fracturePain:'Douleur',horseVisible:'Aspect',horseMove:'Mouvement',fightIssue:'Signe principal',bullet:'Projectile',needsSuture:'Fermeture',burnSeverity:'Brûlure',rpPain:'Douleur réévaluée',consultEvolution:'Évolution'};
  const manual={horseMove:{normal:'Normal',painful:'Douloureux',limited:'Limité',none:'Impossible',unknown:'Non évalué'},rpPain:{mild:'Légère',moderate:'Modérée',strong:'Forte',unsafe:'Conscience / respiration inquiétante',unknown:'Non évaluée'}};
- Object.assign(fields,{animalBleeding:'Saignement',animalInjury:'Blessures',animalArea:'Zone',animalDepth:'Aspect / fonction',animalExposure:'Animal / circonstances'});
+ Object.assign(fields,{animalSpecies:'Animal',animalBleeding:'Saignement',animalInjury:'Blessures',animalArea:'Zone',animalDepth:'Aspect / fonction',animalVenomSigns:'Évolution après morsure',animalExposure:'Animal / circonstances'});
  const steps=activeRouteKind==='surgery'?surgeries[currentSurgery]?.steps:flows[currentFlow]?.steps;
- const choices=(steps || []).flatMap(step=>step.choices || []);
+ const choices=(steps || []).flatMap(step=>activeRouteKind==='flow'&&currentFlow==='animal'?animalChoicesForStep(step):step.choices || []);
  const chips=Object.entries(fields).flatMap(([key,label])=>{
    if(!Object.prototype.hasOwnProperty.call(answers,key))return [];
    const text=manual[key]?.[answers[key]] || choices.find(choice=>choice.set?.[key]===answers[key]&&Object.entries(choice.set).every(([k,v])=>answers[k]===v))?.label;
@@ -62,6 +62,7 @@ function rpPatientState(){
  return state==='awake'?'awake':'uncertain';
 }
 function rpGesture(){
+ if(activeRouteKind==='flow'&&flows[currentFlow]?.steps[stepIndex]?.animalSpeciesPicker)return '';
  const title=activeStepTitle.toLowerCase();
  let gesture='Se place à hauteur du patient et observe ses réactions avant de poursuivre.';
  if(/nettoy|antisept/.test(title))gesture='Déplie un linge propre et prépare le nécessaire près de la zone à soigner.';
@@ -70,6 +71,8 @@ function rpGesture(){
  else if(/respir|stabil|réveil|surveill/.test(title))gesture='Marque une pause et observe la poitrine ainsi que les réactions du patient.';
  else if(/immobil|fracture/.test(title))gesture='Prépare le support du membre sans lui imposer de mouvement.';
  else if(/opérer|explor|ligatur|décomprim/.test(title))gesture='Vérifie que le matériel est prêt avant de reprendre le geste décrit dans la scène.';
+ if(activeRouteKind==='flow'&&currentFlow==='animal'&&animalIsVenom())gesture='Garde le patient au calme, observe sa respiration et prépare le transport sans manipuler la morsure.';
+ else if(activeRouteKind==='flow'&&currentFlow==='animal'&&!animalHasWound())gesture='Soutient la zone touchée et demande au patient de préciser la gêne, sans lui imposer un mouvement.';
  if(rpContext.place==='field')gesture+=' Garde le nécessaire sur un linge propre à portée de main.';
  if(rpContext.place==='office')gesture+=' Dispose le nécessaire sur la table de soin.';
  return `<div class="rp-gesture"><b>Geste RP</b><span>${gesture}</span></div>`;
@@ -134,7 +137,8 @@ function alternateRpPhrase(index,button){
  button.closest('.rp-dialogue').querySelector('.rp-phrase-list').innerHTML=rpPhraseRows(block);
 }
 function rpPhraseRows(block){
- const count=Math.min(compactMode?1:3,block.pool.length);
+ const speciesPicker=activeRouteKind==='flow'&&flows[currentFlow]?.steps[stepIndex]?.animalSpeciesPicker;
+ const count=Math.min(compactMode?1:speciesPicker?2:3,block.pool.length);
  const phrases=Array.from({length:count},(_,offset)=>block.pool[(block.position+offset)%block.pool.length]);
  if(!rpPhraseHistory.has(block.stepKey))rpPhraseHistory.set(block.stepKey,new Set());
  phrases.forEach(phrase=>rpPhraseHistory.get(block.stepKey).add(phrase));

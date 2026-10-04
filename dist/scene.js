@@ -80,7 +80,7 @@ const surgeryEndings={
 function endingMarkup(kind){
   const surgery=kind==='surgery';
   const entry=surgery ? surgeries[currentSurgery] : flows[currentFlow];
-  const notes=surgery ? surgeryEndings[currentSurgery] : sceneEndings[currentFlow];
+  const notes=surgery ? surgeryEndings[currentSurgery] : currentFlow==='animal'?animalEndingNotes():sceneEndings[currentFlow];
   rpPhraseBlocks=[];
   let variant='';
   if(!surgery && answers.needsSuture === true) variant='Des points ont été proposés dans le parcours : mentionne-les seulement si tu les as joués.';

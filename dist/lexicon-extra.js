@@ -41,6 +41,8 @@ function casePhrase(){
  const title=activeStepTitle.toLowerCase();
  if(id==='animal'&&/priorité/.test(title))return '« Je surveille sa respiration et le saignement avant de poursuivre les soins des blessures. »';
  if(id==='animal'&&/animal|circonstanc/.test(title))return '« Quel animal était-ce, et comment l’attaque s’est-elle produite ? »';
+ if(id==='animal'&&animalIsVenom())return '« Depuis la morsure, dites-moi si votre respiration ou vos sensations changent. Je poursuis la surveillance. »';
+ if(id==='animal'&&!animalHasWound())return '« Depuis le choc, dites-moi si la douleur ou le mouvement ont changé, sans forcer sur cette zone. »';
  if(sleepingSurgery())return 'À l’assistant : « Gardez sa respiration sous surveillance pendant que je poursuis cette intervention. »';
  const area={arm:'bras',leg:'jambe',limb:'membre',chest:'thorax',abdomen:'abdomen',head:'tête',back:'dos',ribs:'côtes'}[answers.gunArea || answers.knifeArea || answers.horseArea];
  if(/sutur|fermer|refermer/.test(title))return `« Je vérifie si la ${id==='gunshot'?'blessure par balle':id==='knife'?'plaie au couteau':'plaie'} peut être refermée${area?' au niveau du '+area:''}. »`;

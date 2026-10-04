@@ -5,10 +5,12 @@ const careStateLabels={awake:'Conscient',confused:'Confus',unresponsive:'Ne rép
 function careProductBlocked(){
  const breathing=answers.latestBreathing || answers.breathing || answers.unknownBreathing;
  const bleeding=answers.latestBleeding || answers.unknownBleeding || answers.animalBleeding;
- const animalIncomplete=currentFlow==='animal'&&(!answers.conscious||!bleeding||bleeding==='unknown');
+ const animalBleeding=answers.latestBleeding||answers.animalBleeding;
+ const animalIncomplete=currentFlow==='animal'&&(!answers.conscious||!animalBleeding||animalBleeding==='unknown'||animalIsVenom());
  return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(breathing) || bleeding==='major' || animalIncomplete;
 }
 function careUrgency(base){
+ if(currentFlow==='animal'&&animalIsVenom()&&answers.animalVenomSigns==='danger')return 'critical';
  const state=answers.latestState || answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:'');
  const breathing=answers.latestBreathing || answers.breathing || answers.unknownBreathing;
  const bleeding=answers.latestBleeding || answers.unknownBleeding || answers.animalBleeding;
@@ -129,6 +131,7 @@ Object.values(surgeries).forEach(s=>s.steps.forEach(step=>{step.care={...step.ca
 
 function careMaterialForStep(step,kind){
  let items=[...(step.care?.material || [])];
+ if(currentFlow==='animal'&&step.dynamicAnimal==='clean')items=animalIsVenom()?['Linge propre','Protection simple']:animalHasWound()?items:[];
  if(currentFlow==='animal'&&step.dynamicAnimal==='protect'&&answers.animalDepth==='crush'&&['arm','hand','leg','foot'].includes(answers.animalArea))items.push('Attelle ou écharpe adaptée','Tissu rembourré');
  if(step.dynamicSuture)items=answers.needsSuture===true?['Aiguille et fil','Pince','Ciseaux','Compresses']:[];
  if(step.dynamicUnknownBleeding)items=['major','minor'].includes(answers.unknownBleeding)?['Compresses','Linge propre','Bandage']:[];
