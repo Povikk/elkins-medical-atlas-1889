@@ -43,8 +43,12 @@ function removePatient(number){
  const index=patientSessions.findIndex(p=>p.number===number);if(index<0)return;
  const patient=patientSessions[index];
  if(patient.state&&!confirm(`Supprimer ${patient.label||'Patient '+number} et son parcours temporaire ? Cette suppression ne peut pas être annulée.`))return;
+ if(patientSessions.length===1){
+  currentFlow=null;currentSurgery=null;activePatientNumber=0;
+  patientSessions.splice(0,1,{number:1,state:null});nextPatientNumber=2;
+  selectPatient(1);return;
+ }
  if(number===activePatientNumber){
-  if(patientSessions.length===1)patientSessions.push({number:nextPatientNumber++,state:null});
   const replacement=patientSessions[index+1]||patientSessions[index-1];selectPatient(replacement.number);
  }
  patientSessions.splice(index,1);renderPatientBar();

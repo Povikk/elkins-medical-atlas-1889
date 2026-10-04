@@ -1671,3 +1671,6 @@ summary{cursor:pointer;color:var(--ink)}
 .patient-bar .patient-name-reset{font-size:.75rem;padding:2px 5px;}
 @media(min-width:761px){.sidebar>.patient-bar{flex-wrap:nowrap;}.sidebar .patient-buttons{flex-basis:auto;flex-wrap:nowrap;}.sidebar .patient-list-title{color:var(--sidebar-muted,var(--sidebar-ink));}.sidebar .patient-button.active{box-shadow:inset 3px 0 var(--lime);}}
 @media(hover:none),(max-width:760px){.patient-row-actions{opacity:1;}.patient-bar .patient-row-actions button{min-width:44px;min-height:44px;}.patient-bar .patient-buttons{max-height:132px;}}
+.report-editor{display:grid;gap:10px;margin:10px 0;}
+.report-editor label{display:grid;gap:5px;font-weight:700;min-width:0;}
+.report-editor textarea{box-sizing:border-box;width:100%;min-width:0;resize:vertical;font:inherit;font-weight:400;line-height:1.4;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;}

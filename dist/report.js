@@ -61,7 +61,19 @@ function reportSuggestedCare(kind){
  return [...new Set(items)].join(' ; ')+'.';
 }
 function reportMarkup(kind){
- return `<section class="care-report care-auto-summary" aria-label="Récapitulatif des choix"><h3>Récapitulatif</h3><p><b>Constatations :</b> <span id="report-findings">${reportEscape(reportFindings(kind))}</span></p><p><b>Soins suggérés :</b> <span id="report-care">${reportEscape(reportSuggestedCare(kind))}</span></p><small>Repères RP à adapter aux gestes réellement joués. Les suggestions ne confirment pas un soin effectué. Aucun enregistrement.</small><div class="report-actions"><button class="secondary" type="button" onclick="copyReport()">Copier les deux lignes</button><span id="report-status" role="status"></span></div></section>`;
+ const draft=answers.reportDraft?.[kind],findings=draft?.findings??reportFindings(kind),care=draft?.care??reportSuggestedCare(kind),editing=!!draft?.editing;
+ return `<section class="care-report care-auto-summary" aria-label="Récapitulatif des choix"><h3>Récapitulatif</h3><p ${editing?'hidden':''}><b>Constatations :</b> <span id="report-findings">${reportEscape(findings)}</span></p><p ${editing?'hidden':''}><b>Soins suggérés :</b> <span id="report-care">${reportEscape(care)}</span></p><div class="report-editor" ${editing?'':'hidden'}><label>Constatations<textarea rows="3" oninput="updateReportText('${kind}','findings',this.value)">${reportEscape(findings)}</textarea></label><label>Soins et consignes<textarea rows="3" oninput="updateReportText('${kind}','care',this.value)">${reportEscape(care)}</textarea></label></div><small>Repères RP à adapter aux gestes réellement joués. Les suggestions ne confirment pas un soin effectué. Aucun enregistrement.</small><div class="report-actions"><button class="secondary" type="button" onclick="toggleReportEditor('${kind}')">${editing?'Terminer la modification':'Modifier le compte rendu'}</button><button class="secondary" type="button" onclick="copyReport()">Copier les deux lignes</button><span id="report-status" role="status"></span></div></section>`;
+}
+function toggleReportEditor(kind){
+ answers.reportDraft??={};
+ const draft=answers.reportDraft[kind]??={findings:document.getElementById('report-findings').textContent,care:document.getElementById('report-care').textContent,editing:false};
+ draft.editing=!draft.editing;
+ document.querySelector('.care-report').outerHTML=reportMarkup(kind);
+ if(draft.editing)document.querySelector('.report-editor textarea')?.focus({preventScroll:true});
+}
+function updateReportText(kind,field,value){
+ const draft=answers.reportDraft?.[kind];if(!draft||!['findings','care'].includes(field))return;
+ draft[field]=value;document.getElementById(field==='findings'?'report-findings':'report-care').textContent=value;
 }
 async function copyReport(){
  const text=`Constatations : ${document.getElementById('report-findings').textContent}\nSoins suggérés : ${document.getElementById('report-care').textContent}`;
