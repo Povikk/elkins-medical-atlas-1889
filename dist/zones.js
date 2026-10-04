@@ -9,7 +9,25 @@ function zoneSelections(key){
  return choice?[choice]:[];
 }
 function zoneHas(key,value){return zoneSelections(key).some(c=>c.set[key]===value)||answers[key]===value;}
-function zoneLabels(key){return zoneSelections(key).map(c=>c.label).join(' ; ');}
+function zoneLabels(key){return zoneSelections(key).map(c=>c.label+(key==='gunArea'?gunDetailLabel(c):'')).join(' ; ');}
+function gunDetailLabel(choice){
+ const detail=choice.shot;if(!detail)return '';
+ const type={solid:'balle pleine',pellets:'grenaille',unknown:'projectile indéterminé'}[detail.type]||'projectile indéterminé';
+ return ` (${type} ; ${detail.count||'nombre indéterminé'}${detail.count?(detail.type==='pellets'?' impact(s) observé(s)':' projectile(s) signalé(s)'):''})`;
+}
+function gunDetailsControls(selected){
+ if(!selected.length)return '';
+ return `<div class="gun-details"><small>Facultatif : quantité signalée, ou impacts observés pour la grenaille. Une entrée et une sortie ne comptent pas comme deux balles.</small>${selected.map((choice,i)=>`<div class="gun-detail-row"><b>${reportEscape(choice.label)}</b><select aria-label="Projectile : ${reportEscape(choice.label)}" onchange="updateGunDetail(${i},'type',this.value)">${[['unknown','Type indéterminé'],['solid','Balle pleine'],['pellets','Grenaille']].map(([value,label])=>`<option value="${value}" ${(choice.shot?.type||'unknown')===value?'selected':''}>${label}</option>`).join('')}</select><label>${choice.shot?.type==='pellets'?'Impacts':'Nombre'}<input type="number" min="1" step="1" inputmode="numeric" placeholder="?" aria-label="Quantité : ${reportEscape(choice.label)}" value="${choice.shot?.count||''}" onchange="updateGunDetail(${i},'count',this.value)"></label></div>`).join('')}</div>`;
+}
+function updateGunDetail(index,field,value){
+ if(currentFlow!=='gunshot'||!['type','count'].includes(field))return;
+ const selected=zoneSelections('gunArea').map(c=>({...c,set:{...c.set},shot:{type:'unknown',count:null,...c.shot}}));
+ const choice=selected[index];if(!choice)return;
+ if(field==='type'){if(!['unknown','solid','pellets'].includes(value))return;choice.shot.type=value;choice.shot.count=null;}
+ else choice.shot.count=/^[1-9]\d*$/.test(value)&&Number.isSafeInteger(Number(value))?Number(value):null;
+ answers.gunAreaSelections=selected;delete answers.reportDraft;
+ render();
+}
 function zoneComplete(step){const key=zoneKeyForStep(step);return !key||zoneSelections(key).length>0&&answers[key+'Confirmed']!==false;}
 function zoneIsSelected(key,set){return zoneSelections(key).some(c=>Object.entries(set).every(([k,v])=>c.set[k]===v));}
 function zoneInvalidateAfter(index){
@@ -29,7 +47,7 @@ function toggleZoneSelection(index,set){
  else selected=exclusive(choice)?[choice]:[...selected.filter(c=>!exclusive(c)),choice];
  zoneInvalidateAfter(index);
  for(const c of step.choices)for(const k of Object.keys(c.set))delete answers[k];
- answers[key+'Selections']=selected.map(c=>({label:c.label,set:{...c.set}}));
+ answers[key+'Selections']=selected.map(c=>({label:c.label,set:{...c.set},...(c.shot?{shot:{...c.shot}}:{})}));
  answers[key+'Confirmed']=false;
  // Keep legacy branch selectors conservative; all locations remain available separately.
  const priority=currentFlow==='horse'?['head','back','ribs','chest','abdomen','unknown']:['head','chest','abdomen','unknown','hand','foot','back'];
@@ -47,13 +65,17 @@ function confirmZoneSelection(index){
 }
 function zoneSelectionControls(step,index,disabled=false){
  const key=zoneKeyForStep(step),selected=zoneSelections(key);
- return `<div class="zone-selection-footer"><span role="status">${selected.length?selected.length+' zone'+(selected.length>1?'s':'')+' sélectionnée'+(selected.length>1?'s':''):'Sélectionner une ou plusieurs zones'}</span><button type="button" class="next" onclick="confirmZoneSelection(${index})" ${disabled||!selected.length?'disabled':''}>Valider les zones</button></div>`;
+ return `${key==='gunArea'?gunDetailsControls(selected):''}<div class="zone-selection-footer"><span role="status">${selected.length?selected.length+' zone'+(selected.length>1?'s':'')+' sélectionnée'+(selected.length>1?'s':''):'Sélectionner une ou plusieurs zones'}</span><button type="button" class="next" onclick="confirmZoneSelection(${index})" ${disabled||!selected.length?'disabled':''}>Valider les zones</button></div>`;
 }
 function condensedZones(step,index,pending){
  const key=zoneKeyForStep(step);
  return `<fieldset class="condensed-choice zone-checks" ${pending?'disabled':''}><legend>Zones atteintes</legend><details ${index===stepIndex?'open':''}><summary>${zoneSelections(key).length?condensedEscape(zoneLabels(key)):'Sélectionner plusieurs zones'}</summary><div class="zone-check-list">${step.choices.map(c=>`<label><input type="checkbox" ${zoneIsSelected(key,c.set)?'checked':''} onchange='toggleZoneSelection(${index},${JSON.stringify(c.set)})'>${condensedEscape(c.label)}</label>`).join('')}</div>${zoneSelectionControls(step,index,pending)}</details></fieldset>`;
 }
 function multiZoneCareMarkup(step){
+ if(currentFlow==='gunshot'&&(step.dynamic||step.title==='Examiner la plaie')){
+  const selected=zoneSelections('gunArea'),pellets=selected.some(c=>c.shot?.type==='pellets');
+  return `<div class="route-note"><b>Zones atteintes :</b> ${reportEscape(zoneLabels('gunArea'))}. Réévaluer chaque blessure séparément.${pellets?' Grenaille : repérer les impacts visibles ; ne pas supposer qu’ils sont superficiels ni que tous les plombs sont ressortis. Pas de recherche ou d’extraction systématique de chaque plomb.':''} Le type et le nombre ne suffisent pas à déterminer la profondeur ou la gravité ; surveiller saignement, respiration et fonction.</div>`;
+ }
  if(!step.dynamicGunArea&&!step.dynamicHorseCare&&!['aspect','clean'].includes(step.dynamicAnimal)&&!/Examiner le membre|Nettoyage/.test(step.title))return '';
  const key=zoneKeys.find(k=>zoneSelections(k).length>1);if(!key||zoneKeyForStep(step))return '';
  const selected=zoneSelections(key);

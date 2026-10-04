@@ -15,6 +15,7 @@ function reportFindings(kind){
   const choice=options.find(c=>Object.hasOwn(c.set,key)&&Object.entries(c.set).every(([k,v])=>answers[k]===v));
   if(key==='needsSuture'){result.push(answers[key]===true?'Plaie nette, fermeture envisagée':answers[key]===false?'Fermeture non nécessaire selon le choix':'Fermeture simple écartée');}
   else if(zoneKeys.includes(key)&&zoneSelections(key).length)result.push(zoneLabels(key));
+  else if(key==='bullet'&&zoneSelections('gunArea').some(c=>c.shot?.type==='pellets'))result.push({graze:'Atteintes superficielles constatées',out:'Sortie constatée pour les projectiles identifiés ; autres impacts à vérifier',in:'Projectile(s) / plomb(s) suspecté(s) retenu(s)',unknown:'Présence de projectiles indéterminée',unchecked:'Impacts non encore vérifiés'}[answers.bullet]||choice?.label||'Projectile à préciser');
   else if(choice)result.push(choice.label);
  }
  const movement={normal:'Mouvement conservé selon le choix',painful:'Mouvement douloureux',limited:'Mouvement limité',none:'Mouvement impossible',unknown:'Mouvement non évalué'};
@@ -32,6 +33,7 @@ function reportSuggestedCare(kind){
  if(['gunshot','knife','minor'].includes(id)){
   if(id!=='minor')items.push('Contrôle du saignement si nécessaire');
   items.push('Nettoyage de la plaie','Pansement');
+  if(id==='gunshot'&&zoneSelections('gunArea').some(c=>c.shot?.type==='pellets'))items.push('Évaluation de chaque zone de grenaille, sans recherche ni extraction systématique des plombs');
   if(answers.needsSuture===true)items.push('Suture si appropriée : nombre de points à préciser','Repasser dans 24 h pour contrôler la plaie et le pansement si la suture a été effectuée','Retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h');
   if(id==='gunshot'&&answers.bullet==='in')items.push('Évaluer le projectile retenu, sans extraction systématique');
   if(id==='knife'&&answers.knifeSeverity==='deep'||id==='gunshot'&&['head','chest','abdomen'].includes(answers.gunArea))items.push('Orientation / renfort selon la scène');

@@ -1120,7 +1120,10 @@ function render(capture=false){
       html += sayLines(["« Gardez les yeux ouverts. Regardez-moi. »","« Qu’avez-vous pris ? »"]);
     }
   } else if(step.dynamic && currentFlow==="gunshot"){
-    if(answers.bullet==="graze"){
+    if(zoneSelections('gunArea').some(c=>c.shot?.type==='pellets')){
+      html += section('À faire',['Examiner séparément les zones de grenaille et les éventuelles blessures par balle pleine.','Nettoyer les atteintes accessibles et les protéger ; ne pas sonder les trajets ni rechercher chaque plomb.','Une petite ouverture ne prouve pas une blessure superficielle. Faire évaluer les atteintes profondes, la perte de fonction ou les signes inquiétants.','Choisir la fermeture selon chaque plaie, sans suture automatique de tous les impacts.']);
+      html += sayLines(['« Je vérifie chaque zone atteinte avant de protéger les plaies. »','« Je ne vais pas chercher les plombs à l’aveugle. »']);
+    } else if(answers.bullet==="graze"){
       html += section("À faire",["Nettoyer doucement l’atteinte superficielle et protéger avec un pansement propre.","Aucun projectile à rechercher et aucune suture pour cette éraflure constatée.","Évaluer la douleur ; ménager la zone et surveiller toute aggravation."]);
       html += sayLines(["« Le projectile a effleuré la peau. Je nettoie et je protège cette éraflure. »"]);
     } else if(answers.bullet==="in"){
@@ -1386,7 +1389,8 @@ function render(capture=false){
     const zoneKey=zoneKeyForStep(step);
     html += `<div class="section"><h3>${zoneKey?'Zones atteintes, plusieurs choix possibles':'Choisis ce qui correspond à la scène'}</h3><div class="choices${step.animalSpeciesPicker?' animal-species-choices':''}${zoneKey?' zone-choices':''}">`;
     (step.dynamicAnimal?animalChoicesForStep(step):step.choices).forEach(c=>{
-      html += `<button class="choice" ${zoneKey?`aria-pressed="${zoneIsSelected(zoneKey,c.set)}"`:''} onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
+      const pelletLabel=currentFlow==='gunshot'&&zoneSelections('gunArea').some(z=>z.shot?.type==='pellets')?({graze:'Atteintes superficielles constatées sur toutes les zones',out:'Sortie constatée pour les projectiles identifiés ; autres impacts à vérifier',in:'Projectile(s) ou plomb(s) suspecté(s) encore présent(s)'}[c.set.bullet]):null;
+      html += `<button class="choice" ${zoneKey?`aria-pressed="${zoneIsSelected(zoneKey,c.set)}"`:''} onclick='applyChoice(${JSON.stringify(c.set)})'>${pelletLabel||c.label}</button>`;
     });
     html += `</div></div>`;
     if(zoneKey)html+=zoneSelectionControls(step,stepIndex);
