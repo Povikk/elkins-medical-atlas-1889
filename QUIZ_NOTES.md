@@ -1,19 +1,45 @@
-# Quiz RP
+# Quiz médical
 
-Ajout du 4 octobre 2026. Onglet Quiz dans la navigation principale.
+Refonte éditoriale du 4 octobre 2026.
 
-Les corrections comportent maintenant un encadré court : « Petite histoire » avec un lien pour les anecdotes historiques vérifiées, ou « Petit détail à retenir » pour les notes pédagogiques RP. 107 sujets ont une note spécifique ; les situations réutilisent un sujet mentionné ou une astuce de scène. Aucun encadré avant la réponse. Les notes restent accessibles dans la révision finale. Sources et rédaction : `dist/quiz-notes.js`.
+215 questions : 82 produits, 32 techniques, 21 matériel, 40 observations et 40 situations.
+Les 544 anciennes questions automatiques ont été remplacées. Tous les sujets du catalogue
+sont couverts. Le nombre a été réduit pour éliminer les combinaisons ambiguës et redondantes.
 
-Cet ajout ne corrige pas les ambiguïtés éditoriales signalées lors de la relecture précédente. La banque de questions n’est pas refondue par cette modification.
+Chaque ligne contient sept champs séparés par `|` : référence, question, bonne réponse,
+trois mauvaises réponses, explication. Les distracteurs sont propres à chaque question.
+Ils ne sont pas empruntés au catalogue. Les réponses sont mélangées à l’affichage.
 
-- 544 questions : 340 produits, 62 techniques, 42 matériel, 40 observations et 60 situations. Les questions de reconnaissance inversée utilisent uniquement des descriptions distinctes, sans le nom du produit dans l’indice.
-- 10 questions par série : 4 produits, 2 techniques, 2 situations, 1 matériel et 1 observation.
-- Questions et réponses mélangées. Pas de même sujet deux fois dans une série ; les questions de la série précédente sont évitées.
-- Correction après chaque réponse, puis score sur 10 et réponses repliables à revoir.
-- Série conservée uniquement en mémoire tant que la page est ouverte. Aucun stockage, appel réseau, chronomètre ou dossier patient.
+Fichiers : `dist/quiz-curated.js`, `dist/quiz-products-extra.js`, `dist/quiz-techniques.js`,
+`dist/quiz-equipment.js`, `dist/quiz-situations.js`. Anecdotes : `dist/quiz-notes.js`.
+L’ancien générateur et le remplacement automatique de vocabulaire ont été retirés.
 
-La banque se construit depuis les connaissances existantes de l’Atlas, avec une formulation de scène : patient qui consulte, produit à préparer, geste à jouer ou matériel à demander. Aucune question ne demande de réciter « la fiche ». Les 20 observations ont des situations et actions rédigées spécifiquement. Les questions d’identification partent d’une description et demandent le nom du signe ou de l’objet. Les compositions identiques à la forme sont exclues. Les voies d’application sont regroupées pour ne pas proposer plusieurs réponses orales toutes valables. Sans dosage, recette ni procédure réelle.
+## Rédaction
 
-Pour enrichir : ajouter des lignes à `quizSituations` ou modifier les fiches du catalogue. Conserver une seule réponse correcte et trois distracteurs distincts. La correction ne doit imposer ni diagnostic, ni guérison, ni réveil chronométré au joueur.
+- Une décision ou connaissance précise et un contexte suffisant.
+- Une seule réponse juste, avec trois choix distincts examinés ensemble.
+- Pas d’identification à l’odeur seule ni de faux synonymes de préparations.
+- Pas de joueur, RP, scène, guillemets autour des noms ou rappel systématique de 1889.
+- Pas de dose, recette, méthode opératoire réelle ou réveil chronométré.
+- Ne pas transformer une conjecture ou un soin prévu en résultat certain.
+- Les actes dangereux anciens restent documentaires, distincts des soins actuels.
 
-Vérification : `node tests/quiz.cjs` avec Playwright installé. Teste la banque, 100 tirages, les scores, le verrouillage d’une réponse, la reprise après navigation, la remise à zéro au rechargement, les thèmes et les tailles desktop/mobile. Régression : `node tests/site-smoke.cjs`.
+Les connaissances reposent sur le catalogue existant. Contrôle complémentaire de la gentiane :
+[Kew, racine de gentiane](https://mpns.science.kew.org/mpns-portal/drugDetail?drugName=Gentian+root&filter=latinKewPrefName%3A%22Gentiana+lutea+L.%22&fuzzy=true&nameType=all&query=Lulea)
+et [EMA, Gentianae radix](https://www.ema.europa.eu/en/medicines/herbal/gentianae-radix).
+Les sources des anecdotes historiques restent affichées avec leur texte.
+
+## Fonctionnement
+
+10 questions : 4 produits, 2 techniques, 2 situations, 1 matériel et 1 observation.
+Pas deux fois le même sujet par série, même entre techniques et matériel apparentés.
+Les questions de la série précédente sont évitées. Réponse verrouillée, correction immédiate,
+score sur 10 et révision finale. Aucun résultat enregistré : session en mémoire seulement.
+
+## Vérification
+
+`node tests/quiz.cjs` : banque, couverture du catalogue, vocabulaire, gentiane, écharpe,
+rendu et correction des 215 questions, anecdotes, 100 tirages, score, navigation,
+rechargement, thèmes et formats PC/mobile. Les tests structurels ne constituent pas
+une preuve automatique d’exactitude médicale. Ce quiz est un entraînement historique,
+pas une formation aux soins réels.
