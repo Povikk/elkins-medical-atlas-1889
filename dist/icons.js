@@ -1,5 +1,5 @@
 // Local Twemoji drawings avoid missing glyphs. Icons describe topics and routes.
-const caseEmoji={unknown:'26a0',gunshot:'1f4a5',knife:'1f52a',fight:'1f44a',horse:'1f40e',fracture:'1f9b4',minor:'1fa79',drowning:'1f30a',head:'1f9e0',burn:'1f525',poison:'2620'};
+const caseEmoji={unknown:'26a0',gunshot:'1f4a5',animal:'1f43e',knife:'1f52a',fight:'1f44a',horse:'1f40e',fracture:'1f9b4',minor:'1fa79',drowning:'1f30a',head:'1f9e0',burn:'1f525',poison:'2620'};
 function emojiIcon(code){return `<img class="topic-emoji" src="assets/emoji/${code}.svg" alt="" aria-hidden="true" width="24" height="24" draggable="false">`;}
 function lexEmoji(item){
  const name=item.name.toLowerCase();

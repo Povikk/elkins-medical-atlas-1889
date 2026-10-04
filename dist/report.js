@@ -6,11 +6,12 @@ function reportFindings(kind){
  const result=[route.title];
  const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
  const options=route.steps.flatMap(s=>s.choices||[]);
+ keys.push('animalInjury','animalArea','animalBleeding','animalDepth','animalExposure');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
   if(['breathing','unknownBreathing'].includes(key)&&answers.latestBreathing)continue;
-  if(key==='unknownBleeding'&&answers.latestBleeding)continue;
+  if(['unknownBleeding','animalBleeding'].includes(key)&&answers.latestBleeding)continue;
   const choice=options.find(c=>Object.hasOwn(c.set,key)&&Object.entries(c.set).every(([k,v])=>answers[k]===v));
   if(key==='needsSuture'){result.push(answers[key]===true?'Plaie nette, fermeture envisagée':answers[key]===false?'Fermeture non nécessaire selon le choix':'Fermeture simple écartée');}
   else if(choice)result.push(choice.label);
@@ -33,6 +34,11 @@ function reportSuggestedCare(kind){
   if(answers.needsSuture===true)items.push('Suture si appropriée : nombre de points à préciser');
   if(id==='gunshot'&&answers.bullet==='in')items.push('Évaluer le projectile retenu, sans extraction systématique');
   if(id==='knife'&&answers.knifeSeverity==='deep'||id==='gunshot'&&['head','chest','abdomen'].includes(answers.gunArea))items.push('Orientation / renfort selon la scène');
+ }else if(id==='animal'){
+  items.push('Contrôle du saignement si nécessaire','Nettoyage adapté des plaies accessibles','Protection / pansement','Pas de fermeture automatique');
+  if(answers.animalDepth==='crush')items.push('Soutien du membre si atteint');
+  if(animalNeedsAssessment())items.push('Évaluation spécialisée de la blessure');
+  items.push('Évaluation du risque de rage selon animal et circonstances','Contrôle rapproché');
  }else if(id==='fracture')items.push('Soutien et immobilisation du membre','Pansement si plaie');
  else if(id==='horse'){
   if(answers.horseVisible==='wound')items.push('Nettoyage','Pansement');

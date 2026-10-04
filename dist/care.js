@@ -2,11 +2,16 @@
 let anatomyPinned=false;
 let careObservationDirty=false;
 const careStateLabels={awake:'Conscient',confused:'Confus',unresponsive:'Ne répond pas',unknown:'Non évalué'};
-function careProductBlocked(){return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || (answers.latestBleeding || answers.unknownBleeding)==='major';}
+function careProductBlocked(){
+ const breathing=answers.latestBreathing || answers.breathing || answers.unknownBreathing;
+ const bleeding=answers.latestBleeding || answers.unknownBleeding || answers.animalBleeding;
+ const animalIncomplete=currentFlow==='animal'&&(!answers.conscious||!bleeding||bleeding==='unknown');
+ return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(breathing) || bleeding==='major' || animalIncomplete;
+}
 function careUrgency(base){
  const state=answers.latestState || answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:'');
  const breathing=answers.latestBreathing || answers.breathing || answers.unknownBreathing;
- const bleeding=answers.latestBleeding || answers.unknownBleeding;
+ const bleeding=answers.latestBleeding || answers.unknownBleeding || answers.animalBleeding;
  if(['no','weak'].includes(breathing) || state==='unresponsive' || /not_breathing|unconscious/.test(state || '') || bleeding==='major' || answers.burnSeverity==='airway')return 'critical';
  if(state==='confused' || state==='sleepy')return base==='critical'?base:'serious';
  if(answers.latestState==='awake' && breathing==='yes' && bleeding==='none')return base==='light'?'light':'serious';
@@ -22,6 +27,13 @@ function compactActions(title,items){
 }
 function careStepExtras(step){
  const links=[];
+ if(currentFlow==='animal'&&step.dynamicAnimal){
+  if(answers.animalArea==='head')links.push(['head','Réévaluer le traumatisme crânien, si présent']);
+  if((answers.latestBleeding||answers.animalBleeding)==='major')links.push(['surgery:major_bleeding','Saignement majeur : avis chirurgical si justifié']);
+  if(answers.animalDepth==='crush'&&['arm','hand','leg','foot'].includes(answers.animalArea))links.push(['fracture','Atteinte du membre : évaluation et soutien']);
+  if(answers.animalArea==='abdomen'&&answers.animalDepth==='deep')links.push(['surgery:abdominal','Plaie abdominale profonde : avis chirurgical']);
+  if(answers.conscious==='not_breathing'||answers.latestBreathing==='no')links.push(['unknown','Priorité respiratoire et réévaluation']);
+ }
  if(currentFlow==='fight' && answers.fightIssue==='head' || currentFlow==='horse' && answers.horseArea==='head')links.push(['head','Traumatisme crânien']);
  if(currentFlow==='gunshot' && answers.bullet==='in' && step.dynamic)links.push(['surgery:deep_bullet','Projectile profond, si exploration justifiée']);
  if(currentFlow==='knife' && answers.knifeSeverity==='deep' && answers.knifeArea==='abdomen')links.push(['surgery:abdominal','Plaie abdominale grave, si la scène le justifie']);
@@ -117,6 +129,7 @@ Object.values(surgeries).forEach(s=>s.steps.forEach(step=>{step.care={...step.ca
 
 function careMaterialForStep(step,kind){
  let items=[...(step.care?.material || [])];
+ if(currentFlow==='animal'&&step.dynamicAnimal==='protect'&&answers.animalDepth==='crush'&&['arm','hand','leg','foot'].includes(answers.animalArea))items.push('Attelle ou écharpe adaptée','Tissu rembourré');
  if(step.dynamicSuture)items=answers.needsSuture===true?['Aiguille et fil','Pince','Ciseaux','Compresses']:[];
  if(step.dynamicUnknownBleeding)items=['major','minor'].includes(answers.unknownBleeding)?['Compresses','Linge propre','Bandage']:[];
  if(step.dynamic&&currentFlow==='gunshot'&&answers.bullet==='in')items=['Forceps uniquement si projectile accessible','Compresses'];

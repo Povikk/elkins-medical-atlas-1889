@@ -8,7 +8,7 @@ const assert=require('node:assert/strict');
   await page.goto('http://127.0.0.1:4173/');
   await page.evaluate(()=>{start('gunshot');applyChoice({conscious:'awake'});});
   assert.match(await page.locator('#flow .rp-choice-recap').innerText(),/Conscient/);
-  await page.evaluate(()=>{next();applyChoice({gunArea:'arm'});});
+  await page.evaluate(()=>{next();applyChoice(flows.gunshot.steps[2].choices.find(c=>c.set.gunArea==='arm'&&c.set.gunAreaSide==='left').set);});
   assert.match(await page.locator('#flow .rp-choice-recap').innerText(),/Bras/);
   await page.evaluate(()=>prev());
   assert(!/Bras/.test(await page.locator('#flow .rp-choice-recap').innerText()));

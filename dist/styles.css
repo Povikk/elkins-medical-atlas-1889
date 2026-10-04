@@ -1547,6 +1547,13 @@ summary{cursor:pointer;color:var(--ink)}
 #atlasSearchResults{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 [hidden]{display:none!important}
 /* Detailed care: keep the reading size, remove excess vertical whitespace. */
+@media(min-width:1100px){
+ /* Large labels need their natural width, not narrow fixed cells wrapping over many lines. */
+ html[data-reading-size="xlarge"] :is(#flow,#surgeryFlow):not(.condensed-workspace) .choices>.choice{flex:0 1 auto;width:auto;max-width:100%}
+}
+.animal-reference{border:1px solid var(--line);border-radius:8px;padding:8px 14px;color:var(--ink);background:var(--panel);margin:5px 0;font-size:15px}
+.animal-reference summary{cursor:pointer;color:var(--accent2)}
+.animal-reference p{line-height:1.4;margin:8px 0}
 :is(#flow,#surgeryFlow):not(.condensed-workspace){row-gap:5px}
 :is(#flow,#surgeryFlow):not(.condensed-workspace)>.section{padding:10px 14px;line-height:1.4;margin:0}
 :is(#flow,#surgeryFlow):not(.condensed-workspace) .section h3{margin-bottom:5px}

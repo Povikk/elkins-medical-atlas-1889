@@ -8,7 +8,7 @@ const fs=require('node:fs');
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
   const counts=await page.evaluate(()=>({flows:Object.keys(flows),hooks:hooks.length,equipment:equipmentLexicon.length,symptoms:symptomLexicon.length}));
-  assert.equal(counts.flows.length,17);assert.equal(counts.hooks,60);assert.equal(counts.equipment,21);assert.equal(counts.symptoms,20);
+  assert.equal(counts.flows.length,18);assert.equal(counts.hooks,60);assert.equal(counts.equipment,21);assert.equal(counts.symptoms,20);
   let runs=0;
   for(const id of counts.flows)for(const last of [false,true]){
    await page.evaluate(id=>start(id),id);

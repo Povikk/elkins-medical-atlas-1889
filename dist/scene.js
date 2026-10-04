@@ -86,7 +86,7 @@ function endingMarkup(kind){
   if(!surgery && answers.needsSuture === true) variant='Des points ont été proposés dans le parcours : mentionne-les seulement si tu les as joués.';
   if(!surgery && answers.needsSuture === false) variant='Pas de points nécessaires selon tes choix : conclure sur le nettoyage et la protection.';
   if(!surgery && answers.needsSuture === 'avoid') variant='Fermeture simple écartée : ne pas annoncer une plaie refermée.';
-  const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || answers.latestBleeding==='major';
+  const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || (answers.latestBleeding||answers.animalBleeding)==='major' || (!surgery&&currentFlow==='animal'&&(animalNeedsAssessment()||animalUnsafe()));
   return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : 'Intervention terminée'}</h2>
     <p class="muted">Conclusion à adapter aux gestes et à l'évolution réellement joués. Aucun dossier n'est créé.</p>
     ${rpChoicesMarkup()}

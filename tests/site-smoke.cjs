@@ -99,7 +99,7 @@ async function finishSurgery(page, id) {
   await page.screenshot({ path: path.join(outputDir, "atlas-desktop-dark.png"), fullPage: true });
   await page.locator("#themeToggle").click();
 
-  const interventionIds = ["unknown", "gunshot", "knife", "fight", "horse", "fracture", "minor", "drowning", "head", "burn", "poison"];
+  const interventionIds = ["unknown", "gunshot", "animal", "knife", "fight", "horse", "fracture", "minor", "drowning", "head", "burn", "poison"];
   for (const id of interventionIds) {
     await finishIntervention(page, id, "first");
     await finishIntervention(page, id, "last");

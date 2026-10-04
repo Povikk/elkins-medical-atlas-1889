@@ -765,7 +765,9 @@ function render(capture=false){
     ${careStepExtras(step)}
   `;
 
-  if(step.dynamicUnknownBreathing){
+  if(step.dynamicAnimal){
+    html += animalStepMarkup(step);
+  } else if(step.dynamicUnknownBreathing){
     const breathing=answers.latestBreathing || answers.unknownBreathing;
     if(breathing === "no"){
       html += section("À faire",[

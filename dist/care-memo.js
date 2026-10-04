@@ -27,12 +27,17 @@ function careMemoData(kind){
  if(!surgery&&currentFlow==='gunshot'&&answers.gunArea==='abdomen'){title='Balle : abdomen';row=['Ventre · pâleur · réactions · vomissements','Repos ; surveillance ; orientation chirurgicale si justifiée','Anesthésie uniquement pour la chirurgie justifiée','Hémorragie / atteinte interne ; aucun produit ne répare la lésion'];}
  if(!surgery&&currentFlow==='gunshot'&&answers.gunArea==='chest'){title='Balle : thorax';row=['Souffle · sang craché · réactions','Limiter les mouvements ; surveiller ; organiser du renfort','Ne pas banaliser un opiacé si le souffle est inquiétant','Détresse respiratoire ; aucun médicament ne répare le poumon'];}
  if(!surgery&&currentFlow==='burn'&&answers.burnSeverity==='airway'){row[1]='Priorité au souffle ; réévaluer et organiser du renfort';row[2]='Aucun produit ne remplace le soutien respiratoire';}
- const opioidCase=!surgery&&['gunshot','knife','horse','fracture','burn','dental'].includes(currentFlow)&&!(currentFlow==='burn'&&answers.burnSeverity==='airway');
+ if(!surgery&&currentFlow==='animal'){
+  if(answers.animalMultiplicity==='multiple')row[1]='Inspecter chaque plaie ; priorités ; nettoyer si adapté ; protéger';
+  if(['deep','crush','unknown'].includes(answers.animalDepth))row[1]='Protéger ; demander un avis / renfort ; pas d’exploration ni de fermeture automatique';
+  if(answers.animalBleeding==='unknown'&&!answers.latestBleeding)row[2]='Saignement non évalué : compléter les priorités avant un opiacé';
+ }
+ const opioidCase=!surgery&&['gunshot','knife','horse','fracture','burn','dental','animal'].includes(currentFlow)&&!(currentFlow==='burn'&&answers.burnSeverity==='airway');
  if(opioidCase&&careProductBlocked())row[2]='État à réévaluer avant un opiacé ; pas de produit oral si le patient ne peut pas répondre et avaler';
  else if(opioidCase&&['mild','unsafe'].includes(answers.rpPain))row[2]=answers.rpPain==='mild'?'Repos et soin local adapté ; pas d’opiacé systématique':'État vital d’abord ; suspendre le choix d’un opiacé';
  else if(opioidCase&&answers.rpPain==='moderate')row[2]='Laudanum seulement si le patient peut répondre et avaler ; soin local adapté';
  const breathing=answers.latestBreathing||answers.breathing||answers.unknownBreathing;
- if(['no','weak'].includes(breathing)||answers.latestBleeding==='major'||answers.latestState==='unresponsive')row[3]='Suspendre le soin non prioritaire ; réévaluer et organiser du renfort';
+ if(['no','weak'].includes(breathing)||(answers.latestBleeding||answers.animalBleeding)==='major'||answers.latestState==='unresponsive')row[3]='Suspendre le soin non prioritaire ; réévaluer et organiser du renfort';
  return {title,row};
 }
 function careMemoMarkup(kind){
