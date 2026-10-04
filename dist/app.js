@@ -232,6 +232,7 @@ function start(id){
 }
 
 function showSurgery(){
+  if(typeof capturePatientState==='function')capturePatientState();
   currentSurgery = null;
   surgeryStepIndex = 0;
   materialPanelOpen = false;
@@ -338,6 +339,7 @@ function compactButton(target){
 }
 
 function show(id){
+  if(typeof rememberPatientBeforeNavigation==='function')rememberPatientBeforeNavigation(id);
   if(typeof hideLexQuickTooltip==='function')hideLexQuickTooltip();
   placeReadingControls();
   hideAnatomyTooltip();
@@ -364,6 +366,7 @@ function show(id){
   window.scrollTo({top:0,behavior:"auto"});
 }
 function goHome(){
+  if(typeof capturePatientState==='function')capturePatientState();
   currentFlow=null;
   currentSurgery=null;
   stepIndex=0;
@@ -374,6 +377,7 @@ function goHome(){
   show("home");
 }
 function showCases(){
+  if(typeof capturePatientState==='function')capturePatientState();
   currentFlow=null;
   stepIndex=0;
   answers={};
