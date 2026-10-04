@@ -31,7 +31,10 @@ function renderCondensed(kind){
     body+=[...raw.querySelectorAll(':scope > .route-links')].map(note=>note.outerHTML).join('');
     if(!pending)body+=[...raw.querySelectorAll('.condensed-products')].map(panel=>panel.outerHTML.replace('setRpPain(this.value)',`condensedPain(${index},this.value,'${kind}')`)).join('');
    }
-   if(choices.length){
+   if(zoneKeyForStep(step)){
+    body+=condensedZones(step,index,pending);
+    if(pending||!zoneComplete(step))unresolved=true;
+   }else if(choices.length){
     body+=`<label class="condensed-choice">${pending?'Après les choix précédents':'Observation jouée'}<select aria-label="${condensedEscape(step.title)}" ${pending?'disabled':''} onchange="condensedChoice(${index},this.value)"><option value="">Choisir…</option>${choices.map((choice,i)=>`<option value="${i}" ${selected===i?'selected':''}>${condensedEscape(choice.label)}</option>`).join('')}</select></label>`;
     if(selected<0)unresolved=true;
    }
@@ -59,7 +62,7 @@ function renderCondensed(kind){
   grid.before(current);grid.hidden=true;
  }
 }
-function rootChoiceMissing(route,surgery){if(surgery)return false;const raw=document.createElement('div');raw.innerHTML=render(true);const choices=condensedStepChoices(raw);return choices.length>0&&!choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v));}
+function rootChoiceMissing(route,surgery){if(surgery)return false;if(zoneKeyForStep(route.steps[stepIndex]))return !zoneComplete(route.steps[stepIndex]);const raw=document.createElement('div');raw.innerHTML=render(true);const choices=condensedStepChoices(raw);return choices.length>0&&!choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v));}
 function condensedChoice(index,value){
  if(value==='')return;
  const saved=stepIndex;stepIndex=index;
@@ -69,13 +72,13 @@ function condensedChoice(index,value){
  const later=flows[currentFlow].steps.slice(index+1).flatMap(step=>(step.choices||[]).flatMap(c=>Object.keys(c.set)));
  if(flows[currentFlow].steps.slice(index+1).some(step=>step.dynamicMovementQuestion))later.push('horseMove');
  if(index<saved)later.push('rpPain');
- later.forEach(key=>{if(!key.startsWith('latest'))delete answers[key];});
+ later.forEach(key=>{if(!key.startsWith('latest')){delete answers[key];if(zoneKeys.includes(key)){delete answers[key+'Selections'];delete answers[key+'Confirmed'];}}});
  flowHistory=flowHistory.filter(entry=>entry.index<index);stepIndex=index;applyChoice(choice.set);
 }
 function condensedMark(index,kind){
  if(document.querySelector(`#${kind==='flow'?'flow':'surgeryFlow'} [data-step-index="${index}"] .condensed-mark`)?.disabled)return;
  if(kind==='flow'){
-  const earlier=flows[currentFlow].steps.slice(0,index).some(step=>step.choices&&!step.choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v)));
+  const earlier=flows[currentFlow].steps.slice(0,index).some(step=>zoneKeyForStep(step)?!zoneComplete(step):step.choices&&!step.choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v)));
   if(earlier)return;
   if(index!==stepIndex)flowHistory.push({index:stepIndex,answers:{...answers}});
   stepIndex=index;render();

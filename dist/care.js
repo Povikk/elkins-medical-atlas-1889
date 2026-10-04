@@ -30,15 +30,15 @@ function compactActions(title,items){
 function careStepExtras(step){
  const links=[];
  if(currentFlow==='animal'&&step.dynamicAnimal){
-  if(answers.animalArea==='head')links.push(['head','Réévaluer le traumatisme crânien, si présent']);
+  if(zoneHas('animalArea','head'))links.push(['head','Réévaluer le traumatisme crânien, si présent']);
   if((answers.latestBleeding||answers.animalBleeding)==='major')links.push(['surgery:major_bleeding','Saignement majeur : avis chirurgical si justifié']);
   if(answers.animalDepth==='crush'&&['arm','hand','leg','foot'].includes(answers.animalArea))links.push(['fracture','Atteinte du membre : évaluation et soutien']);
-  if(answers.animalArea==='abdomen'&&answers.animalDepth==='deep')links.push(['surgery:abdominal','Plaie abdominale profonde : avis chirurgical']);
+  if(zoneHas('animalArea','abdomen')&&answers.animalDepth==='deep')links.push(['surgery:abdominal','Plaie abdominale profonde : avis chirurgical']);
   if(answers.conscious==='not_breathing'||answers.latestBreathing==='no')links.push(['unknown','Priorité respiratoire et réévaluation']);
  }
- if(currentFlow==='fight' && answers.fightIssue==='head' || currentFlow==='horse' && answers.horseArea==='head')links.push(['head','Traumatisme crânien']);
+ if(currentFlow==='fight' && answers.fightIssue==='head' || currentFlow==='horse' && zoneHas('horseArea','head') || currentFlow==='gunshot'&&zoneHas('gunArea','head') || currentFlow==='knife'&&zoneHas('knifeArea','head'))links.push(['head','Atteinte à la tête : réévaluation']);
  if(currentFlow==='gunshot' && answers.bullet==='in' && step.dynamic)links.push(['surgery:deep_bullet','Projectile profond, si exploration justifiée']);
- if(currentFlow==='knife' && answers.knifeSeverity==='deep' && answers.knifeArea==='abdomen')links.push(['surgery:abdominal','Plaie abdominale grave, si la scène le justifie']);
+ if(currentFlow==='knife' && answers.knifeSeverity==='deep' && zoneHas('knifeArea','abdomen'))links.push(['surgery:abdominal','Plaie abdominale grave, si la scène le justifie']);
  if(answers.latestBreathing==='no' || answers.conscious==='not_breathing')links.push(['unknown','Réévaluation prioritaire']);
  let html=links.length?`<details class="route-links"><summary>Réorienter si la scène le justifie</summary>${links.map(([id,label])=>`<button class="secondary" onclick="redirectCare('${id}')">${label}</button>`).join('')}</details>`:'';
  if(answers.consultEvolution==='worse')html+='<div class="route-note">Un signe s’aggrave : réévaluer conscience, respiration et saignement avant une simple conclusion de consultation.</div>';

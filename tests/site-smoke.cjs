@@ -17,7 +17,9 @@ async function finishIntervention(page, id, choiceMode) {
     const choices = page.locator("#flow .choice");
     const choiceCount = await choices.count();
     if (choiceCount) {
+      const zone = await page.evaluate(()=>!!zoneKeyForStep(flows[currentFlow].steps[stepIndex]));
       await choices.nth(choiceMode === "last" ? choiceCount - 1 : 0).click();
+      if(zone)await page.getByRole('button',{name:'Valider les zones',exact:true}).click();
       continue;
     }
     const next = page.locator("#flow .next");

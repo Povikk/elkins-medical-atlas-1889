@@ -79,7 +79,7 @@ sceneEndings.animal=['Reprendre les blessures observées et les soins réellemen
 hooks.filter(h=>h.routes.includes('minor')||h.routes.includes('horse')).forEach(h=>h.routes.push('animal'));
 
 function animalBleeding(){return answers.latestBleeding||answers.animalBleeding;}
-function animalNeedsAssessment(){return animalIsVenom()||['deep','crush','unknown'].includes(answers.animalDepth)||['head','chest','abdomen','hand','foot'].includes(answers.animalArea)||answers.animalArea==='unknown';}
+function animalNeedsAssessment(){return animalIsVenom()||['deep','crush','unknown'].includes(answers.animalDepth)||['head','chest','abdomen','hand','foot','unknown'].some(area=>zoneHas('animalArea',area));}
 function animalUnsafe(){return careProductBlocked()||animalBleeding()==='unknown'||!answers.conscious;}
 function animalRiskNote(){
  if(animalIsVenom())return 'Venin possible : organiser une prise en charge urgente et une surveillance continue, même si les marques sont petites. Aucun sérum antivenimeux disponible dans ce parcours de 1889.';

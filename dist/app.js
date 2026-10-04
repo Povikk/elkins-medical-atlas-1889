@@ -522,11 +522,14 @@ function materialPanel(kind){
 }
 
 function applyChoice(set){
+  const zoneKey=zoneKeyForStep(flows[currentFlow].steps[stepIndex]);
+  if(zoneKey&&Object.hasOwn(set,zoneKey)){toggleZoneSelection(stepIndex,set);return;}
   flowHistory.push({index:stepIndex,answers:{...answers}});
   Object.assign(answers,set);
   next(true);
 }
 function next(fromChoice=false){
+  if(!fromChoice&&!zoneComplete(flows[currentFlow].steps[stepIndex]))return;
   if(!fromChoice) flowHistory.push({index:stepIndex,answers:{...answers}});
   const max = flows[currentFlow].steps.length;
   let candidate=stepIndex+1;
@@ -1370,11 +1373,13 @@ function render(capture=false){
 
   if(step.choices){
     html += patientQuestion(step);
-    html += `<div class="section"><h3>Choisis ce qui correspond à la scène</h3><div class="choices${step.animalSpeciesPicker?' animal-species-choices':''}">`;
+    const zoneKey=zoneKeyForStep(step);
+    html += `<div class="section"><h3>${zoneKey?'Zones atteintes, plusieurs choix possibles':'Choisis ce qui correspond à la scène'}</h3><div class="choices${step.animalSpeciesPicker?' animal-species-choices':''}${zoneKey?' zone-choices':''}">`;
     (step.dynamicAnimal?animalChoicesForStep(step):step.choices).forEach(c=>{
-      html += `<button class="choice" onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
+      html += `<button class="choice" ${zoneKey?`aria-pressed="${zoneIsSelected(zoneKey,c.set)}"`:''} onclick='applyChoice(${JSON.stringify(c.set)})'>${c.label}</button>`;
     });
     html += `</div></div>`;
+    if(zoneKey)html+=zoneSelectionControls(step,stepIndex);
   }
 
   if(!html.includes('class="rp-lines')){
@@ -1390,6 +1395,7 @@ function render(capture=false){
     html += `<div class="nav"><button class="secondary" onclick="prev()">Précédent</button></div>`;
   }
 
+  html+=multiZoneCareMarkup(step);
   if(capture)return html;
   document.getElementById("flow").innerHTML=html;
   finalizeCareLayout(document.getElementById('flow'));

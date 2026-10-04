@@ -12,9 +12,12 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict');
    const choices=await p.evaluate(()=>{const raw=document.createElement('div');raw.innerHTML=render(true);return condensedStepChoices(raw);});
    if(choices.length){
     const index=Math.max(0,choices.findIndex(c=>c.set.animalSpecies===speciesItem.id||c.set.conscious==='awake'||c.set.animalBleeding==='minor'||c.set.animalInjury===(['bison','buck','elk','moose','ram'].includes(speciesItem.id)?'blunt':'bite')||c.set.animalArea==='arm'&&c.set.animalSide==='left'||c.set.animalDepth==='surface'||c.set.animalExposure==='wild'));
-    if(compact)await p.locator('#flow .is-current .condensed-choice select:not([disabled])').selectOption(String(index));
+    const zone=await p.evaluate(()=>!!zoneKeyForStep(flows[currentFlow].steps[stepIndex]));
+    if(compact&&zone)await p.locator('#flow .is-current .zone-checks input').nth(index).check();
+    else if(compact)await p.locator('#flow .is-current .condensed-choice select:not([disabled])').selectOption(String(index));
     else await p.locator('#flow .choice').nth(index).click();
-   }else await p.locator('#flow .next').click();
+    if(zone)await (compact?p.locator('#flow .is-current'):p.locator('#flow')).getByRole('button',{name:'Valider les zones',exact:true}).click();
+   }else await p.locator('#flow>.nav .next').click();
   }
   assert(await p.evaluate(()=>interventionEnded),speciesItem.name);
   assert.match(await p.locator('#report-findings').innerText(),new RegExp(speciesItem.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));

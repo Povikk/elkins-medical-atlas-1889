@@ -30,7 +30,7 @@ function rpChoicesMarkup(){
  const choices=(steps || []).flatMap(step=>activeRouteKind==='flow'&&currentFlow==='animal'?animalChoicesForStep(step):step.choices || []);
  const chips=Object.entries(fields).flatMap(([key,label])=>{
    if(!Object.prototype.hasOwnProperty.call(answers,key))return [];
-   const text=manual[key]?.[answers[key]] || choices.find(choice=>choice.set?.[key]===answers[key]&&Object.entries(choice.set).every(([k,v])=>answers[k]===v))?.label;
+   const text=zoneKeys.includes(key)&&zoneSelections(key).length?zoneLabels(key):manual[key]?.[answers[key]] || choices.find(choice=>choice.set?.[key]===answers[key]&&Object.entries(choice.set).every(([k,v])=>answers[k]===v))?.label;
    if(!text)return [];
    return [`<span><b>${label} :</b> ${text}</span>`];
  });

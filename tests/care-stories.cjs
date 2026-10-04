@@ -16,7 +16,7 @@ const fs=require('node:fs');
     if(await page.evaluate(()=>interventionEnded))break;
     await page.evaluate(()=>{materialPanelOpen=true;render();});
     const choices=page.locator('#flow .choice');
-    if(await choices.count())await choices.nth(last?(await choices.count())-1:0).click();
+    if(await choices.count()){const isZone=await page.evaluate(()=>!!zoneKeyForStep(flows[currentFlow].steps[stepIndex]));await choices.nth(last?(await choices.count())-1:0).click();if(isZone)await page.getByRole('button',{name:'Valider les zones',exact:true}).click();}
     else await page.locator('#flow .next').click();
    }
    assert(await page.evaluate(()=>interventionEnded),`${id} completes`);runs++;

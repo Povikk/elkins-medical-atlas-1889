@@ -14,6 +14,7 @@ function reportFindings(kind){
   if(['unknownBleeding','animalBleeding'].includes(key)&&answers.latestBleeding)continue;
   const choice=options.find(c=>Object.hasOwn(c.set,key)&&Object.entries(c.set).every(([k,v])=>answers[k]===v));
   if(key==='needsSuture'){result.push(answers[key]===true?'Plaie nette, fermeture envisagée':answers[key]===false?'Fermeture non nécessaire selon le choix':'Fermeture simple écartée');}
+  else if(zoneKeys.includes(key)&&zoneSelections(key).length)result.push(zoneLabels(key));
   else if(choice)result.push(choice.label);
  }
  const movement={normal:'Mouvement conservé selon le choix',painful:'Mouvement douloureux',limited:'Mouvement limité',none:'Mouvement impossible',unknown:'Mouvement non évalué'};

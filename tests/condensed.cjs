@@ -22,7 +22,8 @@ const assert=require('node:assert/strict');
  assert.equal(await page.evaluate(()=>answers.latestState),'awake');
  await page.getByRole('button',{name:'Vue détaillée',exact:true}).click();assert.equal(await page.evaluate(()=>answers.needsSuture),false);
  await page.evaluate(()=>{start('horse');compactMode=true;answers={conscious:'awake',horseArea:'arm',horseAreaSide:'left',horseAreaPart:'arm',horsePain:'moderate',horseVisible:'bruise',horseMove:'painful'};stepIndex=7;render();});
- await page.locator('[data-step-index="2"] .condensed-choice select').selectOption('0');
+ await page.locator('[data-step-index="2"] .zone-checks details').evaluate(e=>e.open=true);
+ await page.locator('[data-step-index="2"] .zone-checks input').nth(1).check();
  assert.equal(await page.evaluate(()=>answers.horseMove),undefined);
  for(const id of await page.evaluate(()=>Object.keys(surgeries))){await page.evaluate(id=>{openSurgery(id);compactMode=true;renderSurgery();},id);assert.equal(await page.locator('#surgeryFlow .condensed-step').count(),await page.evaluate(()=>surgeries[currentSurgery].steps.length));layouts.push({id,bottom:await page.locator('#surgeryFlow .condensed-grid').evaluate(e=>e.getBoundingClientRect().bottom)});}
  for(const width of [2560,1920,390,320])for(const theme of ['dark','light']){
@@ -39,8 +40,10 @@ const assert=require('node:assert/strict');
   for(let n=0;n<50;n++){
    if(await page.evaluate(()=>interventionEnded))break;
    const select=page.locator('#flow .is-current .condensed-choice select:not([disabled])');
-   if(await select.count()){const options=await select.locator('option').count();await select.selectOption(String(last?options-2:0));}
-   else await page.locator('#flow .next').click();
+   const zones=page.locator('#flow .is-current .zone-checks input');
+   if(await zones.count()){await zones.nth(last?(await zones.count())-1:0).check();await page.locator('#flow .is-current').getByRole('button',{name:'Valider les zones',exact:true}).click();}
+   else if(await select.count()){const options=await select.locator('option').count();await select.selectOption(String(last?options-2:0));}
+   else await page.locator('#flow>.nav .next').click();
   }
   assert(await page.evaluate(()=>interventionEnded),id);runs++;
  }

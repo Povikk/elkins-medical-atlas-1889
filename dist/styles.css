@@ -1598,3 +1598,17 @@ summary{cursor:pointer;color:var(--ink)}
  .story-filters{display:grid;grid-template-columns:1fr}.story-filters label{min-width:0}
  .care-hook>summary small{display:block;margin:5px 0 0}
 }
+/* Clear multi-location selection without expanding the working surface. */
+.zone-choices .choice[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px currentColor}
+.zone-selection-footer{display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap;margin:6px 0;font-size:.9em}
+.zone-checks{border:0;padding:0;margin:8px 0;display:flex;gap:5px;flex-wrap:wrap;min-width:0}
+.zone-checks legend{font-weight:700;margin-bottom:5px}
+.zone-checks details{width:100%;min-width:0}.zone-checks summary{cursor:pointer;font-size:.9em}
+.zone-check-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.zone-check-list>label{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:.9em}
+.zone-check-list>label:has(input:checked){box-shadow:inset 0 0 0 1px currentColor}
+.zone-checks input{width:16px;height:16px;margin:0}
+.zone-checks .zone-selection-footer{width:100%}
+@media(min-width:1100px){
+ :is(#flow,#surgeryFlow):not(.condensed-workspace) .zone-choices>.choice{flex:0 1 auto;width:auto;max-width:100%;min-height:44px;padding:5px 12px}
+}

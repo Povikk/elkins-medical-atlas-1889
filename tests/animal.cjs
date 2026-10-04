@@ -14,9 +14,11 @@ const assert=require('node:assert/strict');
    if(await p.evaluate(()=>interventionEnded))break;
    assert(await p.locator('.care-memo').isVisible());
    if(compact){const select=p.locator('#flow .is-current .condensed-choice select:not([disabled])');
-    if(await select.count()){const count=await select.locator('option').count();await select.selectOption(String(last?count-2:0));}
-    else await p.locator('#flow .next').click();
-   }else{const choices=p.locator('#flow .choice');if(await choices.count())await choices.nth(last?(await choices.count())-1:0).click();else await p.locator('#flow .next').click();}
+    const zones=p.locator('#flow .is-current .zone-checks input');
+    if(await zones.count()){await zones.nth(last?(await zones.count())-1:0).check();await p.locator('#flow .is-current').getByRole('button',{name:'Valider les zones',exact:true}).click();}
+    else if(await select.count()){const count=await select.locator('option').count();await select.selectOption(String(last?count-2:0));}
+    else await p.locator('#flow>.nav .next').click();
+   }else{const choices=p.locator('#flow .choice');if(await choices.count()){const zone=await p.evaluate(()=>!!zoneKeyForStep(flows[currentFlow].steps[stepIndex]));await choices.nth(last?(await choices.count())-1:0).click();if(zone)await p.getByRole('button',{name:'Valider les zones',exact:true}).click();}else await p.locator('#flow .next').click();}
   }
   assert(await p.evaluate(()=>interventionEnded));assert(await p.locator('#report-findings').isVisible());runs++;
  }
@@ -24,9 +26,10 @@ const assert=require('node:assert/strict');
  for(const compact of [false,true])for(const index of [0,1,3,4,5,6,7]){
   const count=await p.evaluate(({index,baseline})=>{answers={...baseline};return animalChoicesForStep(flows.animal.steps[index]).length;},{index,baseline});
   for(let choice=0;choice<count;choice++){
-   await p.evaluate(({compact,index,baseline})=>{compactMode=compact;start('animal');answers={...baseline};stepIndex=index;render();},{compact,index,baseline});
+   await p.evaluate(({compact,index,baseline})=>{compactMode=compact;start('animal');answers={...baseline};if(index===5){delete answers.animalArea;delete answers.animalSide;}stepIndex=index;render();},{compact,index,baseline});
    const expected=await p.evaluate(({index,choice})=>animalChoicesForStep(flows.animal.steps[index])[choice],{index,choice});
-   if(compact)await p.locator(`[data-step-index="${index}"] .condensed-choice select`).selectOption(String(choice));
+   if(compact&&index===5)await p.locator(`[data-step-index="${index}"] .zone-checks input`).nth(choice).check();
+   else if(compact)await p.locator(`[data-step-index="${index}"] .condensed-choice select`).selectOption(String(choice));
    else await p.locator('#flow .choice').nth(choice).click();
    const found=await p.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,answers[key]])),Object.keys(expected.set));
    assert.deepEqual(found,expected.set);
@@ -61,7 +64,7 @@ const assert=require('node:assert/strict');
  assert.match(await p.locator('.med-item').innerText(),/Laudanum/);assert(!/Morphine/.test(await p.locator('.med-item').innerText()));
  await p.evaluate(()=>{answers.rpPain='strong';render();});assert.equal(await p.locator('.med-item').count(),2);
  await p.evaluate(()=>{answers.rpPain='mild';render();});assert.equal(await p.locator('.med-item').count(),0);
- await p.evaluate(()=>{stepIndex=5;applyChoice(flows.animal.steps[5].choices[1].set);prev();});
+ await p.evaluate(()=>{stepIndex=5;applyChoice(flows.animal.steps[5].choices[1].set);confirmZoneSelection(5);prev();});
  assert.equal(await p.evaluate(()=>answers.animalSide),'left');assert.equal(await p.evaluate(()=>answers.latestState),'awake');
  await p.evaluate(()=>{answers.animalSide='right';answers.animalArea='arm';renderEnd();});assert.match(await p.locator('#report-findings').innerText(),/Bras droit/);
  // Earlier condensed changes discard dependent observations, not current vitals.
