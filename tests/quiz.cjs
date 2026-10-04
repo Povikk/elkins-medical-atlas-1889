@@ -8,6 +8,7 @@ const assert=require('node:assert/strict');
  console.log('Bank audit',audit);assert(audit.count>=400);assert.equal(audit.ids,audit.count);assert.equal(audit.prompts,audit.count);assert.deepEqual(audit.bad,[]);
  assert.equal(await page.evaluate(()=>buildQuizBank().filter(q=>/d’après la fiche|repère de scène est proposé|dans le manuel/i.test(q.prompt)).length),0);
  const cough=await page.evaluate(()=>buildQuizBank().find(q=>q.reference==='Toux'&&q.id.endsWith(':rp')));assert.match(cough.prompt,/patient.*toux/i);assert.match(cough.correct,/depuis quand.*respiration/i);
+ const notes=await page.evaluate(()=>({count:Object.keys(quizItemNotes).length,missing:buildQuizBank().filter(q=>q.group!=='Situations'&&!quizItemNotes[q.reference]).map(q=>q.reference),bad:buildQuizBank().filter(q=>!quizNoteFor(q).text||/[\u2013\u2014]/.test(quizNoteFor(q).text)).map(q=>q.id)}));assert.deepEqual(notes.missing,[]);assert.deepEqual(notes.bad,[]);console.log('Notes coverage',notes.count);
  await page.getByRole('button',{name:'Commencer une série',exact:true}).click();
  assert(await page.locator('#quizNext').isDisabled());
  const firstIds=await page.evaluate(()=>quizSession.questions.map(q=>q.id));
@@ -15,12 +16,13 @@ const assert=require('node:assert/strict');
  for(let i=0;i<10;i++){
   assert.equal(await page.locator('.quiz-option').count(),4);
   const index=await page.evaluate(wrong=>{const q=quizSession.questions[quizSession.index];return q.options.findIndex(x=>wrong?x!==q.correct:x===q.correct);},i===3);
-  await page.locator('.quiz-option').nth(index).click();assert(await page.locator('.quiz-feedback').isVisible());assert.equal(await page.locator('.quiz-correct').count(),1);
+  assert.equal(await page.locator('.quiz-anecdote').count(),0);await page.locator('.quiz-option').nth(index).click();assert(await page.locator('.quiz-feedback').isVisible());assert.equal(await page.locator('.quiz-correct').count(),1);assert.equal(await page.locator('.quiz-anecdote').count(),1);
   assert.equal(await page.locator('.quiz-option:disabled').count(),4);
   if(i===2){await page.locator('[data-shell-view="lexique"]').click();assert(await page.locator('#quiz').isHidden());await page.locator('[data-shell-view="quiz"]').click();assert.equal(await page.evaluate(()=>quizSession.index),2);assert(await page.locator('.quiz-feedback').isVisible());}
   await page.locator('#quizNext').click();
  }
  assert.match(await page.locator('.quiz-results').innerText(),/9 \/ 10/);assert.equal(await page.locator('.quiz-review details').count(),10);
+ assert.equal(await page.locator('.quiz-review .quiz-anecdote').count(),10);
  await page.getByRole('button',{name:'Nouvelle série de 10 questions',exact:true}).click();assert.equal(await page.evaluate(ids=>quizSession.questions.filter(q=>ids.includes(q.id)).length,firstIds),0);
  const distribution=await page.evaluate(()=>{const positions=new Set();for(let i=0;i<100;i++){startQuiz();if(quizSession.questions.length!==10)throw Error('Wrong length');if(new Set(quizSession.questions.map(q=>q.topic)).size!==10)throw Error('Repeated topic');for(const q of quizSession.questions){if(new Set(q.options).size!==4)throw Error('Duplicate option');positions.add(q.options.indexOf(q.correct));}}return [...positions];});assert.equal(distribution.length,4);
  for(const width of [2560,1920,390,320])for(const theme of ['dark','light']){

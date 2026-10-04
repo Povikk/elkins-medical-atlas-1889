@@ -2,6 +2,10 @@
 
 Ajout du 4 octobre 2026. Onglet Quiz dans la navigation principale.
 
+Les corrections comportent maintenant un encadré court : « Petite histoire » avec un lien pour les anecdotes historiques vérifiées, ou « Petit détail à retenir » pour les notes pédagogiques RP. 107 sujets ont une note spécifique ; les situations réutilisent un sujet mentionné ou une astuce de scène. Aucun encadré avant la réponse. Les notes restent accessibles dans la révision finale. Sources et rédaction : `dist/quiz-notes.js`.
+
+Cet ajout ne corrige pas les ambiguïtés éditoriales signalées lors de la relecture précédente. La banque de questions n’est pas refondue par cette modification.
+
 - 544 questions : 340 produits, 62 techniques, 42 matériel, 40 observations et 60 situations. Les questions de reconnaissance inversée utilisent uniquement des descriptions distinctes, sans le nom du produit dans l’indice.
 - 10 questions par série : 4 produits, 2 techniques, 2 situations, 1 matériel et 1 observation.
 - Questions et réponses mélangées. Pas de même sujet deux fois dans une série ; les questions de la série précédente sont évitées.

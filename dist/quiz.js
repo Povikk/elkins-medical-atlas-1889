@@ -31,7 +31,8 @@ function nextQuiz(){
  renderQuiz();focusQuizHeading();
 }
 function focusQuizHeading(){document.querySelector('#quiz .quiz-heading')?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'auto'});}
-function renderQuiz(){
+function renderQuiz(){renderQuizContent();renderQuizAnecdotes();}
+function renderQuizContent(){
  const root=document.getElementById('quiz');
  const header='<div class="topbar"><div><h2>Quiz RP · 1889</h2><p class="muted">Pour retenir les repères de l’Atlas, pas pour apprendre des soins réels.</p></div><button type="button" class="secondary" onclick="goHome()">Accueil</button></div>';
  if(!quizSession){
