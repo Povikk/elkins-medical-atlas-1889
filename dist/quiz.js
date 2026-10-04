@@ -31,10 +31,15 @@ function nextQuiz(){
  renderQuiz();focusQuizHeading();
 }
 function focusQuizHeading(){document.querySelector('#quiz .quiz-heading')?.focus({preventScroll:true});window.scrollTo({top:0,behavior:'auto'});}
-function renderQuiz(){renderQuizContent();renderQuizAnecdotes();}
+function renderQuiz(){
+ renderQuizContent();renderQuizAnecdotes();
+ const root=document.getElementById('quiz'),walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+ let node;while((node=walker.nextNode())){const original=node.textContent;if(!original.trim())continue;node.textContent=(/^\s/.test(original)?' ':'')+quizClinicalText(original)+(/\s$/.test(original)?' ':'');}
+ root.setAttribute('aria-label','Quiz médical historique');
+}
 function renderQuizContent(){
  const root=document.getElementById('quiz');
- const header='<div class="topbar"><div><h2>Quiz RP · 1889</h2><p class="muted">Pour retenir les repères de l’Atlas, pas pour apprendre des soins réels.</p></div><button type="button" class="secondary" onclick="goHome()">Accueil</button></div>';
+ const header='<div class="topbar"><div><h2>Quiz médical · 1889</h2><p class="muted">Entraînement historique, pas une formation aux soins réels.</p></div><button type="button" class="secondary" onclick="goHome()">Accueil</button></div>';
  if(!quizSession){
   root.innerHTML=header+`<div class="quiz-workspace"><div class="section quiz-start"><span class="eyebrow">S’ENTRAÎNER HORS SCÈNE</span><h3 class="quiz-heading" tabindex="-1">10 questions, à ton rythme</h3><p>${buildQuizBank().length} questions disponibles, tirées des fiches et des parcours de l’Atlas.</p><div class="quiz-themes"><span>Produits et applications</span><span>Techniques</span><span>Matériel</span><span>Observations</span><span>Situations RP</span></div><p>Une réponse par question, puis une correction expliquée. Chaque série mélange les thèmes et les propositions.</p><button type="button" class="primary" onclick="startQuiz()">Commencer une série</button><p class="muted quiz-note">Sans chronomètre. Aucun résultat enregistré. Tu peux quitter l’onglet et reprendre ta série tant que la page reste ouverte.</p></div></div>`;return;
  }

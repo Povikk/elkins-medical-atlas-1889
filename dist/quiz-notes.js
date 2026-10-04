@@ -133,12 +133,12 @@ function quizNoteFor(question){
   key=Object.keys(quizItemNotes).sort((a,b)=>b.length-a.length).find(name=>text.toLocaleLowerCase('fr').includes(name.toLocaleLowerCase('fr')));
  }
  const row=quizItemNotes[key];
- if(row)return {text:row[0],source:row[1]?quizNoteSources[row[1]]:null,title:row[1]?'Petite histoire':'Petit détail à retenir'};
- return {title:'Astuce de scène',text:'Une bonne question laisse au patient une réponse à jouer. Décrire un geste ou demander ce qui change donne souvent plus de rythme que d’annoncer immédiatement un résultat.',source:null};
+ if(row)return {text:quizClinicalText(row[0]),source:row[1]?quizNoteSources[row[1]]:null,title:row[1]?'Petite histoire':'Petit détail à retenir'};
+ return {title:'Détail à retenir',text:'Demander au patient ce qui a changé permet de compléter l’observation. Un soin réalisé ne suffit pas, à lui seul, à confirmer une amélioration.',source:null};
 }
 function quizNoteMarkup(question){
  const note=quizNoteFor(question);
- return `<aside class="quiz-anecdote"><b>${quizEscape(note.title)}</b><p>${quizEscape(note.text)}</p>${note.source?`<a href="${quizEscape(note.source[1])}" target="_blank" rel="noopener noreferrer">Source : ${quizEscape(note.source[0])}</a>`:'<small>Repère pédagogique RP, pas une consigne de soin réel.</small>'}</aside>`;
+ return `<aside class="quiz-anecdote"><b>${quizEscape(note.title)}</b><p>${quizEscape(note.text)}</p>${note.source?`<a href="${quizEscape(note.source[1])}" target="_blank" rel="noopener noreferrer">Source : ${quizEscape(note.source[0])}</a>`:'<small>Entraînement historique, pas une consigne de soin réel.</small>'}</aside>`;
 }
 function renderQuizAnecdotes(){
  if(!quizSession)return;

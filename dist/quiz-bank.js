@@ -87,21 +87,21 @@ const quizObservationScenes={
 };
 function quizScenePrompt(group,field,name,description){
  if(group==='Produits')return ({
-  form:`Tu prépares « ${name} » pour une scène de soin en 1889. Sous quelle forme le présentes-tu ?`,
-  admin:`Tu dois jouer l’utilisation de « ${name} ». Quelle voie d’application correspond à cette préparation ?`,
-  use:`Tu disposes de « ${name} » dans ta pharmacie de 1889. Dans quel contexte de soin RP l’utiliserais-tu ?`,
+  form:`Tu prépares « ${name} » pour un soin en 1889. Sous quelle forme se présente ce produit ?`,
+  admin:`Tu dois utiliser « ${name} ». Quelle voie d’administration correspond à cette préparation ?`,
+  use:`Tu disposes de « ${name} » dans ta pharmacie de 1889. À quel usage ce produit est-il destiné ?`,
   warning:`Tu envisages « ${name} » pendant un soin. Quelle précaution dois-tu garder en tête ?`,
   sensory:`Tu utilises « ${name} » et veux décrire ce que le patient pourrait percevoir. Quel détail convient, sans le garantir ?`,
-  composition:`Le patient te demande ce que contient « ${name} ». Quelle explication peux-tu lui donner en scène ?`
+  composition:`Le patient te demande ce que contient « ${name} ». Quelle explication lui donnes-tu ?`
  })[field];
  if(group==='Techniques')return ({
-  form:`Tu vas jouer le geste « ${name} ». Quel matériel demandes-tu à ton assistant ?`,
-  admin:`Tu dois jouer « ${name} ». Comment décris-tu ton geste au patient ou à ton assistant ?`,
-  use:`Pendant une consultation, tu envisages « ${name} ». Dans quelle situation ce geste a-t-il sa place ?`,
-  warning:`Tu joues « ${name} ». Quelle limite évites-tu de dépasser dans la scène ?`
+  form:`${quizTechniqueActions[name]} Quel matériel demandes-tu à ton assistant ?`,
+  admin:`${quizTechniqueActions[name]} Quelle action correspond à ce soin ?`,
+  use:`Tu envisages le soin suivant : « ${name} ». Dans quelle situation est-il indiqué dans la médecine de l’époque ?`,
+  warning:`${quizTechniqueActions[name]} Quelle précaution dois-tu respecter ?`
  })[field];
  if(group==='Matériel')return field==='desc'?`Ton assistant cherche l’objet suivant : ${description} Quel matériel lui demandes-tu ?`:`Tu as « ${name} » dans ton sac de médecin. Dans quel moment du soin l’utiliserais-tu ?`;
- return field==='desc'?`Pendant ton examen RP, tu constates ceci : ${description} Comment nommes-tu cette observation ?`:quizObservationScenes[name]?.[0]||`Le patient présente « ${name} ». Que vérifies-tu pour poursuivre le soin ?`;
+ return field==='desc'?`Tu examines le patient : ${quizClinicalText(description)} Quel terme correspond à ce signe ?`:quizObservationScenes[name]?.[0]||`Le patient présente « ${name} ». Que vérifies-tu pour poursuivre le soin ?`;
 }
 
 let quizBankCache = null;
@@ -170,5 +170,5 @@ function buildQuizBank(){
    bank.push({id:'Produits:'+index+':recognize-'+field,topic:'Produits:'+index,group:'Produits',prompt:scene,correct:clean(item.name),pool:others.map(other=>clean(other.name)),explanation:`Il s’agit de ${clean(item.name)}. ${clean(item.use)} ${clean(item.warning)}`,reference:clean(item.name)});
   });
  });
- quizBankCache=bank;return bank;
+ quizBankCache=bank.map(normalizeQuizQuestion);return quizBankCache;
 }
