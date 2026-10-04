@@ -23,6 +23,7 @@ function sceneMaterialMarkup(kind){
   const surgery=kind==='surgery';
   const step=surgery?surgeries[currentSurgery].steps[surgeryStepIndex]:flows[currentFlow].steps[stepIndex];
   let probable=[...((surgery?surgeryMaterials[currentSurgery]:interventionMaterials[currentFlow]) || [])];
+  if(surgery&&additionalSurgeries[currentSurgery])probable=[...new Set(surgeries[currentSurgery].steps.flatMap(stage=>stage.care?.material||[]))];
   if(!surgery){
     if(answers.needsSuture===false || answers.needsSuture==='avoid')probable=probable.filter(x=>!/suture/i.test(x));
     if(answers.bullet && answers.bullet!=='in')probable=probable.filter(x=>!/forceps/i.test(x));
@@ -78,6 +79,7 @@ const surgeryEndings={
   trepanation:['La fin du geste ne garantit ni réveil ni amélioration.','« Nous allons continuer à observer ses réactions et sa respiration. »','Surveillance prolongée de la conscience et de l’évolution jouée, même après un réveil.','Confusion, somnolence, vomissements, respiration ou réactions qui changent.'],
   infected_wound:['Reprendre le nettoyage et le drainage réellement joués ; ne pas annoncer l’infection guérie.','« Le soin ne termine pas la surveillance de cette plaie. Je veux la revoir dans la scène. »','Prévoir une inspection et le renouvellement du pansement selon le RP.','Fièvre, douleur croissante, rougeur qui s’étend ou nouvel écoulement.']
 };
+Object.entries(additionalSurgeries).forEach(([id,entry])=>surgeryEndings[id]=entry.ending);
 function endingMarkup(kind){
   const surgery=kind==='surgery';
   const entry=surgery ? surgeries[currentSurgery] : flows[currentFlow];

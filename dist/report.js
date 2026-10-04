@@ -27,6 +27,7 @@ function reportFindings(kind){
  return [...new Set(result)].join(' ; ')+'.';
 }
 function reportSuggestedCare(kind){
+ if(kind==='surgery'&&surgeries[currentSurgery].reportCare)return surgeries[currentSurgery].reportCare+' Gestes à confirmer selon ce qui a été effectué. Si une suture a été réalisée : contrôle de la plaie et du pansement dans 24 h ; retrait des points selon la cicatrisation, pas automatiquement à 24 h.';
  if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle. Si une suture a été effectuée : repasser dans 24 h pour contrôler la plaie et le pansement ; retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h.';
  const id=currentFlow,items=[];
  const unsafe=careProductBlocked();

@@ -95,6 +95,7 @@ function rpDialogue(items){
    const action=activeStepTitle.toLowerCase();
    const instruction=/saign|ligatur/.test(action)?'Gardez la pression sur la zone pendant que je contrôle le saignement.':/panser|fermer|sutur/.test(action)?'Gardez les compresses prêtes pendant que je protège la plaie.':'Surveillez sa respiration et prévenez-moi si son état change.';
    pool=assistant?[`« Je vais ${stepAction}. ${instruction} »`,`« Dites-moi si sa respiration ou ses réactions changent pendant ce geste. »`,`« Préparez ce dont j’ai besoin pour ${stepAction} ; je garde le patient sous observation. »`,`« Avant de poursuivre cette étape, faisons le point : répond-il à la voix ? »`]:[`« Pour ${stepAction}, j’ai besoin de renfort afin de garder ce patient sous surveillance. »`,`« Je suspends le geste : sa respiration et ses réactions passent en premier. »`,`« Que quelqu’un reste auprès du patient pendant que je prépare la suite. »`,`« Je ne poursuis pas cette étape sans pouvoir assurer sa surveillance. »`];
+  if(assistant&&activeRouteKind==='surgery'&&additionalSurgeries[currentSurgery])pool=[...(items||[]).filter(text=>/^À l’assistant/.test(text)),...pool];
  }else if(state==='confused'){
    audience='Au patient, phrases courtes';
    pool=[`« Je suis le médecin. Je vais ${stepAction}. »`,'« Pouvez-vous me regarder et me dire votre nom ? »','« Vous n’avez pas besoin de tout raconter maintenant. Une réponse courte suffit. »',`« Je vous préviens avant le prochain geste. Dites-moi si vous avez mal. »`,alternative];

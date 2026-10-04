@@ -216,6 +216,12 @@
           <strong> Plaie gravement infectée</strong>
           <span class="muted">Tissus abîmés, infection profonde, nettoyage chirurgical</span>
         </button>
+        <button class="case" onclick="openSurgery('open_fracture')"><strong>Fracture ouverte / membre écrasé</strong><span class="muted">Évaluer la conservation du membre, protéger et soutenir</span></button>
+        <button class="case" onclick="openSurgery('complex_wound')"><strong>Plaie complexe / déchirure importante</strong><span class="muted">Morsure profonde, tissus abîmés, fermeture à évaluer</span></button>
+        <button class="case" onclick="openSurgery('deep_abscess')"><strong>Abcès profond</strong><span class="muted">Collection suspectée, avis chirurgical et drainage si indiqué</span></button>
+        <button class="case" onclick="openSurgery('strangulated_hernia')"><strong>Hernie étranglée</strong><span class="muted">Urgence abdominale nécessitant une évaluation spécialisée</span></button>
+        <button class="case" onclick="openSurgery('empyema')"><strong>Empyème / collection pleurale</strong><span class="muted">Infection autour du poumon, drainage spécialisé si indiqué</span></button>
+        <button class="case" onclick="openSurgery('appendicitis')"><strong>Appendicite / abcès appendiculaire</strong><span class="muted">Chirurgie abdominale exceptionnelle en 1889</span></button>
       </div>
       <div class="section" style="margin-top:16px">
         <h3>Quand utiliser cette section ?</h3>
@@ -286,6 +292,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="surgery-extra.js"></script>
 <script src="pharmacy.js"></script>
 <script src="atlas-labels.js"></script>
 <script src="lexicon-extra.js"></script>

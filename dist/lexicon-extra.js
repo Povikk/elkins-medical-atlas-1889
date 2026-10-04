@@ -54,7 +54,7 @@ function casePhrase(){
 // A narrative pause, not a medical timer. Opioid analgesia is not general anesthesia.
 Object.entries(surgeries).forEach(([id,surgery])=>{
  if(!surgery.steps.some(step=>step.meds?.some(row=>/chloroforme|éther/i.test(row[0]))))return;
- const focus={amputation:'le pansement du membre opéré',deep_bullet:'la plaie explorée',abdominal:'le pansement abdominal',trepanation:'le pansement du crâne'}[id];
+ const focus=surgery.recoveryFocus||{amputation:'le pansement du membre opéré',deep_bullet:'la plaie explorée',abdominal:'le pansement abdominal',trepanation:'le pansement du crâne'}[id]||'la zone soignée';
  surgery.steps.push({title:'Surveiller et attendre le réveil joué',recovery:true,do:[
  'Suspendre la suite de la scène et laisser le joueur jouer un réveil progressif, sans délai médical garanti.',
  'Garder un assistant auprès du patient pour observer respiration, réactions et '+focus+'.',
