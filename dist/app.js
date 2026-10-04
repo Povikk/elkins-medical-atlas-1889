@@ -748,7 +748,7 @@ function render(capture=false){
   if(!capture)rpPhraseBlocks=[];
   activeRouteKind = "flow";
   const flow = flows[currentFlow];
-  const step = flow.steps[stepIndex];
+  const step = currentFlow==='hoof'?hoofCareStep(flow.steps[stepIndex]):flow.steps[stepIndex];
   activeStepTitle = step.title;
   const route=visibleFlowSteps();
   const position=route.findIndex(item=>item.index===stepIndex)+1;

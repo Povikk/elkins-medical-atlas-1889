@@ -7,6 +7,7 @@ function reportFindings(kind){
  const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
  const options=route.steps.flatMap(s=>!surgery&&currentFlow==='animal'?animalChoicesForStep(s):s.choices||[]);
  keys.push('animalSpecies','animalInjury','animalArea','animalBleeding','animalDepth','animalVenomSigns','animalExposure');
+ keys.push('hoofArea','hoofSigns');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
@@ -30,6 +31,7 @@ function reportSuggestedCare(kind){
  if(kind==='surgery'&&surgeries[currentSurgery].reportCare)return surgeries[currentSurgery].reportCare+' Gestes à confirmer selon ce qui a été effectué. Si une suture a été réalisée : contrôle de la plaie et du pansement dans 24 h ; retrait des points selon la cicatrisation, pas automatiquement à 24 h.';
  if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle. Si une suture a été effectuée : repasser dans 24 h pour contrôler la plaie et le pansement ; retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h.';
  const id=currentFlow,items=[];
+ if(id==='hoof')return 'Réévaluation de chaque zone frappée ; '+(answers.hoofSigns==='wound'?'nettoyage et protection des plaies accessibles si effectués ; ':answers.hoofSigns==='function'?'soutien / immobilisation si effectué ; ':answers.hoofSigns==='bruise'?'repos de la zone contuse ; soin local si approprié ; ':'soins à préciser selon les constatations ; ')+(['head','chest','abdomen','back'].some(zone=>zoneHas('hoofArea',zone))||['danger','unknown'].includes(answers.hoofSigns)?'avis / surveillance rapprochée selon l’état ; ':'')+'surveillance ; contrôle selon l’évolution. Gestes à confirmer, pas automatiquement effectués.';
  const unsafe=careProductBlocked();
  if(['gunshot','knife','minor'].includes(id)){
   if(id!=='minor')items.push('Contrôle du saignement si nécessaire');

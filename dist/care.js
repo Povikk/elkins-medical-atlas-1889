@@ -10,6 +10,7 @@ function careProductBlocked(){
  return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(breathing) || bleeding==='major' || animalIncomplete;
 }
 function careUrgency(base){
+ if(currentFlow==='hoof'&&answers.hoofSigns==='danger')return 'critical';
  if(currentFlow==='animal'&&animalIsVenom()&&answers.animalVenomSigns==='danger')return 'critical';
  const state=answers.latestState || answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:'');
  const breathing=answers.latestBreathing || answers.breathing || answers.unknownBreathing;
@@ -29,6 +30,10 @@ function compactActions(title,items){
 }
 function careStepExtras(step){
  const links=[];
+ if(currentFlow==='hoof'){
+  if(zoneHas('hoofArea','head'))links.push(['head','Traumatisme crânien : réévaluation']);
+  if(answers.hoofSigns==='function')links.push(['fracture','Membre : évaluation et immobilisation si justifiées']);
+ }
  if(currentFlow==='animal'&&step.dynamicAnimal){
   if(zoneHas('animalArea','head'))links.push(['head','Réévaluer le traumatisme crânien, si présent']);
   if((answers.latestBleeding||answers.animalBleeding)==='major')links.push(['surgery:major_bleeding','Saignement majeur : avis chirurgical si justifié']);
