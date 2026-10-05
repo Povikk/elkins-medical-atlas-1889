@@ -25,6 +25,7 @@ function routeSupplyPlan(step,kind){
  const id=currentFlow,index=stepIndex;
  if(step.dynamicConscious||step.dynamicUnknownBreathing||step.dynamicBreathing||step.dynamicHead||step.dynamicPoison)return {rows:[],note:'Priorités vitales : aucun produit ne remplace la surveillance, le renfort ou le soutien respiratoire.',material:['Couverture / linge propre selon besoin']};
  if(id==='hoof'&&step.dynamicHoof){
+  if(answers.hoofSigns==='bruise')return {rows:careProductBlocked()||zoneHas('hoofArea','unknown')?[['Préparation à l’arnica','Option pour le bleu sur peau intacte, différée jusqu’à évaluation rassurante ; pas dans une plaie.']]:[],note:'Le soin du bleu ne traite pas une éventuelle lésion interne ; réévaluer chaque zone frappée.'};
   if(answers.hoofSigns==='wound'&&!careProductBlocked())return {rows:woundSupplyRows,material:['Compresses','Pansement'],note:'Plaie profonde ou souillée : avis avant fermeture ; pas d’arnica dans la plaie.'};
   if(answers.hoofSigns==='function')return {rows:[['Attelle ou écharpe','Soutien adapté sans forcer la position ; bandage rembourré.']],note:'Aucun baume ne répare une fracture ; soulagement seulement après évaluation.'};
   return {rows:[],note:'Soin local seulement après examen rassurant ; pas de produit automatique sur une zone inconnue ou inquiétante.'};

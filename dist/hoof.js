@@ -13,7 +13,7 @@ function hoofCareStep(step){
  if(!step.dynamicHoof)return step;
  const sensitive=['head','chest','abdomen','back'].some(zone=>zoneHas('hoofArea',zone));
  const danger=answers.hoofSigns==='danger'||careProductBlocked();
- const simpleBruise=answers.hoofSigns==='bruise'&&!sensitive&&!danger&&!zoneHas('hoofArea','unknown');
+ const simpleBruise=answers.hoofSigns==='bruise'&&!danger&&!zoneHas('hoofArea','unknown');
  let say=step.say,med=[],material=[];
  let actions=sensitive?['Tête, thorax, abdomen ou dos : surveiller réactions, souffle et douleur ; demander un avis adapté même si les marques sont discrètes.','Ne pas forcer les mouvements ni entreprendre une chirurgie sur la seule localisation.']:['Protéger et soutenir les zones douloureuses sans tester de force leur mobilité.'];
  if(danger)actions=['Suspendre les gestes non prioritaires ; réévaluer conscience, souffle et saignement.','Organiser du renfort et une prise en charge adaptée ; ne pas attendre le récit complet du patient.'];
@@ -27,10 +27,16 @@ function hoofCareStep(step){
  }
  else if(answers.hoofSigns==='unknown')actions.push('Compléter les observations ; inconnu ne signifie pas blessure légère.');
  actions.push('Examiner chaque zone séparément ; un choix ne décrit pas automatiquement toutes les blessures.');
+ if(answers.hoofSigns==='bruise'&&!simpleBruise){
+  actions.push('Soin du bleu : baume à l’arnica envisageable seulement sur peau intacte ; soin local différé tant que l’état ou la zone restent à évaluer.');
+ }
+ if(answers.hoofSigns==='bruise'&&sensitive){
+  actions.push('Le baume concerne uniquement le bleu superficiel ; il ne traite ni n’écarte une lésion interne. Pas d’application près des yeux ou sur les muqueuses.');
+ }
  if(danger)say=['« Nous nous occupons d’abord de votre état. Ne vous relevez pas ; je fais venir de l’aide. »'];
  else if(answers.hoofSigns==='wound'){material=['Compresses','Pansement'];say=['« Je vais nettoyer et protéger cette plaie. Pas de baume à l’intérieur. »'];}
  else if(answers.hoofSigns==='function'){material=['Attelle ou écharpe','Tissu rembourré'];say=['« Je vais soutenir ce membre sans le forcer. Nous devons examiner cette difficulté à le bouger. »'];}
- else if(sensitive)say=['« Même si la marque est petite, nous devons surveiller ce coup. Prévenez-moi si votre souffle ou votre douleur change. »'];
+ else if(sensitive)say=[...say,'« Le soin du bleu ne suffit pas à évaluer ce coup. Nous devons continuer à surveiller votre état. »'];
  return {...step,do:actions,say,med,care:{material}};
 }
 sceneEndings.hoof=['Reprendre les zones frappées et les signes réellement constatés, sans conclure à une simple contusion par défaut.','« Nous gardons les zones frappées sous observation ; prévenez-moi de tout changement. »','Repos et protection selon les soins effectués ; contrôle convenu, surveillance prolongée si état incertain.','Malaise, confusion, souffle difficile, douleur croissante, ventre tendu ou perte de fonction.'];
