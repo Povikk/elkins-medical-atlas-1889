@@ -1,0 +1,14 @@
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+let saved=null,accept=true;const elements=new Map();
+const context=vm.createContext({localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v},document:{getElementById:id=>{if(!elements.has(id))elements.set(id,{checked:true});return elements.get(id);},addEventListener(){}},window:{addEventListener(){}},confirm:()=>accept});
+vm.runInContext(fs.readFileSync('dist/cabinet.js','utf8'),context);
+const run=code=>vm.runInContext(code,context),state=()=>JSON.parse(saved);
+run("addCabinetItem('syringes')");assert.equal(saved,null);
+run("addCabinetItem('combo')");assert.deepEqual(state(),{kits:1,syringes:1,combos:1,personalCents:150});
+run("addCabinetItem('kits')");assert.equal(state().personalCents,250);
+run("addCabinetItem('kits')");assert.equal(state().personalCents,350);assert.equal(state().kits+state().syringes,4);
+accept=false;run('resetCabinetCounter()');assert.equal(state().kits,3);
+accept=true;run('resetCabinetCounter()');assert.deepEqual(state(),{kits:0,syringes:0,combos:0,personalCents:350});
+run("addCabinetItem('combo');resetPersonalCounter()");assert.deepEqual(state(),{kits:1,syringes:1,combos:1,personalCents:0});
+saved=JSON.stringify({kits:2,syringes:1,personalCents:500});run("addCabinetItem('kits')");assert.deepEqual(state(),{kits:3,syringes:1,combos:0,personalCents:600});
+console.log('Two fixed prices, independent resets and legacy totals passed.');
