@@ -13,6 +13,10 @@ function sceneToolbar(kind){
   </div>`;
 }
 function shouldSkipStep(step){
+  if(step.recoveryCheck){
+   const initial=answers.conscious||answers.headState||answers.poisonState||answers.breathing;
+   if(['awake','yes'].includes(initial))return true;
+  }
   if(currentFlow==='minor'&&answers.minorIssue&&answers.minorIssue!=='wound'&&(step.dynamicSuture||step.title==='Faut-il refermer ?'))return true;
   if(currentFlow==='gunshot' && answers.bullet==='graze' && (step.dynamicSuture || step.title==='La plaie peut-elle être suturée ?')) return true;
   if(step.dynamicSuture && answers.needsSuture === false) return true;

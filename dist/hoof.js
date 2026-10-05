@@ -20,10 +20,10 @@ function hoofCareStep(step){
  else if(answers.hoofSigns==='wound')actions.push('Nettoyer une plaie accessible si adapté, puis la protéger ; plaie profonde ou souillée : avis, sans fermeture automatique.');
  else if(answers.hoofSigns==='function')actions.push('Soutenir le membre, contrôler sensibilité et circulation décrites ; orienter pour suspicion de fracture ou atteinte profonde.');
  else if(simpleBruise){
-  actions.push('Contusion simple : laisser le membre au repos, proposer un linge frais et un baume à l’arnica facultatif sur peau intacte uniquement.','Ne pas déposer de baume dans une coupure ; arrêter si la peau réagit.');
-  med=[['Préparation à l’arnica','Baume / pommade semi-solide','Application locale sur peau intacte uniquement','Soin local facultatif d’un bleu ; ne remplace pas la réévaluation']];
-  material=['Linge frais','Baume à l’arnica, si utilisé'];
-  say=['« Je vais poser un linge frais sur le bleu. Gardez ce membre au repos. »','« Si nous utilisons le baume, je l’appliquerai seulement là où la peau est intacte. Dites-moi si cela vous irrite. »'];
+  actions.push('Contusion simple : mettre la zone au repos, poser un linge frais et appliquer le baume à l’arnica sur le bleu, sur peau intacte uniquement.','Ne pas déposer de baume dans une coupure ; arrêter si la peau réagit.');
+  med=[['Préparation à l’arnica','Baume / pommade semi-solide','Application locale sur peau intacte uniquement','Soin local du bleu ; ne remplace pas la réévaluation']];
+  material=['Linge frais','Baume à l’arnica'];
+  say=['« Je vais poser un linge frais sur le bleu. Gardez cette zone au repos. »','« J’applique le baume sur le bleu, uniquement sur la peau intacte. Dites-moi si cela vous irrite. »'];
  }
  else if(answers.hoofSigns==='unknown')actions.push('Compléter les observations ; inconnu ne signifie pas blessure légère.');
  actions.push('Examiner chaque zone séparément ; un choix ne décrit pas automatiquement toutes les blessures.');

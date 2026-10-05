@@ -10,7 +10,11 @@ function reportFindings(kind){
  keys.push('hoofArea','hoofSigns','minorIssue');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
-  if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
+  if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState){
+   const initial=options.find(c=>Object.hasOwn(c.set,key)&&c.set[key]===answers[key]);
+   if(initial)result.push('À l’arrivée : '+initial.label);
+   continue;
+  }
   if(['breathing','unknownBreathing'].includes(key)&&answers.latestBreathing)continue;
   if(['unknownBleeding','animalBleeding'].includes(key)&&answers.latestBleeding)continue;
   const choice=options.find(c=>Object.hasOwn(c.set,key)&&Object.entries(c.set).every(([k,v])=>answers[k]===v));
@@ -31,10 +35,14 @@ function reportSuggestedCare(kind){
  if(kind==='surgery'&&surgeries[currentSurgery].reportCare)return surgeries[currentSurgery].reportCare+' Gestes à confirmer selon ce qui a été effectué. Si une suture a été réalisée : contrôle de la plaie et du pansement dans 24 h ; retrait des points selon la cicatrisation, pas automatiquement à 24 h.';
  if(kind==='surgery')return 'Acte chirurgical du parcours si justifié ; pansement ; surveillance ; repos ; contrôle. Si une suture a été effectuée : repasser dans 24 h pour contrôler la plaie et le pansement ; retrait des points à prévoir selon la cicatrisation, pas automatiquement à 24 h.';
  const id=currentFlow,items=[];
- if(id==='hoof')return 'Réévaluation de chaque zone frappée ; '+(answers.hoofSigns==='wound'?'nettoyage et protection des plaies accessibles si effectués ; ':answers.hoofSigns==='function'?'soutien / immobilisation si effectué ; ':answers.hoofSigns==='bruise'?'repos de la zone contuse ; soin local si approprié ; ':'soins à préciser selon les constatations ; ')+(['head','chest','abdomen','back'].some(zone=>zoneHas('hoofArea',zone))||['danger','unknown'].includes(answers.hoofSigns)?'avis / surveillance rapprochée selon l’état ; ':'')+'surveillance ; contrôle selon l’évolution. Gestes à confirmer, pas automatiquement effectués.';
+ if(id==='hoof'){
+  const deferred=careProductBlocked()||zoneHas('hoofArea','unknown');
+  const local=answers.hoofSigns==='wound'?'nettoyage et protection des plaies accessibles si effectués ; ':answers.hoofSigns==='function'?'soutien / immobilisation si effectué ; ':answers.hoofSigns==='bruise'?(deferred?'repos de la zone contuse ; application de baume à l’arnica sur peau intacte différée jusqu’à évaluation rassurante ; ':'repos de la zone contuse ; linge frais ; application de baume à l’arnica sur le bleu, sur peau intacte uniquement ; '):'soins à préciser selon les constatations ; ';
+  return 'Réévaluation de chaque zone frappée ; '+local+(['head','chest','abdomen','back'].some(zone=>zoneHas('hoofArea',zone))||['danger','unknown'].includes(answers.hoofSigns)?'avis / surveillance rapprochée selon l’état ; ':'')+'surveillance ; contrôle selon l’évolution. Gestes à confirmer, pas automatiquement effectués.';
+ }
  const unsafe=careProductBlocked();
  if(['gunshot','knife','minor'].includes(id)){
-  if(id==='minor'&&answers.minorIssue!=='wound')return (answers.minorIssue==='bruise'?'Repos ; linge frais ; arnica sur peau intacte uniquement si utilisée':answers.minorIssue==='irritation'?'Protection de la peau intacte ; limiter les frottements ; onguent adapté si utilisé':'Soin à préciser après examen')+' ; surveillance et contrôle selon évolution. Gestes à confirmer, pas automatiquement effectués.';
+  if(id==='minor'&&answers.minorIssue!=='wound')return (answers.minorIssue==='bruise'?'Repos ; linge frais ; application de baume à l’arnica sur le bleu, sur peau intacte uniquement (différée si état inquiétant)':answers.minorIssue==='irritation'?'Protection de la peau intacte ; limiter les frottements ; onguent adapté si utilisé':'Soin à préciser après examen')+' ; surveillance et contrôle selon évolution. Gestes à confirmer, pas automatiquement effectués.';
   if(id!=='minor')items.push('Contrôle du saignement si nécessaire');
   items.push('Nettoyage de la plaie','Pansement');
   if(id==='gunshot'&&zoneSelections('gunArea').some(c=>c.shot?.type==='pellets'))items.push('Évaluation de chaque zone de grenaille, sans recherche ni extraction systématique des plombs');
@@ -45,20 +53,21 @@ function reportSuggestedCare(kind){
   if(animalIsVenom())return 'Protection simple ; calme et limitation des efforts ; surveillance continue ; prise en charge urgente / transport ; aucun sérum antivenimeux proposé en 1889. Gestes à confirmer, pas des soins automatiquement effectués.';
   items.push('Contrôle du saignement si nécessaire');
   if(animalHasWound())items.push('Nettoyage adapté des plaies accessibles','Protection / pansement','Pas de fermeture automatique');
-  else items.push('Évaluation du choc et de la fonction','Repos / soutien selon les signes','Pas de soin de plaie sans plaie observée');
+  else items.push('Évaluation du choc et de la fonction','Repos / soutien selon les signes','Pas de soin de plaie sans plaie observée',unsafe?'Arnica différée jusqu’à réévaluation':'Application d’arnica si un bleu est constaté sur peau intacte');
   if(answers.animalDepth==='crush')items.push('Soutien du membre si atteint');
   if(animalNeedsAssessment())items.push('Évaluation spécialisée de la blessure');
   if(animalProfile().family!=='reptile'&&animalHasWound())items.push('Évaluation du risque de rage selon animal et circonstances');
   items.push('Contrôle rapproché');
  }else if(id==='fracture')items.push('Soutien et immobilisation du membre','Pansement si plaie');
  else if(id==='horse'){
+  if(answers.horseVisible==='bruise')items.push(unsafe?'Application d’arnica sur le bleu différée jusqu’à réévaluation':'Application de baume à l’arnica sur le bleu, sur peau intacte uniquement');
   if(answers.horseVisible==='wound')items.push('Nettoyage','Pansement');
   if(answers.horseVisible==='deformity'||['limited','none'].includes(answers.horseMove))items.push('Soutien / immobilisation','Réévaluation du membre');
   else items.push('Repos de la zone douloureuse','Réévaluation avant mobilisation');
- }else if(id==='fight')items.push(answers.fightIssue==='cut'?'Nettoyage et pansement':'Soin local si pertinent','Réévaluation si tête ou côtes');
+ }else if(id==='fight')items.push(answers.fightIssue==='cut'?'Nettoyage et pansement':answers.fightIssue==='bruise'?(unsafe?'Arnica sur le bleu différée jusqu’à réévaluation':'Application de baume à l’arnica sur le bleu, sur peau intacte uniquement'):'Soin local selon les constatations','Réévaluation si tête ou côtes');
  else if(id==='burn')items.push('Protection de la brûlure','Surveillance du souffle si fumée / visage');
  else if(id==='drowning')items.push('Priorité respiratoire','Réchauffement','Surveillance');
- else if(id==='head')items.push('Calme','Surveillance de la conscience');
+ else if(id==='head')items.push('Calme','Surveillance de la conscience',unsafe?'Soin local différé jusqu’à réévaluation':'Application d’arnica si bosse / bleu constaté sur peau intacte, loin des yeux ; jamais dans une plaie');
  else if(id==='poison')items.push('Identifier le produit si possible','Surveillance respiratoire','Pas de remède automatique');
  else if(id==='unknown')items.push('Réévaluation de la conscience, du souffle et du saignement','Recherche de la cause après les priorités');
  else items.push('Soins selon les signes décrits','Contrôle de l’évolution');
