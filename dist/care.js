@@ -222,6 +222,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function finalizeCareLayout(root){
+ const supplies=root.querySelector(':scope > .route-supplies'),navigation=root.querySelector(':scope > .nav');
+ if(supplies&&navigation)navigation.before(supplies);
  // Keep the first actions, gestures and speech together before choices and optional detail.
  const gesture=root.querySelector(':scope > .rp-gesture'),dialogue=root.querySelector(':scope > .rp-dialogue');
  const action=[...root.querySelectorAll(':scope > .section')].find(s=>s.querySelector('ul')&&!s.querySelector('.med-item,.compact-med')&&!s.querySelector('.choices')&&!/Matériel/.test(s.querySelector('h3')?.textContent || ''));

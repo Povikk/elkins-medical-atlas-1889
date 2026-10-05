@@ -257,7 +257,7 @@ function renderSurgery(capture=false){
   if(!capture)rpPhraseBlocks=[];
   activeRouteKind = "surgery";
   const s = surgeries[currentSurgery];
-  const step = s.steps[surgeryStepIndex];
+  const step = reviewedCareStep(s.steps[surgeryStepIndex],'surgery');
   activeStepTitle = step.title;
   const pct = Math.round(((surgeryStepIndex+1)/s.steps.length)*100);
 
@@ -291,6 +291,7 @@ function renderSurgery(capture=false){
   }
   if(step.meds) html += meds(step.meds);
   html += careStepExtras(step);
+  html += routeSuppliesMarkup(step,'surgery',html);
 
   html += `<div class="nav">
     <button class="secondary" onclick="prevSurgery()">Précédent</button>
@@ -620,6 +621,8 @@ function sensoryNote(name){
 }
 
 function meds(rows){
+  if(!rows?.length)return '';
+  if(activeRouteKind==='flow'&&(currentFlow==='poison'||currentFlow==='head'||['no','weak','unknown'].includes(answers.latestBreathing||answers.breathing||answers.unknownBreathing)))rows=rows.filter(r=>!/ammoniaque|sels odorants/i.test(r[0]));
   const unsafeOral=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak','unknown'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing);
   const withheldOral=unsafeOral && rows.some(r=>/orale|à boire|boisson/i.test(r[2]));
   if(withheldOral)rows=rows.filter(r=>!/orale|à boire|boisson/i.test(r[2]));
@@ -748,7 +751,7 @@ function render(capture=false){
   if(!capture)rpPhraseBlocks=[];
   activeRouteKind = "flow";
   const flow = flows[currentFlow];
-  const step = currentFlow==='hoof'?hoofCareStep(flow.steps[stepIndex]):flow.steps[stepIndex];
+  const step = reviewedCareStep(currentFlow==='hoof'?hoofCareStep(flow.steps[stepIndex]):flow.steps[stepIndex],'flow');
   activeStepTitle = step.title;
   const route=visibleFlowSteps();
   const position=route.findIndex(item=>item.index===stepIndex)+1;
@@ -1108,7 +1111,7 @@ function render(capture=false){
       html += section("À faire",[
         "Le patient respire : le surveiller sans interruption.",
         "Le stimuler doucement.",
-        "Des sels odorants peuvent servir de stimulant RP d’époque.",
+        "Les sels odorants ne traitent pas l’intoxication et ne remplacent pas le soutien respiratoire.",
         "Préparer une respiration artificielle si la respiration s’affaiblit davantage."
       ]);
     } else {
@@ -1410,6 +1413,7 @@ function render(capture=false){
   }
 
   html+=multiZoneCareMarkup(step);
+  html+=routeSuppliesMarkup(step,'flow',html);
   if(capture)return html;
   document.getElementById("flow").innerHTML=html;
   finalizeCareLayout(document.getElementById('flow'));

@@ -7,7 +7,7 @@ function reportFindings(kind){
  const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
  const options=route.steps.flatMap(s=>!surgery&&currentFlow==='animal'?animalChoicesForStep(s):s.choices||[]);
  keys.push('animalSpecies','animalInjury','animalArea','animalBleeding','animalDepth','animalVenomSigns','animalExposure');
- keys.push('hoofArea','hoofSigns');
+ keys.push('hoofArea','hoofSigns','minorIssue');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState)continue;
@@ -34,6 +34,7 @@ function reportSuggestedCare(kind){
  if(id==='hoof')return 'Réévaluation de chaque zone frappée ; '+(answers.hoofSigns==='wound'?'nettoyage et protection des plaies accessibles si effectués ; ':answers.hoofSigns==='function'?'soutien / immobilisation si effectué ; ':answers.hoofSigns==='bruise'?'repos de la zone contuse ; soin local si approprié ; ':'soins à préciser selon les constatations ; ')+(['head','chest','abdomen','back'].some(zone=>zoneHas('hoofArea',zone))||['danger','unknown'].includes(answers.hoofSigns)?'avis / surveillance rapprochée selon l’état ; ':'')+'surveillance ; contrôle selon l’évolution. Gestes à confirmer, pas automatiquement effectués.';
  const unsafe=careProductBlocked();
  if(['gunshot','knife','minor'].includes(id)){
+  if(id==='minor'&&answers.minorIssue!=='wound')return (answers.minorIssue==='bruise'?'Repos ; linge frais ; arnica sur peau intacte uniquement si utilisée':answers.minorIssue==='irritation'?'Protection de la peau intacte ; limiter les frottements ; onguent adapté si utilisé':'Soin à préciser après examen')+' ; surveillance et contrôle selon évolution. Gestes à confirmer, pas automatiquement effectués.';
   if(id!=='minor')items.push('Contrôle du saignement si nécessaire');
   items.push('Nettoyage de la plaie','Pansement');
   if(id==='gunshot'&&zoneSelections('gunArea').some(c=>c.shot?.type==='pellets'))items.push('Évaluation de chaque zone de grenaille, sans recherche ni extraction systématique des plombs');

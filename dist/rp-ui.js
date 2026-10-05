@@ -32,7 +32,7 @@ function rpChoicesMarkup(){
    if(!Object.prototype.hasOwnProperty.call(answers,key))return [];
    const text=zoneKeys.includes(key)&&zoneSelections(key).length?zoneLabels(key):manual[key]?.[answers[key]] || choices.find(choice=>choice.set?.[key]===answers[key]&&Object.entries(choice.set).every(([k,v])=>answers[k]===v))?.label;
    if(!text)return [];
-   return [`<span><b>${label} :</b> ${text}</span>`];
+   return [`<span><b>${label} :</b> ${reportEscape(text)}</span>`];
  });
  return conciseCareRecap(chips);
 }

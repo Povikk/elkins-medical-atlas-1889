@@ -9,7 +9,7 @@ function zoneSelections(key){
  return choice?[choice]:[];
 }
 function zoneHas(key,value){return zoneSelections(key).some(c=>c.set[key]===value)||answers[key]===value;}
-function zoneLabels(key){return zoneSelections(key).map(c=>c.label+(key==='gunArea'?gunDetailLabel(c):'')).join(' ; ');}
+function zoneLabels(key){return zoneSelections(key).map(c=>c.label+(c.detail?' : '+c.detail:'')+(key==='gunArea'?gunDetailLabel(c):'')).join(' ; ');}
 function gunDetailLabel(choice){
  const detail=choice.shot;if(!detail)return '';
  const type={solid:'balle pleine',pellets:'grenaille',unknown:'projectile indéterminé'}[detail.type]||'projectile indéterminé';
@@ -47,7 +47,7 @@ function toggleZoneSelection(index,set){
  else selected=exclusive(choice)?[choice]:[...selected.filter(c=>!exclusive(c)),choice];
  zoneInvalidateAfter(index);
  for(const c of step.choices)for(const k of Object.keys(c.set))delete answers[k];
- answers[key+'Selections']=selected.map(c=>({label:c.label,set:{...c.set},...(c.shot?{shot:{...c.shot}}:{})}));
+ answers[key+'Selections']=selected.map(c=>({label:c.label,set:{...c.set},...(c.shot?{shot:{...c.shot}}:{}),...(c.detail?{detail:c.detail}:{})}));
  answers[key+'Confirmed']=false;
  // Keep legacy branch selectors conservative; all locations remain available separately.
  const priority=currentFlow==='horse'?['head','back','ribs','chest','abdomen','unknown']:['head','chest','abdomen','unknown','hand','foot','back'];
@@ -65,7 +65,14 @@ function confirmZoneSelection(index){
 }
 function zoneSelectionControls(step,index,disabled=false){
  const key=zoneKeyForStep(step),selected=zoneSelections(key);
- return `${key==='gunArea'?gunDetailsControls(selected):''}<div class="zone-selection-footer"><span role="status">${selected.length?selected.length+' zone'+(selected.length>1?'s':'')+' sélectionnée'+(selected.length>1?'s':''):'Sélectionner une ou plusieurs zones'}</span><button type="button" class="next" onclick="confirmZoneSelection(${index})" ${disabled||!selected.length?'disabled':''}>Valider les zones</button></div>`;
+ return `${key==='gunArea'?gunDetailsControls(selected):''}${selected.length?`<details class="zone-precisions"><summary>+ Préciser un endroit (facultatif)</summary>${selected.map((c,i)=>`<label>${reportEscape(c.label)}<input type="text" maxlength="100" placeholder="Ex. : index, oreille gauche…" aria-label="Précision : ${reportEscape(c.label)}" value="${reportEscape(c.detail||'')}" oninput="updateZonePrecision('${key}',${i},this.value)" ${disabled?'disabled':''}></label>`).join('')}</details>`:''}<div class="zone-selection-footer"><span role="status">${selected.length?selected.length+' zone'+(selected.length>1?'s':'')+' sélectionnée'+(selected.length>1?'s':''):'Sélectionner une ou plusieurs zones'}</span><button type="button" class="next" onclick="confirmZoneSelection(${index})" ${disabled||!selected.length?'disabled':''}>Valider les zones</button></div>`;
+}
+function updateZonePrecision(key,index,value){
+ if(!zoneKeys.includes(key))return;
+ const selected=zoneSelections(key).map(c=>({...c,set:{...c.set}}));
+ if(!selected[index])return;
+ selected[index].detail=String(value).replace(/[\r\n]/g,' ').slice(0,100);
+ answers[key+'Selections']=selected;delete answers.reportDraft;
 }
 function condensedZones(step,index,pending){
  const key=zoneKeyForStep(step);

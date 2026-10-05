@@ -91,6 +91,7 @@ function animalMemoRow(row){
  if(animalIsVenom())return [row[0],'Calme ; protection simple ; surveillance et transport urgent','Aucun sérum antivenimeux en 1889 ; pas d’opiacé automatique','Venin possible ; pas de garrot, incision, aspiration ni cautérisation'];
  if(careProductBlocked())row[2]='État vital d’abord ; pas d’opiacé avant réévaluation';
  if(!animalHasWound()){row[1]='Examiner le choc et les autres lésions ; soutenir sans forcer';row[2]=careProductBlocked()?'État vital d’abord ; réévaluer avant un opiacé':'Soulagement selon l’état ; aucun antiseptique sans plaie';row[3]='Chute / piétinement ; perte de sensibilité ou fonction à réévaluer';}
+ else if(!careProductBlocked())row[2]='Eau propre · phénol préparé si adapté · compresses / pansement ; douleur évaluée';
  else if(animalProfile().family==='reptile')row[3]='Plaie profonde / écrasement / souillures ; vérifier une immersion ; pas de rage liée au reptile';
  return row;
 }
