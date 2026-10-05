@@ -265,8 +265,7 @@ for(const [id,key] of [['gunshot','gunArea'],['knife','knifeArea'],['horse','hor
   const zones=area==='limb'?[['arm','Bras'],['leg','Jambe']]:[[area,names[area]]];
   return zones.flatMap(([zone,label])=>[
    {label:`${label} : gauche`,set:{...choice.set,[`${key}Side`]:'left',[`${key}Part`]:zone}},
-   {label:`${label} : droite`,set:{...choice.set,[`${key}Side`]:'right',[`${key}Part`]:zone}},
-   {label:`${label} : côté non précisé`,set:{...choice.set,[`${key}Side`]:null,[`${key}Part`]:zone}}
+   {label:`${label} : droite`,set:{...choice.set,[`${key}Side`]:'right',[`${key}Part`]:zone}}
   ]);
  });
 }
