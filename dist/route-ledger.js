@@ -101,6 +101,7 @@ function careInvalidateFrom(index,kind='flow'){
  for(const [key,scope]of Object.entries(scopes))if(scope.kind===kind&&scope.route===route&&scope.index>=index){
   if(key==='bleedingStatus'&&answers.latestBleeding===(confirmed[key]==='controlled'?'none':'major')){if(scope.priorBleeding===undefined)delete answers.latestBleeding;else answers.latestBleeding=scope.priorBleeding;}
   delete confirmed[key];delete scopes[key];if(key==='closure'){delete answers.reportClosure;delete answers.sutureCount;}
+  if(key==='consultMedication')delete answers.consultMedication;
  }
  answers.careConfirmed=confirmed;answers.careScopes=scopes;
 }
@@ -116,6 +117,7 @@ function reportActualCare(){
  const c=answers.careConfirmed||{},items=new Map();
  const add=(key,label)=>items.set(key,label);
  for(const label of Object.values(answers.completedCare||{}).flat())add(label,label);
+ if(answers.consultMedication)add('consultMedication',consultationMedicationLabel());
  for(const [key,value]of Object.entries(c)){
   if(value==='used'&&key.startsWith('product:')){
    const name=key.slice(8);const alias=/phénol|carbol/i.test(name)?careActs.antisepsis:/arnica/i.test(name)?careActs.arnica:/sels odorants|ammoniaque/i.test(name)?careActs.salts:/zinc/i.test(name)?careActs.zinc:null;

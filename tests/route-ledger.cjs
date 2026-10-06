@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const element=()=>({innerHTML:'',textContent:'',dataset:{},classList:{add(){},remove(){},contains(){return false;}},querySelectorAll(){return [];},querySelector(){return null;},setAttribute(){},addEventListener(){},append(){}});
 const context={console,document:{addEventListener(){},querySelectorAll(){return [];},querySelector(){return null;},getElementById(){return element();},createElement:element,documentElement:element()},localStorage:{getItem(){return null;},setItem(){}},hooks:[],caseEmoji:{},window:{addEventListener(){}},matchMedia:()=>({matches:false,addEventListener(){}}),innerWidth:1920,emojiIcon:()=>'',urgencyBadge:()=>'',normalize:s=>String(s).toLowerCase(),escapeHTML:s=>String(s)};
 context.document.body=element();context.sleepingSurgery=()=>false;vm.createContext(context);
-for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','recovery','route-ledger','followup','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
+for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
 const run=source=>vm.runInContext(source,context);
 run(`currentFlow='hoof';activeRouteKind='flow';answers={conscious:'awake',hoofSigns:'bruise',hoofArea:'abdomen'};stepIndex=flows.hoof.steps.findIndex(s=>s.dynamicHoof);completeRoutineStep('flow');completeRoutineStep('flow');`);
 assert.match(run('reportActualCare()'),/arnica/);assert.equal((run('reportActualCare()').match(/arnica/g)||[]).length,1);
@@ -38,6 +38,30 @@ assert.equal(run("flows.animal.steps.some(step=>step.dynamicAnimal==='context')"
 run("answers={conscious:'awake',animalSpecies:'cougar',animalInjury:'bite',animalExposure:'known'}");
 assert.doesNotMatch(run("reportFindings('flow')"),/défensive|provocation|Rencontre en milieu sauvage/);
 // Exercise metadata and generated HTML for every authored stage under varied observations.
+assert.equal(run('Object.values(consultationProducts).flat().flatMap(p=>p.names).every(name=>lexique.some(item=>item.name===name))'),true,'Every product resolves to a historical lexicon card');
+for(const id of ['fever','cough','fatigue','digestive','dental']){
+ run(`currentFlow='${id}';activeRouteKind='flow';stepIndex=flows[currentFlow].steps.length-1;answers={conscious:'awake',consultEvolution:'stable'};`);
+ assert.match(run('render(true)'),/Produit proposé selon la plainte/,'Consultation products rendered: '+id);
+ run(`if('${id}'==='fatigue')setConsultationProfile('appetite');chooseConsultationProduct(0,'prescribed');`);
+ assert.match(run('reportActualCare()'),/prescrit/,'Prescription enters recap');
+ run(`chooseConsultationProduct(0,'given');`);
+ assert.match(run('reportActualCare()'),/administré/);
+ assert.doesNotMatch(run('reportActualCare()'),/prescrit/,'Only one administration decision');
+ run(`chooseConsultationProduct(0,'given');`);
+ assert.equal(run('answers.consultMedication'),undefined,'Decision can be cancelled');
+ run(`answers.conscious='unconscious_breathing';chooseConsultationProduct(0,'given');`);
+ assert.equal(run('answers.consultMedication'),undefined,'No oral medicine for unconscious patient');
+ run(`currentFlow='followup_${id}';stepIndex=1;answers={followupFindings:['Amélioration rapportée']};if('${id}'==='fatigue')setConsultationProfile('appetite');chooseConsultationProduct(0,'given');`);
+ assert.equal(run('answers.consultMedication'),undefined,'Follow-up checks ability to swallow');
+ run(`setConsultationOralReady();chooseConsultationProduct(0,'given');`);
+ assert.match(run('reportActualCare()'),/administré/);
+ run(`toggleFollowupChoice('care',0)`);
+ assert.ok(run('answers.consultMedication'),'Adding a care choice keeps the medicine');
+ run(`followupNoCare()`);
+ assert.equal(run('answers.consultMedication'),undefined,'Exam-only cancels medication');
+}
+run(`currentFlow='followup_digestive';stepIndex=1;answers={followupFindings:['Constipation persistante'],consultOralReady:true};`);
+assert.equal(run('consultationProfile().id'),'constipation','Follow-up reuses symptom choice');
 assert.equal(run("Object.keys(flows).filter(id=>!flows[id].followup&&id!=='unknown').every(id=>followupMenuKeys.includes(id))"),true,'Every visible intervention has a follow-up');
 assert.equal(run("Object.keys(surgeries).every(id=>followupMenuKeys.includes('operation_'+id))"),true,'Every surgery has a follow-up');
 assert.equal(run('new Set(followupMenuKeys).size'),run('followupMenuKeys.length'),'No duplicated follow-up cards');

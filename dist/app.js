@@ -1401,6 +1401,7 @@ function render(capture=false){
     if(step.med) html += meds(step.med);
   }
 
+  if(step.consultationTreatment)html+=consultationProductsMarkup();
   if(step.choices){
     html += patientQuestion(step);
     const zoneKey=zoneKeyForStep(step);

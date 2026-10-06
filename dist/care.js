@@ -210,8 +210,8 @@ const careAssistantTasks={
 Object.entries(careAssistantTasks).forEach(([id,steps])=>Object.entries(steps).forEach(([index,assistant])=>flows[id].steps[index].care.assistant=assistant));
 document.addEventListener('DOMContentLoaded',()=>{
  const grid=document.querySelector('#cases .case-grid');
- const title=document.createElement('h3');title.className='consultations-heading';title.textContent='Consultations et suivi';grid.after(title);
- const cards=document.createElement('div');cards.className='case-grid';cards.innerHTML=careConsultations.map(([id,title,desc])=>`<button class="case" onclick="start('${id}')"><strong>${title}</strong><span class="muted">${desc}</span></button>`).join('');title.after(cards);
+ const title=document.createElement('h3');title.className='consultations-heading';title.textContent='Consultations simples';grid.after(title);
+ const cards=document.createElement('div');cards.className='case-grid';cards.innerHTML=careConsultations.filter(([id])=>id!=='checkup').map(([id,title,desc])=>`<button class="case" onclick="start('${id}')"><strong>${title}</strong><span class="muted">${desc}</span></button>`).join('');title.after(cards);
  document.addEventListener('click',event=>{
   const button=event.target.closest('[onclick]');if(!button)return;
   const code=button.getAttribute('onclick');

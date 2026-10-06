@@ -8,6 +8,7 @@ function reportFindings(kind){
   if(followupZoneLabels())result.push('Zones du suivi : '+followupZoneLabels());
   if(answers.followupNote)result.push(answers.followupNote);
   result.push(...(answers.followupFindings||[]));
+  if(answers.consultProfile||answers.consultMedication)result.push(consultationProfile()?.label);
   return [...new Set(result)].join(' ; ')+'.';
  }
  const keys=['conscious','headState','poisonState','unknownBreathing','breathing','unknownBleeding','unknownWake','gunArea','knifeArea','knifeSeverity','horseArea','horsePain','fractureArea','fracturePain','minorArea','horseVisible','fightIssue','bullet','needsSuture','burnSeverity','consultEvolution'];
@@ -33,6 +34,7 @@ function reportFindings(kind){
   else if(choice)result.push(key==='bullet'&&answers.careConfirmed?.projectile?'À l’examen : '+choice.label:choice.label);
  }
  const movement={normal:'Mouvement conservé',painful:'Mouvement douloureux',limited:'Mouvement limité',none:'Mouvement impossible',unknown:'Mouvement non évalué'};
+ if(answers.consultProfile||answers.consultMedication)result.push(consultationProfile()?.label);
  if(movement[answers.horseMove])result.push(movement[answers.horseMove]);
  const pain={mild:'Douleur réévaluée : légère',moderate:'Douleur réévaluée : modérée',strong:'Douleur réévaluée : forte',unknown:'Douleur non réévaluée',unsafe:'État vital à réévaluer avant antalgique'};
  if(pain[answers.rpPain])result.push(pain[answers.rpPain]);

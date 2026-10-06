@@ -1768,6 +1768,16 @@ summary{cursor:pointer;color:var(--ink)}
 .followup-note{display:grid;gap:6px;margin-top:14px;font-size:14px}
 .followup-note input{width:100%;max-width:640px;padding:9px 12px}
 .followup-no-care{margin-top:12px}
+.consultation-products .muted{font-size:13px;margin:8px 0;line-height:1.4}
+.consult-product-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.consult-product{padding:10px;border:1px solid var(--line);border-radius:8px;display:grid;gap:7px}
+.consult-product-actions{display:flex;gap:6px}
+.consult-product-actions button{padding:6px 10px;min-height:34px}
+.consult-product-actions button[aria-pressed="true"],.consult-oral-ready[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--lime)}
+.consult-product details{font-size:13px;line-height:1.4}
+.consult-product summary{cursor:pointer}
+.consult-oral-ready{margin-top:8px}
+@media(hover:none){.consult-product-actions button{min-height:44px}}
 .followup-zones{padding:10px 12px}
 .followup-zones>summary{cursor:pointer;font-size:14px;line-height:1.4}
 .followup-zones[open]>.followup-choices{margin-top:9px;gap:5px}

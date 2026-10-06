@@ -114,10 +114,12 @@ function toggleFollowupChoice(field,index){
  const key=field==='findings'?'followupFindings':'followupCare',selected=new Set(answers[key]||[]);
  if(selected.has(label))selected.delete(label);else selected.add(label);
  // Do not allow mutually exclusive observations or point decisions together.
- const exclusive=field==='findings'?[followupCommonSigns,['Gonflement diminué','Gonflement persistant'],['Peau intacte','Plaie constatée'],['Réactions habituelles','Confusion rapportée','Somnolence inhabituelle'],['Souffle sans gêne rapportée','Gêne respiratoire'],['Fièvre diminuée','Fièvre persistante','Fièvre aggravée'],['Toux diminuée','Toux persistante','Toux aggravée'],['Énergie améliorée','Fatigue persistante','Faiblesse aggravée'],['Amélioration rapportée','Aggravation rapportée'],['Appétit amélioré','Appétit diminué']]:[['Points conservés','Points retirés','Retrait partiel des points']];
+ const exclusive=field==='findings'?[followupCommonSigns,['Gonflement diminué','Gonflement persistant'],['Peau intacte','Plaie constatée'],['Réactions habituelles','Confusion rapportée','Somnolence inhabituelle'],['Souffle sans gêne rapportée','Gêne respiratoire'],['Fièvre diminuée','Fièvre persistante','Fièvre aggravée'],['Toux diminuée','Toux persistante','Toux aggravée'],['Énergie améliorée','Fatigue persistante','Faiblesse aggravée'],['Amélioration rapportée','Aggravation rapportée'],['Appétit amélioré','Appétit diminué'],['Diarrhée persistante','Constipation persistante']]:[['Points conservés','Points retirés','Retrait partiel des points']];
  if(selected.has(label))for(const group of exclusive)if(group.includes(label))for(const item of group)if(item!==label)selected.delete(item);
  if(field==='care'&&label.includes('arnica')&&selected.has(label)&&!(answers.followupFindings||[]).includes('Peau intacte'))return;
+ const medication=field==='care'?answers.consultMedication:null;
  careInvalidateFrom(stepIndex);
+ if(medication){answers.consultMedication=medication;careRegisterScope('consultMedication');}
  answers[key]=[...selected];
  if(field==='care')answers.followupNoCare=false;
  if(field==='findings'&&selected.has('Plaie constatée'))answers.followupCare=(answers.followupCare||[]).filter(x=>!x.includes('arnica'));
@@ -127,7 +129,7 @@ function followupSetNote(value){answers.followupNote=String(value).slice(0,240);
 function followupWarning(){return (answers.followupFindings||[]).some(x=>['Douleur aggravée','Saignement repris','Fièvre rapportée','Fièvre aggravée','Extrémité froide / pâle','Gêne respiratoire','Malaise rapporté','Confusion rapportée','Somnolence inhabituelle','Vomissements rapportés','Sang craché rapporté','Sang rapporté dans les selles','Faiblesse aggravée','Aggravation rapportée'].includes(x));}
 function followupNext(){
  if(stepIndex===0&&(!(answers.followupFindings||[]).length||followupZoneSource()&&!(answers.followupZones||[]).length))return;
- if(stepIndex===1&&!(answers.followupCare||[]).length&&!answers.followupNoCare)return;
+ if(stepIndex===1&&!(answers.followupCare||[]).length&&!answers.followupNoCare&&!answers.consultMedication)return;
  next();
 }
 function followupNoCare(){careInvalidateFrom(stepIndex);answers.followupNoCare=!answers.followupNoCare;answers.followupCare=[];render();}
@@ -135,7 +137,7 @@ function renderFollowup(capture=false){
  activeRouteKind='flow';const type=followupType(),step=flows[currentFlow].steps[stepIndex],field=step.dynamicFollowup;
  activeStepTitle=step.title;
  const chosen=answers[field==='findings'?'followupFindings':'followupCare']||[];
- const ready=field==='findings'?chosen.length&&(!followupZoneSource()||(answers.followupZones||[]).length):chosen.length||answers.followupNoCare;
+ const ready=field==='findings'?chosen.length&&(!followupZoneSource()||(answers.followupZones||[]).length):chosen.length||answers.followupNoCare||answers.consultMedication;
  let html=`<div class="topbar"><div><span class="badge">Suivi : ${type.title}</span><h2>${stepIndex+1} / 2 - ${step.title}</h2></div><button type="button" class="secondary" onclick="showFollowup()">Autre suivi</button></div><div class="progress"><div style="width:${(stepIndex+1)*50}%"></div></div>`;
  if(field==='findings')html+=followupZonesMarkup()+section('À contrôler',type.checks);
  else html+=`${followupZoneLabels()?`<div class="route-note"><strong>Zones du suivi :</strong> ${reportEscape(followupZoneLabels())}</div>`:''}<div class="route-note"><strong>Constatations :</strong> ${reportEscape((answers.followupFindings||[]).join(' · '))}</div><p class="muted">Cocher uniquement les soins réellement effectués. Plusieurs choix possibles.</p>`;
@@ -144,6 +146,7 @@ function renderFollowup(capture=false){
  const blocked=label.includes('arnica')&&!(answers.followupFindings||[]).includes('Peau intacte');
  return `<button type="button" class="secondary" aria-pressed="${chosen.includes(label)}" onclick="toggleFollowupChoice('${field}',${index})" ${blocked?'disabled title="Constater une peau intacte avant de choisir ce soin"':''}>${reportEscape(label)}</button>`;
  }).join('')}</div>${field==='findings'?`<label class="followup-note">Zone / précision facultative<input maxlength="240" value="${reportEscape(answers.followupNote||'')}" placeholder="Ex. : épaule droite, contrôle après chute" oninput="followupSetNote(this.value)"></label>`:`<button type="button" class="secondary followup-no-care" aria-pressed="${!!answers.followupNoCare}" onclick="followupNoCare()">Examen seul, sans soin supplémentaire</button>`}</div>`;
+ if(field==='care')html+=consultationProductsMarkup();
  html+=`<div class="nav"><button type="button" class="secondary" onclick="${stepIndex?'prev()':'showFollowup()'}">${stepIndex?'Précédent':'Motifs de suivi'}</button><button type="button" class="next" onclick="followupNext()" ${ready?'':'disabled'}>${stepIndex?'Terminer le suivi':'Soins et consignes'}</button></div>`;
  if(capture)return html;
  const root=document.getElementById('flow');root.classList.remove('condensed-workspace');root.innerHTML=html;
