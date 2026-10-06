@@ -135,15 +135,19 @@ function alternateRpPhrase(index,button){
  const root=document.getElementById(activeRouteKind==='surgery'?'surgeryFlow':'flow');
  if(!block || block.stepKey!==rpDialogueStepKey() || !button.isConnected || !root?.contains(button))return;
  block.position=(block.position+1)%block.pool.length;
- button.closest('.rp-dialogue').querySelector('.rp-phrase-list').innerHTML=rpPhraseRows(block);
+ const list=button.closest('.rp-dialogue').querySelector('.rp-phrase-list');
+ const expanded=!!list.querySelector('.rp-more-phrases')?.open;
+ list.innerHTML=rpPhraseRows(block);
+ if(expanded&&list.querySelector('.rp-more-phrases'))list.querySelector('.rp-more-phrases').open=true;
 }
 function rpPhraseRows(block){
- const speciesPicker=activeRouteKind==='flow'&&flows[currentFlow]?.steps[stepIndex]?.animalSpeciesPicker;
- const count=Math.min(compactMode?1:speciesPicker?2:3,block.pool.length);
- const phrases=Array.from({length:count},(_,offset)=>block.pool[(block.position+offset)%block.pool.length]);
+ if(!block.pool.length)return '';
+ const phrases=[block.pool[block.position%block.pool.length]];
  if(!rpPhraseHistory.has(block.stepKey))rpPhraseHistory.set(block.stepKey,new Set());
  phrases.forEach(phrase=>rpPhraseHistory.get(block.stepKey).add(phrase));
- return phrases.map(phrase=>`<div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase">${phrase}</span></div>`).join('');
+ const row=phrase=>`<div class="rp-line"><span class="rp-arrow" aria-hidden="true">→</span><span class="rp-current-phrase">${phrase}</span></div>`;
+ const others=Array.from({length:block.pool.length-1},(_,offset)=>block.pool[(block.position+offset+1)%block.pool.length]);
+ return row(phrases[0])+(others.length&&!compactMode?`<details class="rp-more-phrases"><summary>Plus de phrases</summary>${others.map(row).join('')}</details>`:'');
 }
 function rpDialogueStepKey(){
  return activeRouteKind==='surgery'?`surgery:${currentSurgery}:${surgeryStepIndex}:${surgeryEnded}`:`flow:${currentFlow}:${stepIndex}:${interventionEnded}`;

@@ -292,6 +292,7 @@ function renderSurgery(capture=false){
   if(step.meds) html += meds(step.meds);
   html += careStepExtras(step);
   html += routeSuppliesMarkup(step,'surgery',html);
+  html += stepConfirmMarkup(step,'surgery',html);
 
   html += `<div class="nav">
     <button class="secondary" onclick="prevSurgery()">Précédent</button>
@@ -304,6 +305,7 @@ function renderSurgery(capture=false){
 }
 
 function nextSurgery(){
+  completeRoutineStep('surgery');
   const s = surgeries[currentSurgery];
   if(surgeryStepIndex < s.steps.length-1){
     surgeryStepIndex++;
@@ -353,16 +355,16 @@ function show(id){
     answers={};flowHistory=[];currentFlow=null;currentSurgery=null;materialPanelOpen=false;resetRpScene();
     document.getElementById('flow').innerHTML='';document.getElementById('surgeryFlow').innerHTML='';
   }
-  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
+  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
   target.classList.remove("hidden");
-  const shellView = id === "flow" ? "cases" : id === "surgeryFlow" ? "surgery" : id;
+  const shellView = id === "flow" ? (flows[currentFlow]?.followup?'followup':'cases') : id === "surgeryFlow" ? "surgery" : id;
   document.querySelectorAll("[data-shell-view]").forEach(button=>{
     const active = button.dataset.shellView === shellView;
     button.classList.toggle("active",active);
     if(active) button.setAttribute("aria-current","page");
     else button.removeAttribute("aria-current");
   });
-  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz"];
+  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"];
   document.body.classList.toggle("compact-header", compactSections.includes(id));
   window.scrollTo({top:0,behavior:"auto"});
 }
@@ -533,11 +535,14 @@ function applyChoice(set){
   const zoneKey=zoneKeyForStep(flows[currentFlow].steps[stepIndex]);
   if(zoneKey&&Object.hasOwn(set,zoneKey)){toggleZoneSelection(stepIndex,set);return;}
   flowHistory.push({index:stepIndex,answers:{...answers}});
+  zoneInvalidateAfter(stepIndex);
   Object.assign(answers,set);
+  if(Object.hasOwn(set,'needsSuture')&&set.needsSuture===false){answers.reportClosure='none';careRegisterScope('closure');}
   next(true);
 }
 function next(fromChoice=false){
   if(!fromChoice&&!zoneComplete(flows[currentFlow].steps[stepIndex]))return;
+  completeRoutineStep('flow');
   if(!fromChoice) flowHistory.push({index:stepIndex,answers:{...answers}});
   const max = flows[currentFlow].steps.length;
   let candidate=stepIndex+1;
@@ -550,9 +555,9 @@ function prev(){
   else showCases();
 }
 function section(title,items,cls=""){
-  const label=/^Priorité/.test(title)?'Priorité':/surveill|vérification finale|avant de terminer|consignes/i.test(title)?'À surveiller':/optionnel|soin local|douleur/i.test(title)?'Si nécessaire':'';
+  const label=/^Priorité/.test(title)?'Priorité':/surveill|vérification finale|avant de terminer|consignes/i.test(title)?'À surveiller':'';
   const heading=`<h3>${title}${label && label!==title ? ` <small class="step-cue">${label}</small>` : ''}</h3>`;
-  const row=x=>`<li>${/\bsi\b|peut |éventuel|selon la scène/i.test(x)?'<span class="action-cue">Si nécessaire</span> ':''}${x}</li>`;
+  const row=x=>`<li>${x}</li>`;
   if(compactMode){
     if(title === "Matériel"){
       return `<div class="section ${cls}">${heading}<div class="compact-inline">${items.join(" · ")}</div></div>`;
@@ -636,8 +641,8 @@ function meds(rows){
   if(opioids && selected === "unsafe") rows = rows.filter(r=>!/morphine|laudanum/i.test(r[0]));
   if(compactMode)return `<div class="condensed-products"><p>Produits facultatifs : ${rows.length?rows.map(r=>r[0]).join(' ou '):'aucun proposé dans cet état'}.</p>${unavailable||withheldOral?'<p class="condensed-alert">Réévaluer conscience et respiration. Pas de produit oral si le patient ne peut pas répondre et avaler.</p>':''}${opioids?`<label>Douleur <select onchange="setRpPain(this.value)"><option value="">À évaluer</option>${[['mild','Légère'],['moderate','Modérée'],['strong','Forte'],['unsafe','État vital inquiétant'],['unknown','Non évaluée']].map(([v,t])=>`<option value="${v}" ${selected===v?'selected':''}>${t}</option>`).join('')}</select></label>`:''}</div>`;
   return `<div class="section">
-    <h3>Médicament / produit <small class="step-cue">Si nécessaire</small></h3>
-    <p class="muted product-choice-note">Possibilités selon la scène, pas des produits à utiliser tous ensemble.</p>
+    <h3>Médicament / produit</h3>
+    <p class="muted product-choice-note">Choisir le produit adapté à l’état du patient ; les alternatives ne se cumulent pas.</p>
     ${assessment}
     ${unavailable||withheldOral?'<p class="route-note">Réévaluer conscience et respiration avant un opiacé. Aucune proposition orale tant que le patient ne peut pas répondre et avaler.</p>':''}
     ${rows.map(r=>`
@@ -746,6 +751,8 @@ function categoryClass(category){
 }
 
 function render(capture=false){
+  if(flows[currentFlow]?.followup)return renderFollowup(capture);
+  if(!capture&&!compactMode&&renderGroupedRoute())return;
   if(compactMode&&!capture)return renderCondensed('flow');
   if(!capture)document.getElementById('flow').classList.remove('condensed-workspace');
   if(!capture)rpPhraseBlocks=[];
@@ -753,8 +760,8 @@ function render(capture=false){
   const flow = flows[currentFlow];
   const step = reviewedCareStep(currentFlow==='hoof'?hoofCareStep(flow.steps[stepIndex]):flow.steps[stepIndex],'flow');
   activeStepTitle = step.title;
-  const route=visibleFlowSteps();
-  const position=route.findIndex(item=>item.index===stepIndex)+1;
+  const route=routeScreenGroups();
+  const position=route.findIndex(group=>group.includes(stepIndex))+1;
   const pct = Math.round((position/route.length)*100);
   let html = `
     <div class="topbar">
@@ -850,7 +857,7 @@ function render(capture=false){
     } else if(wake === "confused"){
       html += section("À faire",[
         "Garder le patient allongé.",
-        "Suspecter en priorité chute, traumatisme crânien ou intoxication selon la scène.",
+        "Rechercher une chute, un choc à la tête ou une prise de produit dans les faits rapportés.",
         "Ne pas chercher un récit détaillé."
       ]);
       html += sayLines(["« Ne vous relevez pas. Dites-moi seulement votre nom et où vous avez mal. »"]);
@@ -898,7 +905,10 @@ function render(capture=false){
     }
 
   } else if(step.dynamicFightCare){
-    if(answers.fightIssue === "bruise"){
+    if(answers.fightIssue === "dislocation"){
+      html += section("À faire", ["Soutenir le membre dans la position trouvée, sans forcer l’articulation.", "Vérifier la sensibilité et l’aspect des extrémités avant et après le soutien.", "Examiner la luxation possible avant de décider d’un geste de réduction ; une fracture associée reste possible."]);
+      html += section("Matériel", ["Écharpe ou attelle adaptée", "Tissu rembourré"]);
+    } else if(answers.fightIssue === "bruise"){
       html += section("À faire",[
         "Appliquer un linge frais si disponible.",
         "Sur peau intacte, utiliser une préparation à l'arnica.",
@@ -1200,6 +1210,9 @@ function render(capture=false){
       ]);
     }
   } else if(step.dynamicMovementQuestion && currentFlow==="horse"){
+    if(['dislocation','deformity'].includes(answers.horseVisible)){
+      html += section("À observer sans mobiliser", ["Ne pas demander de tester les mouvements de l’articulation déformée.", "Observer les extrémités et demander si le patient ressent un engourdissement."]);
+    } else {
     const area = answers.horseArea;
     if(area === "none"){
       html += section("À faire",[
@@ -1246,6 +1259,7 @@ function render(capture=false){
       </div></div>`;
     }
 
+    }
   } else if(step.dynamicHorseCare && currentFlow==="horse"){
     const area = answers.horseArea;
     const vis = answers.horseVisible;
@@ -1254,12 +1268,12 @@ function render(capture=false){
 
     if([vis,move,area].includes('unknown')){
       html += section('À faire',['L’examen reste incomplet : ne pas annoncer une simple contusion.','Ne pas forcer le mouvement ; préciser les signes accessibles dans la scène.','Organiser une nouvelle évaluation et du renfort si nécessaire.']);
-    } else if(vis === "deformity" || move === "none"){
+    } else if(vis === "deformity" || vis === "dislocation" || move === "none"){
       html += section("À faire",[
         "Considérer une fracture ou luxation possible.",
-        "Immobiliser dans la position la plus stable.",
+        "Soutenir dans la position trouvée, sans forcer l’articulation.",
         "Poser une attelle rembourrée sans serrer excessivement.",
-        "Éviter de faire marcher le patient."
+        "Vérifier la sensibilité et l’aspect des extrémités après le soutien ; éviter l’appui sur un membre inférieur atteint."
       ]);
       html += sayLines([
         "« Je ne veux pas que vous bougiez ce membre. »",
@@ -1364,7 +1378,7 @@ function render(capture=false){
       ]);
       html += meds([
         ["Morphine","Sel de morphine dissous en solution injectable","Injection hypodermique avec seringue","Douleur forte"],
-        ["Laudanum","Liquide opiacé (teinture d’opium)","Voie orale uniquement si le patient est suffisamment conscient et peut avaler","Alternative orale selon la scène"]
+        ["Laudanum","Liquide opiacé (teinture d’opium)","Voie orale uniquement si le patient est suffisamment conscient et peut avaler","Alternative orale pour la douleur, après évaluation"]
       ]);
     }
 
@@ -1414,6 +1428,7 @@ function render(capture=false){
 
   html+=multiZoneCareMarkup(step);
   html+=routeSuppliesMarkup(step,'flow',html);
+  html+=stepConfirmMarkup(step,'flow',html);
   if(capture)return html;
   document.getElementById("flow").innerHTML=html;
   finalizeCareLayout(document.getElementById('flow'));

@@ -13,6 +13,7 @@ function sceneToolbar(kind){
   </div>`;
 }
 function shouldSkipStep(step){
+  if(step.dynamicConscious&&answers.conscious==='awake'&&!['no','weak','unknown'].includes(answers.latestBreathing)&&!['unresponsive','confused','unknown'].includes(answers.latestState)&&answers.latestBleeding!=='major')return true;
   if(step.recoveryCheck){
    const initial=answers.conscious||answers.headState||answers.poisonState||answers.breathing;
    if(['awake','yes'].includes(initial))return true;
@@ -88,21 +89,17 @@ Object.entries(additionalSurgeries).forEach(([id,entry])=>surgeryEndings[id]=ent
 function endingMarkup(kind){
   const surgery=kind==='surgery';
   const entry=surgery ? surgeries[currentSurgery] : flows[currentFlow];
+  if(!surgery&&entry.followup)return followupEndingMarkup();
   const notes=surgery ? surgeryEndings[currentSurgery] : currentFlow==='animal'?animalEndingNotes():sceneEndings[currentFlow];
   rpPhraseBlocks=[];
   let variant='';
-  if(!surgery && answers.needsSuture === true) variant='Des points ont été proposés dans le parcours : mentionne-les seulement si tu les as joués.';
-  if(!surgery && answers.needsSuture === false) variant='Pas de points nécessaires selon tes choix : conclure sur le nettoyage et la protection.';
-  if(!surgery && answers.needsSuture === 'avoid') variant='Fermeture simple écartée : ne pas annoncer une plaie refermée.';
+  if(answers.reportClosure==='sutured')variant='Contrôle de la plaie et du pansement dans 24 h. Le retrait des points dépend de la cicatrisation.';
   const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || (answers.latestBleeding||answers.animalBleeding)==='major' || (!surgery&&currentFlow==='animal'&&(animalNeedsAssessment()||animalUnsafe()));
   return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : 'Intervention terminée'}</h2>
     <p class="muted">Conclusion à adapter aux gestes et à l'évolution réellement joués. Aucun dossier n'est créé.</p>
-    ${rpChoicesMarkup()}
-    ${sceneToolbar(kind)}
     ${unresolved ? '<div class="route-note">Un signe inquiétant a été choisi dans ce parcours. La fin des étapes ne signifie pas que le patient peut repartir : réévalue son état dans la scène.</div>' : ''}
-    <h3>Pour conclure la scène</h3><p>${notes[0]}</p>${variant ? `<p>${variant}</p>` : ''}
-    ${sayLines([notes[1]])}<h3>Consignes RP</h3><p>${notes[2]}</p><h3>À surveiller / motif de retour</h3><p>${notes[3]}</p>
     ${reportMarkup(kind)}
+    <details class="ending-detail"><summary>Consignes, signes à surveiller et formulation</summary><p>${notes[0]}</p>${variant?`<p>${variant}</p>`:''}${sayLines([notes[1]])}<p>${notes[2]}</p><p>${notes[3]}</p></details>
     <div class="nav"><button class="secondary" onclick="${surgery ? 'surgeryEnded=false;renderSurgery()' : 'interventionEnded=false;render()'}">Revoir la dernière étape</button><button class="next" onclick="${surgery ? 'showSurgery()' : 'showCases()'}">${surgery ? 'Autre chirurgie' : 'Nouvelle intervention'}</button><button class="secondary" onclick="goHome()">Accueil</button></div></div>`;
 }
 

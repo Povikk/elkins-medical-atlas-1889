@@ -17,7 +17,7 @@ function gunDetailLabel(choice){
 }
 function gunDetailsControls(selected){
  if(!selected.length)return '';
- return `<div class="gun-details"><small>Facultatif : quantité signalée, ou impacts observés pour la grenaille. Une entrée et une sortie ne comptent pas comme deux balles.</small>${selected.map((choice,i)=>`<div class="gun-detail-row"><b>${reportEscape(choice.label)}</b><select aria-label="Projectile : ${reportEscape(choice.label)}" onchange="updateGunDetail(${i},'type',this.value)">${[['unknown','Type indéterminé'],['solid','Balle pleine'],['pellets','Grenaille']].map(([value,label])=>`<option value="${value}" ${(choice.shot?.type||'unknown')===value?'selected':''}>${label}</option>`).join('')}</select><label>${choice.shot?.type==='pellets'?'Impacts':'Nombre'}<input type="number" min="1" step="1" inputmode="numeric" placeholder="?" aria-label="Quantité : ${reportEscape(choice.label)}" value="${choice.shot?.count||''}" onchange="updateGunDetail(${i},'count',this.value)"></label></div>`).join('')}</div>`;
+ return `<div class="gun-details"><small>Facultatif : quantité signalée, ou impacts observés pour la grenaille. Une entrée et une sortie ne comptent pas comme deux balles.</small>${selected.map((choice,i)=>`<div class="gun-detail-row"><b>${reportEscape(choice.label)}</b><select data-projectile="${choice.shot?.type||'unknown'}" title="Choisir le type de projectile pour cette zone" aria-label="Projectile : ${reportEscape(choice.label)}" onchange="updateGunDetail(${i},'type',this.value)">${[['unknown','Type indéterminé'],['solid','Balle pleine'],['pellets','Grenaille']].map(([value,label])=>`<option value="${value}" ${(choice.shot?.type||'unknown')===value?'selected':''}>${label}</option>`).join('')}</select><label>${choice.shot?.type==='pellets'?'Impacts':'Nombre'}<input type="number" min="1" step="1" inputmode="numeric" placeholder="?" aria-label="Quantité : ${reportEscape(choice.label)}" value="${choice.shot?.count||''}" onchange="updateGunDetail(${i},'count',this.value)"></label></div>`).join('')}</div>`;
 }
 function updateGunDetail(index,field,value){
  if(currentFlow!=='gunshot'||!['type','count'].includes(field))return;
@@ -25,12 +25,15 @@ function updateGunDetail(index,field,value){
  const choice=selected[index];if(!choice)return;
  if(field==='type'){if(!['unknown','solid','pellets'].includes(value))return;choice.shot.type=value;choice.shot.count=null;}
  else choice.shot.count=/^[1-9]\d*$/.test(value)&&Number.isSafeInteger(Number(value))?Number(value):null;
- answers.gunAreaSelections=selected;delete answers.reportDraft;
+ answers.gunAreaSelections=selected;
  render();
 }
 function zoneComplete(step){const key=zoneKeyForStep(step);return !key||zoneSelections(key).length>0&&answers[key+'Confirmed']!==false;}
 function zoneIsSelected(key,set){return zoneSelections(key).some(c=>Object.entries(set).every(([k,v])=>c.set[k]===v));}
 function zoneInvalidateAfter(index){
+ careInvalidateFrom(index);
+ const prefix='flow:'+currentFlow+':';
+ answers.completedCare=Object.fromEntries(Object.entries(answers.completedCare||{}).filter(([key])=>!key.startsWith(prefix)||Number(key.slice(prefix.length))<=index));
  const later=flows[currentFlow].steps.slice(index+1);
  for(const step of later)for(const choice of step.choices||[])for(const key of Object.keys(choice.set)){
   delete answers[key];if(zoneKeys.includes(key)){delete answers[key+'Selections'];delete answers[key+'Confirmed'];}
@@ -72,7 +75,7 @@ function updateZonePrecision(key,index,value){
  const selected=zoneSelections(key).map(c=>({...c,set:{...c.set}}));
  if(!selected[index])return;
  selected[index].detail=String(value).replace(/[\r\n]/g,' ').slice(0,100);
- answers[key+'Selections']=selected;delete answers.reportDraft;
+ answers[key+'Selections']=selected;
 }
 function condensedZones(step,index,pending){
  const key=zoneKeyForStep(step);

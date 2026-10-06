@@ -18,7 +18,7 @@ function careUrgency(base){
  if(['no','weak'].includes(breathing) || state==='unresponsive' || /not_breathing|unconscious/.test(state || '') || bleeding==='major' || answers.burnSeverity==='airway')return 'critical';
  if(state==='confused' || state==='sleepy')return base==='critical'?base:'serious';
  if(answers.latestState==='awake' && breathing==='yes' && bleeding==='none')return base==='light'?'light':'serious';
- if(answers.horseVisible==='deformity' || answers.horseMove==='none' || answers.knifeSeverity==='deep' || ['chest','abdomen','head'].includes(answers.gunArea))return 'serious';
+ if(['deformity','dislocation'].includes(answers.horseVisible) || answers.fightIssue==='dislocation' || answers.hoofSigns==='dislocation' || answers.animalDepth==='dislocation' || answers.horseMove==='none' || answers.knifeSeverity==='deep' || ['chest','abdomen','head'].includes(answers.gunArea))return 'serious';
  return base;
 }
 function compactActions(title,items){
@@ -32,7 +32,7 @@ function careStepExtras(step){
  const links=[];
  if(currentFlow==='hoof'){
   if(zoneHas('hoofArea','head'))links.push(['head','Traumatisme crânien : réévaluation']);
-  if(answers.hoofSigns==='function')links.push(['fracture','Membre : évaluation et immobilisation si justifiées']);
+  if(['function','dislocation'].includes(answers.hoofSigns))links.push(['fracture','Membre : évaluation de fracture / luxation et soutien']);
  }
  if(currentFlow==='animal'&&step.dynamicAnimal){
   if(zoneHas('animalArea','head'))links.push(['head','Réévaluer le traumatisme crânien, si présent']);
@@ -137,14 +137,14 @@ Object.values(surgeries).forEach(s=>s.steps.forEach(step=>{step.care={...step.ca
 function careMaterialForStep(step,kind){
  let items=[...(step.care?.material || [])];
  if(currentFlow==='animal'&&step.dynamicAnimal==='clean')items=animalIsVenom()?['Linge propre','Protection simple']:animalHasWound()?items:[];
- if(currentFlow==='animal'&&step.dynamicAnimal==='protect'&&answers.animalDepth==='crush'&&['arm','hand','leg','foot'].includes(answers.animalArea))items.push('Attelle ou écharpe adaptée','Tissu rembourré');
+ if(currentFlow==='animal'&&step.dynamicAnimal==='protect'&&['crush','dislocation'].includes(answers.animalDepth)&&['arm','hand','leg','foot','shoulder','ankle'].some(zone=>zoneHas('animalArea',zone)))items.push('Attelle ou écharpe adaptée','Tissu rembourré');
  if(step.dynamicSuture)items=answers.needsSuture===true?['Aiguille et fil','Pince','Ciseaux','Compresses']:[];
  if(step.dynamicUnknownBleeding)items=['major','minor'].includes(answers.unknownBleeding)?['Compresses','Linge propre','Bandage']:[];
  if(step.dynamic&&currentFlow==='gunshot'&&answers.bullet==='in')items=['Forceps uniquement si projectile accessible','Compresses'];
  if(step.dynamicHorseCare){
-  items=answers.horseVisible==='deformity'||answers.horseMove==='none'?['Attelle','Bandage','Tissu rembourré']:answers.horseVisible==='wound'?['Compresses','Antiseptique prévu','Petit pansement']:['bruise','swelling'].includes(answers.horseVisible)?['Linge frais','Bandage de soutien si utile']:[];
+  items=['deformity','dislocation'].includes(answers.horseVisible)||answers.horseMove==='none'?['Attelle','Bandage','Tissu rembourré']:answers.horseVisible==='wound'?['Compresses','Antiseptique prévu','Petit pansement']:['bruise','swelling'].includes(answers.horseVisible)?['Linge frais','Bandage de soutien si utile']:[];
  }
- if(step.dynamicFightCare)items=answers.fightIssue==='cut'?['Compresses','Antiseptique prévu','Pansement']:answers.fightIssue==='bruise'?['Linge frais']:[];
+ if(step.dynamicFightCare)items=answers.fightIssue==='dislocation'?['Attelle ou écharpe','Tissu rembourré']:answers.fightIssue==='cut'?['Compresses','Antiseptique prévu','Pansement']:answers.fightIssue==='bruise'?['Linge frais']:[];
  if(step.dynamicBurn)items=answers.burnSeverity==='airway'?[]:['Eau fraîche disponible','Linge propre','Pansement protecteur'];
  const products=step.care?.products || [];
  if(products.some(p=>/morphine/i.test(p[0]))&&!careProductBlocked()&&answers.rpPain==='strong')items.push('Seringue uniquement si morphine retenue');
@@ -222,8 +222,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function finalizeCareLayout(root){
+ root.classList.add('care-screen-fit');
+ root.querySelectorAll('.nav .next').forEach(button=>button.title='Passer à la suite reprend les soins courants de cette étape dans le récapitulatif. Celui-ci reste modifiable.');
  const supplies=root.querySelector(':scope > .route-supplies'),navigation=root.querySelector(':scope > .nav');
  if(supplies&&navigation)navigation.before(supplies);
+ const confirmations=root.querySelector(':scope > .care-confirmations');
+ if(confirmations&&navigation)navigation.before(confirmations);
  // Keep the first actions, gestures and speech together before choices and optional detail.
  const gesture=root.querySelector(':scope > .rp-gesture'),dialogue=root.querySelector(':scope > .rp-dialogue');
  const action=[...root.querySelectorAll(':scope > .section')].find(s=>s.querySelector('ul')&&!s.querySelector('.med-item,.compact-med')&&!s.querySelector('.choices')&&!/Matériel/.test(s.querySelector('h3')?.textContent || ''));
@@ -242,6 +246,10 @@ function finalizeCareLayout(root){
  root.querySelectorAll('.med-item').forEach(card=>{
   const grid=card.querySelector('.med'),composition=[...grid?.children || []].find(c=>c.querySelector('strong')?.textContent==='Composition'),context=card.querySelector('.product-context');
   if(composition||context){const details=document.createElement('details');details.className='product-details';const summary=document.createElement('summary');summary.textContent='Composition et repère du produit';details.append(summary);if(composition)details.append(composition);if(context)details.append(context);card.append(details);}
+  const extra=document.createElement('details');extra.className='product-full-detail';
+  const summary=document.createElement('summary');summary.textContent='Forme, application et sensations';extra.append(summary);
+  [...card.children].filter(child=>child.matches('.med,.sensory-note,.product-details')).forEach(child=>extra.append(child));
+  if(extra.children.length>1)card.append(extra);
  });
  root.querySelectorAll(':scope > .route-links,:scope > .assistant-note').forEach(note=>{const nav=root.querySelector(':scope > .nav');if(nav)nav.before(note);});
  root.querySelectorAll(':scope > .section').forEach(panel=>{if(panel.querySelector('h3')?.textContent==='Matériel'){const details=document.createElement('details');details.className='inline-material';const summary=document.createElement('summary');summary.textContent='Matériel de cette étape';details.append(summary,...panel.querySelectorAll('ul'));panel.replaceWith(details);}});
@@ -253,6 +261,13 @@ function finalizeCareLayout(root){
  }
  const tools=root.querySelector(':scope > .scene-tools'),context=root.querySelector(':scope > .rp-context');
  if(tools&&context){const strip=document.createElement('div');strip.className='care-control-strip';tools.before(strip);strip.append(tools,context);}
+ // Use the width for product alternatives; keep vital alerts outside folded detail.
+ root.querySelectorAll('.section').forEach(panel=>{
+  const cards=[...panel.children].filter(child=>child.classList.contains('med-item'));
+  if(cards.length){const grid=document.createElement('div');grid.className='care-product-grid';cards[0].before(grid);grid.append(...cards);}
+ });
+ const recap=root.querySelector(':scope > .rp-choice-recap');
+ if(recap){const details=document.createElement('details');details.className='care-inline-recap';const summary=document.createElement('summary');summary.textContent='Rappel des choix';recap.before(details);details.append(summary,recap);}
 }
 
 // Keep anatomical branch values stable; the side is a separate observation.

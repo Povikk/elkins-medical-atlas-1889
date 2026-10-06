@@ -460,6 +460,7 @@ const flows = {
         choices:[
           {label:"Bleu / bosse / douleur légère", set:{fightIssue:"bruise"}},
           {label:"Petite coupure / éraflure", set:{fightIssue:"cut"}},
+          {label:"Articulation déformée / luxation possible", set:{fightIssue:"dislocation"}},
           {label:"Douleur aux côtes", set:{fightIssue:"ribs"}},
           {label:"Mal à la tête / étourdissement", set:{fightIssue:"head"}},
           {label:"Douleur diffuse sans blessure visible", set:{fightIssue:"general"}},
@@ -525,7 +526,8 @@ const flows = {
           {label:"Bleu / bosse / contusion", set:{horseVisible:"bruise"}},
           {label:"Petite éraflure / coupure", set:{horseVisible:"wound"}},
           {label:"Gonflement important", set:{horseVisible:"swelling"}},
-          {label:"Membre déformé / position anormale", set:{horseVisible:"deformity"}}
+          {label:"Membre déformé / position anormale", set:{horseVisible:"deformity"}},
+          {label:"Articulation déformée / luxation possible", set:{horseVisible:"dislocation"}}
         ]
       },
       {

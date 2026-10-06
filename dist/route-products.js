@@ -1,10 +1,11 @@
 // Authored supply plans for fictional 1889 care. No automatic administration or records.
 const woundSupplyRows=[
  ['Eau propre disponible','Nettoyage superficiel accessible, avec un linge propre ; pas de sondage.'],
- ['Phénol / acide carbolique','Préparation antiseptique historique déjà préparée, si retenue par le médecin ; usage externe adapté, jamais pur ni dans un trajet profond.'],
+ ['Phénol / acide carbolique','Antisepsie avec une préparation historique adaptée à l’usage externe ; jamais pur ni dans un trajet profond. Reprise dans le récapitulatif avec le nettoyage.'],
  ['Compresses et pansement','Protection propre après le soin ; renouveler selon les constatations.']
 ];
 const bruiseSupplyRows=[['Préparation à l’arnica','Appliquer le baume sur le bleu, sur peau intacte uniquement, jamais dans une plaie.'],['Linge frais','Soin de confort du bleu ; repos et réévaluation restent nécessaires.']];
+const jointSupportSupply={rows:[['Attelle ou écharpe','Soutenir le membre dans la position trouvée, sans forcer l’articulation.']],material:['Tissu rembourré','Bandage de maintien'],note:'Luxation possible : examiner l’articulation et les extrémités avant toute décision de réduction. Aucun baume ne remet une articulation en place.'};
 function reviewedCareStep(step,kind){
  if(kind==='surgery')return step;
  if(currentFlow==='minor'&&step.dynamicMinorCare){
@@ -18,11 +19,12 @@ function routeSupplyPlan(step,kind){
  if(kind==='surgery'){
   const title=step.title.toLowerCase();
   if(/anesth/.test(title))return {rows:[],note:'Éther OU chloroforme selon décision spécialisée ; jamais les deux automatiquement. Surveillance dédiée ; pas de réveil garanti.'};
-  if(/nettoy|prépar|accéder|opérer|explor|acte |tissus|drainage si|drainage spécialisé|traiter la lésion|ligatur/.test(title))return {rows:[['Phénol / acide carbolique','Antisepsie historique préparée de la peau / du matériel si retenue ; aucun produit pur ni application profonde.']],material:step.care?.material||['Instruments adaptés au geste retenu','Compresses'],note:'Préparation locale distincte de l’anesthésie ; pas de mélange ni recette. L’antiseptique ne traite pas une lésion interne.'};
+  if(/nettoy|prépar|accéder|opérer|explor|acte |tissus|drainage si|drainage spécialisé|traiter la lésion|ligatur/.test(title))return {rows:[['Phénol / acide carbolique','Antisepsie historique préparée de la peau / du matériel ; aucun produit pur ni application profonde.']],material:step.care?.material||['Instruments adaptés au geste retenu','Compresses'],note:'Préparation locale distincte de l’anesthésie ; pas de mélange ni recette. L’antiseptique ne traite pas une lésion interne.'};
   if(/fermer|refermer|protéger|protection|panser|écoulement/.test(title))return {rows:[['Compresses et pansement','Protection adaptée à la fermeture ou au drainage réellement réalisé.']],material:step.care?.material||['Bandage','Aiguille et fil uniquement si fermeture retenue']};
   return {rows:[],note:'Examen / surveillance : aucun produit supplémentaire systématique.',material:step.care?.material||[]};
  }
  const id=currentFlow,index=stepIndex;
+ if(step.dynamicHorseCare&&answers.horseVisible==='dislocation'||step.dynamicFightCare&&answers.fightIssue==='dislocation'||step.dynamicHoof&&answers.hoofSigns==='dislocation')return jointSupportSupply;
  if(step.dynamicConscious||step.dynamicUnknownBreathing||step.dynamicBreathing||step.dynamicHead||step.dynamicPoison)return {rows:[],note:'Priorités vitales : aucun produit ne remplace la surveillance, le renfort ou le soutien respiratoire.',material:['Couverture / linge propre selon besoin']};
  if(id==='hoof'&&step.dynamicHoof){
   if(answers.hoofSigns==='bruise')return {rows:careProductBlocked()||zoneHas('hoofArea','unknown')?[['Préparation à l’arnica','Option pour le bleu sur peau intacte, différée jusqu’à évaluation rassurante ; pas dans une plaie.']]:[],note:'Le soin du bleu ne traite pas une éventuelle lésion interne ; réévaluer chaque zone frappée.'};
@@ -33,9 +35,11 @@ function routeSupplyPlan(step,kind){
  if(step.dynamicAnimal==='clean'){
   if(animalIsVenom()||animalUnsafe())return {rows:[['Linge propre / protection simple','Protéger pendant l’organisation du renfort et du transport.']],note:animalIsVenom()?'Aucun antivenin courant en 1889 ; pas d’incision, aspiration ou cautérisation.':'Nettoyage et produits locaux différés pendant la prise en charge prioritaire.'};
   if(animalHasWound())return {rows:woundSupplyRows,note:'Aucun antiseptique ne prévient à lui seul la rage. Pas de fermeture ni de baume automatiques pour une morsure.'};
+  if(['crush','dislocation'].includes(answers.animalDepth))return jointSupportSupply;
   return {rows:bruiseSupplyRows,note:'Pas d’antiseptique sans plaie ; déformation / perte de fonction : examen et soutien d’abord.'};
  }
  if(step.dynamicUnknownBleeding)return {rows:['major','minor'].includes(answers.unknownBleeding)?[['Compresses / linge propre','Contrôle du saignement visible et protection temporaire.']]:[],note:'L’examen du saignement ne justifie pas un médicament systématique.'};
+ if(step.dynamicAnimal==='protect'&&answers.animalDepth==='dislocation')return jointSupportSupply;
  if(step.dynamicSuture)return {rows:answers.needsSuture===true?woundSupplyRows:woundSupplyRows.filter(r=>r[0]!=='Phénol / acide carbolique'),material:answers.needsSuture===true?['Aiguille et fil','Pince','Ciseaux']:[],note:answers.needsSuture===true?'Points uniquement si fermeture retenue ; nombre à préciser.':'Pas de points dans cette branche ; protéger et organiser l’avis si nécessaire.'};
  if(id==='gunshot'&&step.dynamic)return {rows:woundSupplyRows,note:answers.bullet==='graze'?'Éraflure constatée : soin superficiel, pas d’extraction ni de points.':'Pas de recherche de projectile ou de plomb à l’aveugle.'};
  if(id==='knife'&&step.title==='Nettoyer')return {rows:woundSupplyRows,note:'Nettoyer ce qui est accessible ; profondeur incertaine : protéger et demander un avis.'};
@@ -72,8 +76,8 @@ flows.burn.steps[3].med=flows.burn.steps[3].med.filter(r=>!r[0].includes('Carron
 flows.poison.steps[3].med=[];
 flows.poison.steps[3].care.products=[];
 flows.poison.steps[3].do=['Surveiller constamment respiration et réactions.','Organiser du renfort et poursuivre le soutien respiratoire si nécessaire.','Aucun antidote spécifique proposé en 1889 ; sels odorants et nouveaux opiacés ne traitent pas cette intoxication.'];
-careMemoRows.gunshot[2]='Nettoyage accessible : eau propre ; antiseptique préparé si retenu ; compresses ; douleur évaluée';
-careMemoRows.knife[2]='Eau propre · antiseptique préparé si adapté · compresses ; antalgique facultatif';
+careMemoRows.gunshot[2]='Plaie : eau propre · antisepsie au phénol préparé · compresses ; antalgique facultatif';
+careMemoRows.knife[2]='Plaie : eau propre · antisepsie au phénol préparé · compresses ; antalgique facultatif';
 careMemoRows.minor[2]='Bleu : arnica sur peau intacte ; plaie : eau / antisepsie adaptée / pansement ; irritation : zinc';
 careMemoRows.hoof[2]='Bleu simple : arnica / linge frais ; plaie : eau, antisepsie adaptée, compresses ; déformation : soutien';
 careMemoRows.head[2]='Coupure : nettoyage / pansement ; bosse : soin de peau intacte ; aucun produit ne traite la commotion';

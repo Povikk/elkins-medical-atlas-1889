@@ -28,6 +28,7 @@
     <nav class="side-nav">
       <button type="button" class="side-nav-item active" data-shell-view="home" data-mobile-label="Accueil" onclick="goHome()"><span aria-hidden="true">⌂</span>Vue d’ensemble</button>
       <button type="button" class="side-nav-item" data-shell-view="cases" data-mobile-label="Soins" onclick="showCases()" aria-label="Ouvrir les soins guidés"><span aria-hidden="true">✚</span>Intervention</button>
+      <button type="button" class="side-nav-item" data-shell-view="followup" data-mobile-label="Suivi" onclick="showFollowup()"><span aria-hidden="true">↻</span>Suivi</button>
       <button type="button" class="side-nav-item" data-shell-view="lexique" data-mobile-label="Lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
       <button type="button" class="side-nav-item" data-shell-view="surgery" data-mobile-label="Chirurgie" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
       <button type="button" class="side-nav-item" data-shell-view="atlas" data-mobile-label="Atlas" onclick="showAtlas()"><span aria-hidden="true">◎</span>Atlas anatomique</button>
@@ -42,7 +43,7 @@
         </div>
         <small class="cabinet-mobile-legend">Seringue + kit : 2,50 $ · Kit seul : 1,50 $</small>
         <div class="cabinet-money-row"><span>Cabinet</span><strong id="cabinetTotal" aria-live="polite">0,00 $</strong><button type="button" class="cabinet-paid" onclick="resetCabinetCounter()" aria-label="Réinitialiser le montant du cabinet" title="Confirmer le versement au cabinet">Versé</button></div>
-        <button type="button" class="cabinet-personal-row" onclick="resetPersonalCounter()" aria-label="Réinitialiser mes gains" title="Cliquer pour remettre uniquement tes gains à zéro"><span>Mes gains</span><strong id="personalTotal" aria-live="polite">0,00 $</strong></button>
+        <button type="button" class="cabinet-personal-row" onclick="resetPersonalCounter()" aria-label="Réinitialiser mes gains" title="Cliquer pour remettre uniquement tes gains à zéro"><span>Mes gains</span><strong id="personalTotal" aria-live="polite">0,00 $</strong><span aria-hidden="true">↺</span></button>
         <small id="cabinetStatus" role="status" hidden></small>
       </div>
     </section>
@@ -76,10 +77,6 @@
           <strong>Intervention</strong>
           <span>Prise en charge principale, guidée étape par étape</span>
         </button>
-        <button class="case priority-case priority-case-home" onclick="start('unknown')">
-          <strong> Patient inconscient / cause inconnue</strong>
-          <span class="muted">Commencer par l'état vital avant de chercher ce qui s'est passé</span>
-        </button>
         <button class="home-btn" onclick="showLexique()">
           <strong>Lexique</strong>
           <span>Produits, antidouleurs, antiseptiques, anesthésiques et soins</span>
@@ -102,10 +99,6 @@
         <button class="danger" onclick="goHome()">Accueil</button>
       </div>
       <div class="case-grid">
-        <button class="case priority-case" onclick="start('unknown')">
-          <strong> Inconscient / cause inconnue</strong>
-          <span class="muted">Respiration, saignement, réveil, puis recherche de la cause</span>
-        </button>
         <button class="case" onclick="start('gunshot')">
           <strong> Blessure par balle</strong>
           <span class="muted">Projectile, saignement, plaie d’entrée/sortie</span>
@@ -294,6 +287,7 @@
     </dialog>
     <dialog id="incidentDialog" class="scene-dialog" aria-labelledby="incidentTitle"><div class="dialog-heading"><h2 id="incidentTitle">Son état change</h2><button type="button" class="secondary" onclick="closeIncident()">Fermer</button></div><div id="incidentContent"></div></dialog>
     <section id="flow" class="hidden"></section>
+    <section id="followup" class="hidden" aria-label="Suivi du patient"></section>
     <section id="quiz" class="hidden" aria-label="Quiz d'entraînement RP"></section>
   </main>
 
@@ -318,12 +312,16 @@
 <script src="condensed.js"></script>
 <script src="care-memo.js"></script>
 <script src="report.js"></script>
+<script src="confirmations.js"></script>
 <script src="animal.js"></script>
 <script src="zones.js"></script>
 <script src="hoof.js"></script>
 <script src="route-products.js"></script>
 <script src="zone-parts.js"></script>
 <script src="recovery.js"></script>
+<script src="route-ledger.js"></script>
+<script src="followup.js"></script>
+<script src="route-layout.js"></script>
 <script src="cabinet.js"></script>
 <script src="lex-quick.js"></script>
 <script src="techniques.js"></script>

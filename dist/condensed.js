@@ -42,6 +42,7 @@ function renderCondensed(kind){
     const products=[...raw.querySelectorAll('.condensed-products')].map(panel=>panel.outerHTML.replace('setRpPain(this.value)',`condensedPain(${index},this.value,'${kind}')`)).join('');
     body='<ul><li>Évaluer la douleur et l’état vital avant un produit facultatif.</li><li>Privilégier installation, repos et soin de la blessure ; surveiller conscience et respiration.</li></ul>'+products+[...raw.querySelectorAll(':scope > .route-note,:scope > .assistant-note')].map(note=>`<p class="condensed-alert">${condensedEscape(note.textContent)}</p>`).join('');
    }
+   if(!pending)body+=[...raw.querySelectorAll('.care-confirmations')].map(panel=>panel.outerHTML).join('');
    if(!body)body='<p>Vérifier les observations avant de poursuivre.</p>';
    cards.push(`<article class="condensed-step ${current?'is-current':''} ${pending?'is-pending':''}" data-step-index="${index}" ${current?'aria-current="step"':''}><h3><span>${position+1}</span>${condensedEscape(step.title)}${current?'<small>En cours</small>':''}</h3>${body}<button class="condensed-mark" ${pending?'disabled':''} onclick="condensedMark(${index},'${kind}')">${current?'Étape actuelle':pending?'À venir':'Se placer ici'}</button></article>`);
   });
@@ -81,7 +82,8 @@ function condensedMark(index,kind){
   const earlier=flows[currentFlow].steps.slice(0,index).some(step=>zoneKeyForStep(step)?!zoneComplete(step):step.choices&&!step.choices.some(c=>Object.entries(c.set).every(([k,v])=>answers[k]===v)));
   if(earlier)return;
   if(index!==stepIndex)flowHistory.push({index:stepIndex,answers:{...answers}});
-  stepIndex=index;render();
- }else{surgeryStepIndex=index;renderSurgery();}
+   if(index>stepIndex)for(let i=stepIndex;i<index;i++){stepIndex=i;if(!shouldSkipStep(flows[currentFlow].steps[i]))completeRoutineStep('flow');}
+   stepIndex=index;render();
+  }else{if(index>surgeryStepIndex)for(let i=surgeryStepIndex;i<index;i++){surgeryStepIndex=i;completeRoutineStep('surgery');}surgeryStepIndex=index;renderSurgery();}
 }
 function condensedPain(index,value,kind){if(kind==='surgery')surgeryStepIndex=index;else stepIndex=index;setRpPain(value);}

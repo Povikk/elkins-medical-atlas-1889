@@ -60,12 +60,9 @@ flows.animal={title:'Attaque d’animal',urgency:'serious',steps:[
   ...[['head','Tête / visage / cou'],['chest','Thorax'],['abdomen','Abdomen'],['back','Dos'],['unknown','Zone non déterminée']].map(([area,label])=>animalChoice(label,{animalArea:area,animalSide:'none'}))
  ]),
  {...animalStep('Aspect et fonction',['Observer profondeur apparente, souillures et bords de la plaie sans sonder à l’aveugle.','Rechercher perte de sensibilité, déformation ou mouvement impossible.','Ne pas conclure à une plaie bénigne sur la seule taille de l’ouverture.'],['« Ne forcez pas le mouvement. Je vérifie ce qui a pu être atteint. »','« Cette ouverture ne suffit pas à connaître la profondeur de la blessure. »'],[
-  animalChoice('Atteinte superficielle, sans gêne de mouvement décrite',{animalDepth:'surface'}),animalChoice('Plaie profonde / perforante ou déchirure importante',{animalDepth:'deep'}),animalChoice('Écrasement, déformation ou fonction altérée',{animalDepth:'crush'}),animalChoice('Profondeur / fonction non évaluées',{animalDepth:'unknown'}),
+  animalChoice('Atteinte superficielle, sans gêne de mouvement décrite',{animalDepth:'surface'}),animalChoice('Plaie profonde / perforante ou déchirure importante',{animalDepth:'deep'}),animalChoice('Écrasement, déformation ou fonction altérée',{animalDepth:'crush'}),animalChoice('Articulation déformée / luxation possible',{animalDepth:'dislocation'}),animalChoice('Profondeur / fonction non évaluées',{animalDepth:'unknown'}),
   animalChoice('Marques locales, aucun autre signe rapporté',{animalVenomSigns:'local'}),animalChoice('Douleur / gonflement qui progressent',{animalVenomSigns:'progressing'}),animalChoice('Malaise, réactions ou respiration qui se dégradent',{animalVenomSigns:'danger'}),animalChoice('Évolution non déterminée',{animalVenomSigns:'unknown'})
  ]),dynamicAnimal:'aspect'},
- {title:'Circonstances de l’attaque',dynamicAnimal:'context',choices:[
-  animalChoice('Rencontre en milieu sauvage, déroulement rapporté',{animalExposure:'wild'}),animalChoice('Attaque sans provocation ou comportement inhabituel rapportés',{animalExposure:'unusual'}),animalChoice('Réaction défensive après approche, surprise ou poursuite',{animalExposure:'known'}),animalChoice('Circonstances non déterminées',{animalExposure:'unknown'})
- ],care:{material:[]}},
  {title:'Soin local adapté',dynamicAnimal:'clean',care:{material:['Eau propre disponible','Compresses','Pansement propre'],assistant:'Préparez le linge et le pansement ; ne mélangez pas des antiseptiques et ne sondez pas la plaie.'}},
  {title:'Soulager la douleur',dynamicAnimal:'pain',care:{products:animalAnalgesics,material:[],assistant:'Surveillez conscience et respiration si un antalgique a réellement été administré.'}},
  {title:'Protéger et soutenir',dynamicAnimal:'protect',care:{material:['Compresses','Bandage'],assistant:'Vérifiez que le bandage ne gêne pas ; préparez le transport si une orientation est nécessaire.'}},
@@ -78,13 +75,13 @@ sceneEndings.animal=['Reprendre les blessures observées et les soins réellemen
 hooks.filter(h=>h.routes.includes('minor')||h.routes.includes('horse')).forEach(h=>h.routes.push('animal'));
 
 function animalBleeding(){return answers.latestBleeding||answers.animalBleeding;}
-function animalNeedsAssessment(){return animalIsVenom()||['deep','crush','unknown'].includes(answers.animalDepth)||['head','chest','abdomen','hand','foot','unknown'].some(area=>zoneHas('animalArea',area));}
+function animalNeedsAssessment(){return animalIsVenom()||['deep','crush','dislocation','unknown'].includes(answers.animalDepth)||['head','chest','abdomen','hand','foot','unknown'].some(area=>zoneHas('animalArea',area));}
 function animalUnsafe(){return careProductBlocked()||animalBleeding()==='unknown'||!answers.conscious;}
 function animalRiskNote(){
  if(animalIsVenom())return 'Venin possible : organiser une prise en charge urgente et une surveillance continue, même si les marques sont petites. Aucun sérum antivenimeux disponible dans ce parcours de 1889.';
  if(animalProfile().family==='reptile')return 'Alligator : pas de risque de rage transmis par ce reptile. Surveiller plutôt lésions profondes, souillures et conséquences d’une immersion éventuelle.';
  if(!animalHasWound())return 'Sans plaie ouverte ni exposition à la salive rapportées, ne pas inventer une morsure. Réévaluer les conséquences du choc et de la chute.';
- return answers.animalExposure==='known'?'Une réaction défensive n’exclut pas à elle seule un risque de rage. Faire évaluer l’exposition à la salive avec un praticien compétent.':'Faire évaluer rapidement une éventuelle exposition à la rage, même si la plaie paraît petite ; les circonstances ne suffisent pas à exclure ce risque.';
+ return 'Faire évaluer une éventuelle exposition à la rage après morsure ; la petite taille de la plaie ne suffit pas à exclure ce risque.';
 }
 function animalMemoRow(row){
  if(answers.animalSpecies&&answers.animalSpecies!=='unknown')row[0]=animalProfile().name+' · souffle · sang · zones atteintes';
@@ -109,9 +106,6 @@ function animalStepMarkup(step){
   case 'injury':
    actions=[animalProfile().focus,'Choisir les lésions réellement observées ; l’espèce ne confirme ni leur profondeur ni leur gravité.'];
    phrases=animalIsVenom()?['« Quand le serpent vous a-t-il mordu ? »','« Depuis la morsure, la douleur ou le gonflement ont-ils changé ? »']:['« Montrez-moi tous les endroits où vous avez été touché. »','« Avez-vous été renversé ou piétiné pendant l’attaque ? »'];break;
-  case 'context':
-   actions=['Préciser le moment de l’attaque, le nombre d’animaux et une chute ou immersion éventuelle.',animalIsVenom()?'Venin possible : demander une prise en charge urgente sans attendre l’identification certaine du serpent. Ne pas retourner le capturer.':animalProfile().family==='reptile'?'Alligator : reprendre morsure, milieu souillé et immersion. Ce reptile ne transmet pas la rage.':'Préciser une exposition à la salive et un comportement inhabituel ; l’agressivité seule ne prouve pas la rage.'];
-   phrases=['« Quand l’attaque a-t-elle eu lieu ? »','« Êtes-vous tombé ou passé sous l’eau ? »'];break;
   case 'aspect':
    actions=animalIsVenom()?['Observer l’évolution de la douleur, du gonflement, des réactions et de la respiration.','Choisir les signes rapportés ; petites marques ou absence de symptômes ne prouvent pas l’absence de venin.']:!animalHasWound()?['Examiner douleur, sensibilité et mouvement sans forcer.','Rechercher déformation, faiblesse ou gêne apparue après le choc ; ne pas supposer une fracture.']:step.do;
    phrases=animalIsVenom()?['« Depuis la morsure, qu’est-ce qui a changé ? »','« Dites-moi si vous avez un malaise ou si votre respiration devient difficile. »']:!animalHasWound()?['« Sans forcer, dites-moi ce qui vous gêne depuis le choc. »']:step.say;break;
@@ -145,7 +139,7 @@ function animalStepMarkup(step){
     actions=['Protéger sans compression serrée ; éviter les mouvements inutiles.','Organiser le transport et surveiller tout changement de respiration, de réactions ou de gonflement.'];
     phrases=['« Ne forcez pas sur ce membre. Prévenez-moi de toute sensation nouvelle. »'];break;
    }
-   actions=[!animalHasWound()?'Sans plaie ouverte, ménager la zone et soutenir le membre si nécessaire ; pas de pansement de plaie systématique.':unsafe?'Protéger provisoirement les plaies pendant la prise en charge prioritaire ; ne pas banaliser un départ.':'Poser une protection propre adaptée, sans bandage trop serré.',answers.animalDepth==='crush'?'Soutenir le membre atteint sans forcer ; prévoir une évaluation de fracture ou de lésion profonde, sans diagnostic automatique.':'Ménager la zone blessée ; vérifier sensibilité et gêne après le soin.',multiple?'Revérifier toutes les plaies et leurs pansements, pas seulement la zone principale.':'Rechercher un signe nouveau ou un saignement qui reprend, si une plaie est présente.'];
+   actions=[!animalHasWound()?'Sans plaie ouverte, protéger la zone douloureuse ; pas de pansement de plaie systématique.':unsafe?'Protéger provisoirement les plaies pendant la prise en charge prioritaire ; ne pas banaliser un départ.':'Poser une protection propre adaptée, sans bandage trop serré.',['crush','dislocation'].includes(answers.animalDepth)?'Soutenir le membre dans la position trouvée, sans forcer ; examiner la fracture ou la luxation possible avant toute décision de réduction.':'Ménager la zone blessée ; vérifier sensibilité et gêne après le soin.',multiple?'Revérifier toutes les zones atteintes, leurs soutiens et les pansements présents.':'Vérifier la sensibilité et l’aspect des extrémités après le soutien, et l’absence de reprise du saignement en présence d’une plaie.'];
    phrases=!animalHasWound()?['« Ne forcez pas sur cette zone. Dites-moi si la douleur augmente ou si vous perdez de la sensibilité. »']:['« Dites-moi si le bandage serre, si vos doigts s’engourdissent ou si la douleur augmente. »'];break;
   case 'finish':
    actions=[unsafe?'État non rassurant ou incomplet : poursuivre la surveillance et organiser du renfort, pas une sortie automatique.':animalNeedsAssessment()?'Organiser l’évaluation de la blessure à risque avant de conclure ; un pansement ne suffit pas à écarter une lésion profonde.':'Prévoir un contrôle rapproché de la plaie et du pansement.','Expliquer : revenir si douleur croissante, rougeur qui s’étend, écoulement, fièvre, saignement ou perte de sensibilité.',animalRiskNote()];
