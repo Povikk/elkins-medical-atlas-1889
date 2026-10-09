@@ -19,6 +19,7 @@ flows.fluidLoss={title:'Déperdition de liquides / Anémie profonde',urgency:'se
  {title:'Signes et circonstances',dynamicLossAssessment:true,do:[],choices:lossProfiles.map(p=>({label:p.label,set:{lossProfile:p.id}}))},
  {title:'Soins et consignes',dynamicLossCare:true,do:[],say:[]}
 ]};
+caseEmoji.fluidLoss='1f4a7';
 function lossCareStep(step){
  if(step.dynamicLossAssessment){
   if(!answers.lossBranch)return {...step,do:['Choisir d’abord le motif : déperdition de liquides ou anémie.'],choices:undefined};

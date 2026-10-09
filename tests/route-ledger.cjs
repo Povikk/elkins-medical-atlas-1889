@@ -4,6 +4,8 @@ const context={console,document:{addEventListener(){},querySelectorAll(){return 
 context.document.body=element();context.sleepingSurgery=()=>false;vm.createContext(context);
 for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
 const run=source=>vm.runInContext(source,context);
+assert.equal(run('caseEmoji.fluidLoss'),'1f4a7');
+assert(fs.existsSync('dist/assets/emoji/'+run('caseEmoji.fluidLoss')+'.svg'));
 run(`currentFlow='fluidLoss';activeRouteKind='flow';answers={lossBranch:'liquids',lossProfile:'heat',conscious:'awake'};stepIndex=flows.fluidLoss.steps.length-1;completeRoutineStep('flow')`);
 assert.match(run('reportActualCare()'),/Eau potable proposée/);assert.doesNotMatch(run('reportActualCare()'),/fer prescrite/);
 assert.match(run("reportFindings('flow')"),/Chaleur/);
