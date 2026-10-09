@@ -15,6 +15,7 @@ function reportFindings(kind){
  const options=route.steps.flatMap(s=>!surgery&&currentFlow==='animal'?animalChoicesForStep(s):s.choices||[]);
  keys.push('animalSpecies','animalInjury','animalArea','animalBleeding','animalDepth','animalVenomSigns');
  keys.push('hoofArea','hoofSigns','minorIssue');
+ keys.push('lossBranch','lossProfile');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState){

@@ -2,8 +2,30 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const element=()=>({innerHTML:'',textContent:'',dataset:{},classList:{add(){},remove(){},contains(){return false;}},querySelectorAll(){return [];},querySelector(){return null;},setAttribute(){},addEventListener(){},append(){}});
 const context={console,document:{addEventListener(){},querySelectorAll(){return [];},querySelector(){return null;},getElementById(){return element();},createElement:element,documentElement:element()},localStorage:{getItem(){return null;},setItem(){}},hooks:[],caseEmoji:{},window:{addEventListener(){}},matchMedia:()=>({matches:false,addEventListener(){}}),innerWidth:1920,emojiIcon:()=>'',urgencyBadge:()=>'',normalize:s=>String(s).toLowerCase(),escapeHTML:s=>String(s)};
 context.document.body=element();context.sleepingSurgery=()=>false;vm.createContext(context);
-for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
+for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
 const run=source=>vm.runInContext(source,context);
+run(`currentFlow='fluidLoss';activeRouteKind='flow';answers={lossBranch:'liquids',lossProfile:'heat',conscious:'awake'};stepIndex=flows.fluidLoss.steps.length-1;completeRoutineStep('flow')`);
+assert.match(run('reportActualCare()'),/Eau potable proposée/);assert.doesNotMatch(run('reportActualCare()'),/fer prescrite/);
+assert.match(run("reportFindings('flow')"),/Chaleur/);
+assert.equal(run("lossCareStep(flows.fluidLoss.steps.find(s=>s.dynamicLossAssessment)).choices.length"),4);
+run(`answers={lossBranch:'anemia',lossProfile:'iron',conscious:'awake'};completeRoutineStep('flow')`);
+assert.doesNotMatch(run('reportActualCare()'),/fer prescrite|Eau potable/);
+assert.equal(run("lossCareStep(flows.fluidLoss.steps.at(-1)).confirmActs.length"),1);
+run(`careConfirm('act:Préparation de fer prescrite','done')`);assert.match(run('reportActualCare()'),/fer prescrite/);
+run(`careInvalidateFrom(stepIndex)`);assert.doesNotMatch(run('reportActualCare()'),/fer prescrite/);
+for(const profile of ['bloodloss','anemiaDanger','intolerance','dehydrationDanger']){
+ run(`answers={lossBranch:'${['bloodloss','anemiaDanger'].includes(profile)?'anemia':'liquids'}',lossProfile:'${profile}',conscious:'awake'};completeRoutineStep('flow')`);
+ assert.match(run('reportActualCare()'),/urgente organisée/);assert.doesNotMatch(run('reportActualCare()'),/Eau potable proposée|fer prescrite/);
+}
+run(`answers={lossBranch:'liquids',lossProfile:'heat',conscious:'unconscious_breathing'};completeRoutineStep('flow')`);assert.doesNotMatch(run('reportActualCare()'),/Eau potable proposée/);
+assert.equal(run("lossCareStep(flows.fluidLoss.steps.at(-1)).med.length"),0);
+assert(run("followupMenuKeys.includes('fluidLoss')"));
+for(const profile of run('lossProfiles')){
+ run(`answers={lossBranch:'${profile.branch}',lossProfile:'${profile.id}',conscious:'awake'};stepIndex=flows.fluidLoss.steps.length-1`);
+ const html=run('render(true)');assert(!/undefined|NaN/.test(html));assert.match(run("reportFindings('flow')"),new RegExp(profile.label.slice(0,8)));
+}
+run(`answers={lossBranch:'anemia',lossProfile:'activeBleeding',conscious:'awake'};completeRoutineStep('flow')`);assert.match(run('reportActualCare()'),/Contrôle du saignement/);
+run(`stepIndex=0;applyChoice({lossBranch:'liquids'})`);assert.equal(run('answers.lossProfile'),undefined);assert.doesNotMatch(run('reportActualCare()'),/saignement|fer prescrite/);
 run(`currentFlow='hoof';activeRouteKind='flow';answers={conscious:'awake',hoofSigns:'bruise',hoofArea:'abdomen'};stepIndex=flows.hoof.steps.findIndex(s=>s.dynamicHoof);completeRoutineStep('flow');completeRoutineStep('flow');`);
 assert.match(run('reportActualCare()'),/arnica/);assert.equal((run('reportActualCare()').match(/arnica/g)||[]).length,1);
 run(`answers={conscious:'awake',hoofSigns:'wound',hoofArea:'arm'};completeRoutineStep('flow')`);

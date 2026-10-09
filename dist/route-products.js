@@ -8,6 +8,7 @@ const bruiseSupplyRows=[['Préparation à l’arnica','Appliquer le baume sur le
 const jointSupportSupply={rows:[['Attelle ou écharpe','Soutenir le membre dans la position trouvée, sans forcer l’articulation.']],material:['Tissu rembourré','Bandage de maintien'],note:'Luxation possible : examiner l’articulation et les extrémités avant toute décision de réduction. Aucun baume ne remet une articulation en place.'};
 function reviewedCareStep(step,kind){
  if(kind==='surgery')return step;
+ if(currentFlow==='fluidLoss')return lossCareStep(step);
  if(currentFlow==='minor'&&step.dynamicMinorCare){
   const issue=answers.minorIssue;
   const wound=issue==='wound',bruise=issue==='bruise',irritation=issue==='irritation';
@@ -16,6 +17,7 @@ function reviewedCareStep(step,kind){
  return step;
 }
 function routeSupplyPlan(step,kind){
+ if(kind==='flow'&&currentFlow==='fluidLoss')return {rows:[],material:lossCareStep(step).care?.material||[],note:step.dynamicLossCare?'Pas de morphine, laudanum, purgatif ou perfusion automatique pour ce motif.':'Observer les réactions et le souffle avant tout produit.'};
  if(kind==='surgery'){
   const title=step.title.toLowerCase();
   if(/anesth/.test(title))return {rows:[],note:'Éther OU chloroforme selon décision spécialisée ; jamais les deux automatiquement. Surveillance dédiée ; pas de réveil garanti.'};
