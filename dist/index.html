@@ -35,15 +35,14 @@
       <button type="button" class="side-nav-item" data-shell-view="stories" data-mobile-label="Accroches" onclick="showStories()"><span aria-hidden="true">▤</span>Accroches</button>
       <button type="button" class="side-nav-item" data-shell-view="quiz" data-mobile-label="Quiz" onclick="showQuiz()"><span aria-hidden="true">?</span>Quiz</button>
     </nav>
-    <section class="cabinet-counter" aria-label="Compteurs de soins et gains" title="Compteurs conservés sur ce navigateur uniquement">
+    <section class="cabinet-counter" aria-label="Objets utilisés et montant dû au cabinet" title="Compteurs conservés sur ce navigateur uniquement">
       <div class="cabinet-counter-content">
         <div class="cabinet-item-buttons">
-          <button type="button" onclick="addCabinetItem('combo')" aria-label="Ajouter une seringue et un kit" title="Seringue + kit après réanimation : 2,50 $, dont 1,50 $ pour toi et 1 $ au cabinet"><span aria-hidden="true"><img src="assets/emoji/1f489.svg" width="20" height="20" alt="">+<img src="assets/emoji/1fa79.svg" width="20" height="20" alt=""></span><b id="cabinetComboCount">0</b></button>
-          <button type="button" onclick="addCabinetItem('kits')" aria-label="Ajouter un kit seul" title="Kit seul avec consultation : 1,50 $, dont 1 $ pour toi et 0,50 $ au cabinet"><img src="assets/emoji/1fa79.svg" width="24" height="24" alt="" aria-hidden="true"><b id="cabinetKitCount">0</b></button>
+          <button type="button" onclick="addCabinetItem('kits')" aria-label="Ajouter un kit de soin" title="Kit de soin : +0,37 $ à reverser au cabinet"><img src="assets/emoji/1fa79.svg" width="24" height="24" alt="" aria-hidden="true"><b id="cabinetKitCount">0</b></button>
+          <button type="button" onclick="addCabinetItem('syringes')" aria-label="Ajouter une seringue vivifiante" title="Seringue vivifiante : +0,57 $ à reverser au cabinet"><img src="assets/emoji/1f489.svg" width="24" height="24" alt="" aria-hidden="true"><b id="cabinetSyringeCount">0</b></button>
         </div>
-        <small class="cabinet-mobile-legend">Seringue + kit : 2,50 $ · Kit seul : 1,50 $</small>
-        <div class="cabinet-money-row"><span>Cabinet</span><strong id="cabinetTotal" aria-live="polite">0,00 $</strong><button type="button" class="cabinet-paid" onclick="resetCabinetCounter()" aria-label="Réinitialiser le montant du cabinet" title="Confirmer le versement au cabinet">Versé</button></div>
-        <button type="button" class="cabinet-personal-row" onclick="resetPersonalCounter()" aria-label="Réinitialiser mes gains" title="Cliquer pour remettre uniquement tes gains à zéro"><span>Mes gains</span><strong id="personalTotal" aria-live="polite">0,00 $</strong><span aria-hidden="true">↺</span></button>
+        <small class="cabinet-mobile-legend">Kit : +0,37 $ · Seringue : +0,57 $ au cabinet</small>
+        <div class="cabinet-money-row"><span>À reverser</span><strong id="cabinetTotal" aria-live="polite">0,00 $</strong><button type="button" class="cabinet-paid" onclick="resetCabinetCounter()" aria-label="Réinitialiser le montant du cabinet" title="Confirmer le versement au cabinet">Versé</button></div>
         <small id="cabinetStatus" role="status" hidden></small>
       </div>
     </section>
