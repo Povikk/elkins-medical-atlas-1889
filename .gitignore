@@ -2,3 +2,5 @@ tmp/
 .sites-runtime/
 node_modules/
 debug.log
+dist/server/
+dist/.openai/

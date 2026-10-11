@@ -42,8 +42,9 @@
           <button type="button" onclick="addCabinetItem('syringes')" aria-label="Ajouter une seringue vivifiante" title="Seringue vivifiante : +0,75 $ à reverser au cabinet"><img src="assets/emoji/1f489.svg" width="24" height="24" alt="" aria-hidden="true"><b id="cabinetSyringeCount">0</b></button>
         </div>
         <small class="cabinet-mobile-legend">Kit : +0,40 $ · Seringue : +0,75 $ au cabinet</small>
-        <div class="cabinet-money-row"><span>À reverser</span><strong id="cabinetTotal" aria-live="polite">0,00 $</strong><button type="button" class="cabinet-paid" onclick="resetCabinetCounter()" aria-label="Réinitialiser le montant du cabinet" title="Confirmer le versement au cabinet">Versé</button></div>
+        <div class="cabinet-money-row"><span>À reverser</span><strong id="cabinetTotal" aria-live="polite">0,00 $</strong><button type="button" id="cabinetSettings" class="cabinet-settings" onclick="openCabinetSettings()" aria-label="Régler les tarifs du cabinet" title="Tarifs partagés du cabinet" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-1 3 3 2 3-1 2 3 3-1 1-3 3-1 1-3-2-2 1-3-3-2-3 1-2-3Z"/><circle cx="12" cy="11" r="3"/></svg></button><button type="button" class="cabinet-paid" onclick="resetCabinetCounter()" aria-label="Réinitialiser le montant du cabinet" title="Confirmer le versement au cabinet">Versé</button></div>
         <small id="cabinetStatus" role="status" hidden></small>
+        <small id="cabinetRatesStatus" role="status" hidden></small>
       </div>
     </section>
     <button type="button" id="themeToggle" class="theme-toggle sidebar-theme" aria-pressed="false"></button>
@@ -298,6 +299,16 @@
   </div>
 </div>
 
+<dialog id="cabinetSettingsDialog" class="cabinet-settings-dialog" aria-labelledby="cabinetSettingsTitle">
+ <form onsubmit="saveCabinetRates(event)">
+  <div class="cabinet-settings-heading"><h3 id="cabinetSettingsTitle">Tarifs du cabinet</h3><button type="button" class="secondary" onclick="document.getElementById('cabinetSettingsDialog').close()" aria-label="Fermer les réglages">×</button></div>
+  <p>Montants à reverser par objet. Ces tarifs s’appliquent à tous, uniquement aux prochains clics.</p>
+  <label>Kit de soin ($)<input id="cabinetKitRate" type="text" inputmode="decimal" required autocomplete="off"></label>
+  <label>Seringue vivifiante ($)<input id="cabinetSyringeRate" type="text" inputmode="decimal" required autocomplete="off"></label>
+  <div class="report-actions"><button type="button" class="secondary" onclick="document.getElementById('cabinetSettingsDialog').close()">Annuler</button><button type="submit" class="next" id="cabinetRatesSave">Appliquer à tous</button></div>
+  <small id="cabinetSettingsMessage" role="status" aria-live="polite"></small>
+ </form>
+</dialog>
 <script src="data.js"></script>
 <script src="surgery-extra.js"></script>
 <script src="pharmacy.js"></script>
@@ -325,6 +336,7 @@
 <script src="consultation-products.js"></script>
 <script src="route-layout.js"></script>
 <script src="cabinet.js"></script>
+<script src="cabinet-rates.js"></script>
 <script src="lex-quick.js"></script>
 <script src="techniques.js"></script>
 <script src="quiz-curated.js"></script>

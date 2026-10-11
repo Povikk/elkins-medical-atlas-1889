@@ -18,10 +18,11 @@ function renderCabinetCounter(){
  document.getElementById('cabinetStatus').hidden=!cabinetStorageError;
 }
 function saveCabinetCounts(){try{localStorage.setItem(cabinetStorageKey,JSON.stringify(cabinetCounts));cabinetStorageError=false;}catch(error){cabinetStorageError=true;}renderCabinetCounter();}
-function addCabinetItem(key){
+async function addCabinetItem(key){
  if(!['kits','syringes'].includes(key))return;
+ if(typeof ensureCabinetRates==='function'&&!await ensureCabinetRates())return;
  cabinetCounts=loadCabinetCounts();
- const contribution=key==='kits'?40:75;
+ const contribution=typeof sharedCabinetRates!=='undefined'&&sharedCabinetRates?(key==='kits'?sharedCabinetRates.kitCents:sharedCabinetRates.syringeCents):(key==='kits'?40:75);
  if(cabinetCounts[key]>=1000000||!Number.isSafeInteger(cabinetCounts.dueCents+contribution))return;
  cabinetCounts[key]++;cabinetCounts.dueCents+=contribution;saveCabinetCounts();
 }
