@@ -1824,3 +1824,13 @@ summary{cursor:pointer;color:var(--ink)}
 .zone-precisions label{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
 .zone-precisions input{flex:1;min-width:140px;max-width:100%;padding:6px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:5px}
 @media(hover:none){.cabinet-counter-content .cabinet-paid,.cabinet-counter-content .cabinet-personal-row{min-height:44px}}
+/* Category accents are landmarks, not severity badges. Text keeps theme contrast. */
+[data-route-accent="gunshot"]{--route-color:#a75a47;--route-tint:#f3e2dc}
+[data-route-accent="hoof"]{--route-color:#94702b;--route-tint:#f4ead1}
+[data-route-accent="animal"]{--route-color:#487b60;--route-tint:#e1ece2}
+html[data-theme="dark"] [data-route-accent="gunshot"]{--route-color:#cf8d79;--route-tint:#2b211e}
+html[data-theme="dark"] [data-route-accent="hoof"]{--route-color:#c4a35f;--route-tint:#29271b}
+html[data-theme="dark"] [data-route-accent="animal"]{--route-color:#7bac8d;--route-tint:#1c2b23}
+:is(#cases .case,#followup .card)[data-route-accent]{border-color:var(--route-color);border-left-width:4px;background:var(--route-tint);color:var(--ink)}
+:is(#cases .case,#followup .card)[data-route-accent]:hover{box-shadow:inset 0 0 0 1px var(--route-color);background:var(--route-tint)}
+:is(#cases .case,#followup .card)[data-route-accent]:focus-visible{outline:2px solid var(--route-color);outline-offset:3px}
