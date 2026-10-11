@@ -9,6 +9,7 @@ const jointSupportSupply={rows:[['Attelle ou écharpe','Soutenir le membre dans 
 function reviewedCareStep(step,kind){
  if(kind==='surgery')return step;
  if(currentFlow==='fluidLoss')return lossCareStep(step);
+ if(currentFlow==='strangulation')return strangulationCareStep(step);
  if(currentFlow==='minor'&&step.dynamicMinorCare){
   const issue=answers.minorIssue;
   const wound=issue==='wound',bruise=issue==='bruise',irritation=issue==='irritation';
@@ -17,6 +18,7 @@ function reviewedCareStep(step,kind){
  return step;
 }
 function routeSupplyPlan(step,kind){
+ if(kind==='flow'&&currentFlow==='strangulation')return {rows:step.dynamicStrangCare&&answers.strangNeck==='abrasion'&&!strangulationDanger()?woundSupplyRows:[],material:strangulationCareStep(step).care?.material||[],note:'Aucun opiacé, anesthésique ou baume systématique après une compression du cou. Ne pas faire boire pour tester la déglutition.'};
  if(kind==='flow'&&currentFlow==='fluidLoss')return {rows:[],material:lossCareStep(step).care?.material||[],note:step.dynamicLossCare?'Pas de morphine, laudanum, purgatif ou perfusion automatique pour ce motif.':'Observer les réactions et le souffle avant tout produit.'};
  if(kind==='surgery'){
   const title=step.title.toLowerCase();

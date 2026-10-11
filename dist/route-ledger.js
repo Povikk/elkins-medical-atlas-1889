@@ -13,6 +13,8 @@ function localCareReady(){
 function routinePlan(step,kind){
  const a=answers,acts=[];const add=(...keys)=>acts.push(...keys);
  if(kind==='flow'&&step.dynamicLossCare)add(...lossRoutineActs());
+ if(kind==='flow'&&step.dynamicStrangPriority)return strangulationRoutineActs(step);
+ if(kind==='flow'&&step.dynamicStrangCare)add(...strangulationRoutineActs(step));
  if(kind==='flow'&&step.dynamicFollowup)return step.dynamicFollowup==='findings'?['Examen de suivi réalisé']:[...(a.followupCare||[]),...(a.followupNoCare?['Examen seul, sans soin supplémentaire']:[])];
  if(step.choices||zoneKeyForStep(step)||step.dynamicMovementQuestion)return acts;
  if(kind==='surgery'){

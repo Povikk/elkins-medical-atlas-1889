@@ -2,8 +2,30 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const element=()=>({innerHTML:'',textContent:'',dataset:{},classList:{add(){},remove(){},contains(){return false;}},querySelectorAll(){return [];},querySelector(){return null;},setAttribute(){},addEventListener(){},append(){}});
 const context={console,document:{addEventListener(){},querySelectorAll(){return [];},querySelector(){return null;},getElementById(){return element();},createElement:element,documentElement:element()},localStorage:{getItem(){return null;},setItem(){}},hooks:[],caseEmoji:{},window:{addEventListener(){}},matchMedia:()=>({matches:false,addEventListener(){}}),innerWidth:1920,emojiIcon:()=>'',urgencyBadge:()=>'',normalize:s=>String(s).toLowerCase(),escapeHTML:s=>String(s)};
 context.document.body=element();context.sleepingSurgery=()=>false;vm.createContext(context);
-for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
+for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','strangulation','recovery','route-ledger','followup','consultation-products','route-layout'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
 const run=source=>vm.runInContext(source,context);
+run(`currentFlow='strangulation';activeRouteKind='flow';answers={conscious:'awake',strangNeck:'none',strangThroat:'normal'};stepIndex=flows.strangulation.steps.length-1;completeRoutineStep('flow')`);
+assert.equal(run('routeScreenGroups().length'),3);
+assert.equal(run('routeScreenGroups().find(g=>g.length===2).length'),2);
+assert.match(run('reportActualCare()'),/signes retardés/);assert.doesNotMatch(run('reportActualCare()'),/arnica|phénol|Morphine|Sels odorants/);
+assert.match(run("reportFindings('flow')"),/Pas de marque visible/);
+run(`answers={conscious:'awake',strangNeck:'abrasion',strangThroat:'normal'};completeRoutineStep('flow');completeRoutineStep('flow')`);
+assert.match(run('reportActualCare()'),/Nettoyage/);assert.equal((run('reportActualCare()').match(/Antisepsie/g)||[]).length,1);
+for(const throat of ['voice','swallow','both','breathing','unknown']){
+ run(`answers={conscious:'awake',strangNeck:'abrasion',strangThroat:'${throat}'};completeRoutineStep('flow')`);
+ assert.match(run('reportActualCare()'),/urgente/);assert.doesNotMatch(run('reportActualCare()'),/Nettoyage|arnica|phénol/);
+ assert.equal(run("careUrgency('serious')"),'critical');
+ assert(!/undefined|NaN/.test(run('render(true)')));
+}
+run(`answers={conscious:'unconscious_breathing',latestState:'awake',latestBreathing:'yes',strangNeck:'none',strangThroat:'normal'};completeRoutineStep('flow')`);
+assert.match(run('reportActualCare()'),/urgente/);assert.match(run("reportFindings('flow')"),/À l’arrivée/);
+run(`answers={conscious:'unconscious_breathing'};stepIndex=1;completeRoutineStep('flow')`);assert.doesNotMatch(run('reportActualCare()'),/Sels odorants/);
+assert.doesNotMatch(run('render(true)'),/ammoniaque|Silvester|Morphine/);
+run(`answers={conscious:'not_breathing'};completeRoutineStep('flow')`);assert.match(run('reportActualCare()'),/Soutien respiratoire/);
+assert(run("followupMenuKeys.includes('strangulation')"));assert.equal(run('caseEmoji.strangulation'),'26a0');
+assert(fs.existsSync('dist/assets/emoji/26a0.svg'));
+run(`currentFlow='followup_strangulation';answers={};toggleFollowupChoice('findings',followupType().signs.indexOf('Voix habituelle'));toggleFollowupChoice('findings',followupType().signs.indexOf('Voix changée'))`);
+assert.equal(run("answers.followupFindings.includes('Voix habituelle')"),false);
 assert.equal(run('caseEmoji.fluidLoss'),'1f4a7');
 assert(fs.existsSync('dist/assets/emoji/'+run('caseEmoji.fluidLoss')+'.svg'));
 run(`currentFlow='fluidLoss';activeRouteKind='flow';answers={lossBranch:'liquids',lossProfile:'heat',conscious:'awake'};stepIndex=flows.fluidLoss.steps.length-1;completeRoutineStep('flow')`);

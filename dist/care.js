@@ -10,6 +10,7 @@ function careProductBlocked(){
  return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(breathing) || bleeding==='major' || animalIncomplete;
 }
 function careUrgency(base){
+ if(currentFlow==='strangulation'&&strangulationDanger())return 'critical';
  if(currentFlow==='hoof'&&answers.hoofSigns==='danger')return 'critical';
  if(currentFlow==='animal'&&animalIsVenom()&&answers.animalVenomSigns==='danger')return 'critical';
  const state=answers.latestState || answers.conscious || answers.headState || answers.poisonState || (currentFlow==='unknown'?answers.unknownWake:'');

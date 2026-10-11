@@ -16,6 +16,7 @@ function reportFindings(kind){
  keys.push('animalSpecies','animalInjury','animalArea','animalBleeding','animalDepth','animalVenomSigns');
  keys.push('hoofArea','hoofSigns','minorIssue');
  keys.push('lossBranch','lossProfile');
+ keys.push('strangNeck','strangThroat');
  for(const key of keys){
   if(!Object.hasOwn(answers,key))continue;
   if(['conscious','headState','poisonState','unknownWake'].includes(key)&&answers.latestState){

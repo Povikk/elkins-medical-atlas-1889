@@ -1,7 +1,7 @@
 // Screen groups preserve authored steps, branch data and the reversible detailed engine.
 function routeScreenGroups(){
  const steps=flows[currentFlow].steps,groups=[];
- const titles=currentFlow==='horse'?[['Quelle intensité ?','Que vois-tu ?','Peut-il bouger ?']]:currentFlow==='animal'?[['Soin local adapté','Soulager la douleur','Protéger et soutenir']]:['gunshot','knife'].includes(currentFlow)?[['Suture / fermeture',currentFlow==='gunshot'?'Pansement':'Pansement et repos']]:careConsultations.some(([id])=>id===currentFlow)?[['Comprendre la demande','Évolution observée']]:[];
+ const titles=currentFlow==='strangulation'?[['Aspect du cou','Voix, déglutition et souffle']]:currentFlow==='horse'?[['Quelle intensité ?','Que vois-tu ?','Peut-il bouger ?']]:currentFlow==='animal'?[['Soin local adapté','Soulager la douleur','Protéger et soutenir']]:['gunshot','knife'].includes(currentFlow)?[['Suture / fermeture',currentFlow==='gunshot'?'Pansement':'Pansement et repos']]:careConsultations.some(([id])=>id===currentFlow)?[['Comprendre la demande','Évolution observée']]:[];
  const bundled=new Map();
  for(const list of titles){const indices=list.map(title=>steps.findIndex(s=>s.title===title));if(indices.every(i=>i>=0)&&indices.every((v,i)=>i===0||v===indices[i-1]+1))bundled.set(indices[0],indices);}
  for(let i=0;i<steps.length;i++){
@@ -40,7 +40,7 @@ function renderGroupedRoute(){
  const groups=routeScreenGroups(),indices=groups.find(group=>group.includes(stepIndex));if(!indices||indices.length<2)return false;
  const saved=stepIndex,parts=[];activeRouteKind='flow';rpPhraseBlocks=[];
  const first=groupedStepRaw(indices[0]),top=first.querySelector('.topbar');
- top.querySelector('h2').textContent=`${groups.indexOf(indices)+1} / ${groups.length} - ${currentFlow==='horse'?'Douleur, aspect et mobilité':currentFlow==='animal'?'Soins et protection':careConsultations.some(([id])=>id===currentFlow)?'Examen et évolution':'Fermeture et pansement'}`;
+ top.querySelector('h2').textContent=`${groups.indexOf(indices)+1} / ${groups.length} - ${currentFlow==='strangulation'?'Cou, voix et respiration':currentFlow==='horse'?'Douleur, aspect et mobilité':currentFlow==='animal'?'Soins et protection':careConsultations.some(([id])=>id===currentFlow)?'Examen et évolution':'Fermeture et pansement'}`;
  for(const index of indices){
   const step=flows[currentFlow].steps[index],raw=groupedStepRaw(index);
   raw.querySelectorAll('.topbar,.progress,.nav,.rp-context,.scene-tools,.rp-choice-recap,.rp-choice-question').forEach(el=>el.remove());
