@@ -21,7 +21,7 @@ function saveCabinetCounts(){try{localStorage.setItem(cabinetStorageKey,JSON.str
 function addCabinetItem(key){
  if(!['kits','syringes'].includes(key))return;
  cabinetCounts=loadCabinetCounts();
- const contribution=key==='kits'?37:57;
+ const contribution=key==='kits'?40:75;
  if(cabinetCounts[key]>=1000000||!Number.isSafeInteger(cabinetCounts.dueCents+contribution))return;
  cabinetCounts[key]++;cabinetCounts.dueCents+=contribution;saveCabinetCounts();
 }
