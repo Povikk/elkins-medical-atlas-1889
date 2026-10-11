@@ -1,6 +1,6 @@
 // Fictional 1889 scene, not a modern emergency-care protocol.
 // Risk boundaries: https://www.gloshospitals.nhs.uk/your-visit/patient-information-leaflets/injury-to-the-throat/
-flows.strangulation={title:'Étranglement / strangulation',urgency:'serious',steps:[
+flows.strangulation={title:'Strangulation',urgency:'serious',steps:[
  {title:'État du patient',do:['Mettre fin à la compression et observer réactions et souffle ; ne pas attendre un récit complet.'],say:['« Vous m’entendez ? Je vérifie votre respiration. »'],choices:flows.gunshot.steps[0].choices.map(c=>({label:c.label,set:{...c.set}}))},
  {title:'Priorités après la compression',dynamicConscious:true,dynamicStrangPriority:true},
  {title:'Aspect du cou',do:['Observer le cou sans le comprimer, le masser ni forcer ses mouvements.'],say:['« Montrez-moi ce qui vous fait mal, sans tourner la tête de force. »'],choices:[
