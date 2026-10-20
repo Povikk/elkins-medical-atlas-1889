@@ -4,7 +4,7 @@ for(const [id,flow] of Object.entries(flows)){
  if(index<0)continue;
  flow.steps.splice(index+1,0,{
   title:'État après les premiers gestes',recoveryCheck:true,
-  do:['Indiquer les réactions et la respiration réellement constatées après les premiers gestes.',id==='strangulation'?'Un réveil ne suffit pas à écarter une lésion du cou ; continuer la surveillance.':'Les sels odorants ne garantissent pas un réveil ; continuer la surveillance.'],
+  do:['Indiquer les réactions et la respiration réellement constatées après les premiers gestes.',flow.obstetric?'Un réveil ne suffit pas à résoudre la cause ; poursuivre la surveillance obstétricale.':id==='strangulation'?'Un réveil ne suffit pas à écarter une lésion du cou ; continuer la surveillance.':'Les sels odorants ne garantissent pas un réveil ; continuer la surveillance.'],
   say:['« Vous m’entendez maintenant ? Pouvez-vous me répondre ? »'],
   choices:[
    {label:'Reprend connaissance, répond et respire',set:{latestState:'awake',latestBreathing:'yes'}},

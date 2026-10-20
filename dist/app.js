@@ -355,16 +355,16 @@ function show(id){
     answers={};flowHistory=[];currentFlow=null;currentSurgery=null;materialPanelOpen=false;resetRpScene();
     document.getElementById('flow').innerHTML='';document.getElementById('surgeryFlow').innerHTML='';
   }
-  ["home","cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
+  ["home","cases","obstetrics","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"].forEach(x=>document.getElementById(x)?.classList.add("hidden"));
   target.classList.remove("hidden");
-  const shellView = id === "flow" ? (flows[currentFlow]?.followup?'followup':'cases') : id === "surgeryFlow" ? "surgery" : id;
+  const shellView = id === "flow" ? (flows[currentFlow]?.followup?'followup':flows[currentFlow]?.obstetric?'obstetrics':'cases') : id === "surgeryFlow" ? "surgery" : id;
   document.querySelectorAll("[data-shell-view]").forEach(button=>{
     const active = button.dataset.shellView === shellView;
     button.classList.toggle("active",active);
     if(active) button.setAttribute("aria-current","page");
     else button.removeAttribute("aria-current");
   });
-  const compactSections = ["cases","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"];
+  const compactSections = ["cases","obstetrics","lexique","surgery","surgeryFlow","atlas","flow","stories","quiz","followup"];
   document.body.classList.toggle("compact-header", compactSections.includes(id));
   window.scrollTo({top:0,behavior:"auto"});
 }
@@ -552,7 +552,7 @@ function next(fromChoice=false){
 function prev(){
   const previous=flowHistory.pop();
   if(previous){const latest=Object.fromEntries(Object.entries(answers).filter(([key])=>key.startsWith('latest')));stepIndex=previous.index;answers={...previous.answers,...latest};interventionEnded=false;render();}
-  else showCases();
+  else returnToCareCatalog();
 }
 function section(title,items,cls=""){
   const label=/^Priorité/.test(title)?'Priorité':/surveill|vérification finale|avant de terminer|consignes/i.test(title)?'À surveiller':'';
@@ -772,7 +772,7 @@ function render(capture=false){
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         ${compactButton("flow")}
-        <button class="danger" onclick="showCases()">Changer de cas</button>
+        <button class="danger" onclick="returnToCareCatalog()">Changer de cas</button>
       </div>
     </div>
     <div class="progress"><div style="width:${pct}%"></div></div>

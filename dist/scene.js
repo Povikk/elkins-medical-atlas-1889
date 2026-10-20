@@ -57,6 +57,7 @@ function patientQuestion(step){
   const unable = ['asleep','unresponsive','uncertain'].includes(rpPatientState()) || incidentKind;
   return `<div class="patient-question"><b>${unable ? 'Si le patient ne peut pas répondre' : 'À demander au joueur'}</b><p>${unable ? "Observe les signes visibles ou utilise une réponse incertaine. Ne lui impose pas une sensation." : question}</p></div>`;
 }
+function returnToCareCatalog(){if(flows[currentFlow]?.obstetric&&!flows[currentFlow]?.followup)showObstetrics();else showCases();}
 function flowRouteNote(){
   if(answers.needsSuture !== false) return '';
   const previous=flows[currentFlow].steps[stepIndex-1];
@@ -94,13 +95,13 @@ function endingMarkup(kind){
   rpPhraseBlocks=[];
   let variant='';
   if(answers.reportClosure==='sutured')variant='Contrôle de la plaie et du pansement dans 24 h. Le retrait des points dépend de la cicatrisation.';
-  const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || (answers.latestBleeding||answers.animalBleeding)==='major' || (!surgery&&currentFlow==='animal'&&(animalNeedsAssessment()||animalUnsafe()));
-  return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : 'Intervention terminée'}</h2>
+  const unresolved=['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['no','weak'].includes(answers.latestBreathing || answers.breathing || answers.unknownBreathing) || (answers.latestBleeding||answers.animalBleeding)==='major' || (!surgery&&currentFlow==='animal'&&(animalNeedsAssessment()||animalUnsafe())) || (!surgery&&entry.obstetric&&obstetricDanger());
+  return `<div class="section scene-ending"><span class="badge">${entry.title}</span><h2>${surgery ? 'Scène chirurgicale terminée' : entry.obstetric?'Parcours obstétrical terminé':'Intervention terminée'}</h2>
     <p class="muted">Conclusion à adapter aux gestes et à l'évolution réellement joués. Aucun dossier n'est créé.</p>
     ${unresolved ? '<div class="route-note">Un signe inquiétant a été choisi dans ce parcours. La fin des étapes ne signifie pas que le patient peut repartir : réévalue son état dans la scène.</div>' : ''}
     ${reportMarkup(kind)}
     <details class="ending-detail"><summary>Consignes, signes à surveiller et formulation</summary><p>${notes[0]}</p>${variant?`<p>${variant}</p>`:''}${sayLines([notes[1]])}<p>${notes[2]}</p><p>${notes[3]}</p></details>
-    <div class="nav"><button class="secondary" onclick="${surgery ? 'surgeryEnded=false;renderSurgery()' : 'interventionEnded=false;render()'}">Revoir la dernière étape</button><button class="next" onclick="${surgery ? 'showSurgery()' : 'showCases()'}">${surgery ? 'Autre chirurgie' : 'Nouvelle intervention'}</button><button class="secondary" onclick="goHome()">Accueil</button></div></div>`;
+    <div class="nav"><button class="secondary" onclick="${surgery ? 'surgeryEnded=false;renderSurgery()' : 'interventionEnded=false;render()'}">Revoir la dernière étape</button><button class="next" onclick="${surgery ? 'showSurgery()' : 'returnToCareCatalog()'}">${surgery ? 'Autre chirurgie' : entry.obstetric?'Autre parcours obstétrical':'Nouvelle intervention'}</button><button class="secondary" onclick="goHome()">Accueil</button></div></div>`;
 }
 
 function openSceneReferences(index){

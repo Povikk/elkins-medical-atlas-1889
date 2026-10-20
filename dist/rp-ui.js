@@ -26,6 +26,7 @@ function rpChoicesMarkup(){
  const fields={conscious:'État initial',headState:'État initial',poisonState:'État initial',unknownBreathing:'Respiration initiale',breathing:'Respiration initiale',unknownBleeding:'Saignement',unknownWake:'Dernière réaction',gunArea:'Zone',knifeArea:'Zone',knifeSeverity:'Plaie',horseArea:'Zone',horsePain:'Douleur',fracturePain:'Douleur',horseVisible:'Aspect',horseMove:'Mouvement',fightIssue:'Signe principal',bullet:'Projectile',needsSuture:'Fermeture',burnSeverity:'Brûlure',rpPain:'Douleur réévaluée',consultEvolution:'Évolution'};
  const manual={horseMove:{normal:'Normal',painful:'Douloureux',limited:'Limité',none:'Impossible',unknown:'Non évalué'},rpPain:{mild:'Légère',moderate:'Modérée',strong:'Forte',unsafe:'Conscience / respiration inquiétante',unknown:'Non évaluée'}};
  Object.assign(fields,{animalSpecies:'Animal',animalBleeding:'Saignement',animalInjury:'Blessures',animalArea:'Zone',animalDepth:'Aspect / fonction',animalVenomSigns:'Évolution après morsure',animalExposure:'Animal / circonstances'});
+ Object.assign(fields,{obProfile:'Situation obstétricale',obBaby:'Naissance / enfant'});
  const steps=activeRouteKind==='surgery'?surgeries[currentSurgery]?.steps:flows[currentFlow]?.steps;
  const choices=(steps || []).flatMap(step=>activeRouteKind==='flow'&&currentFlow==='animal'?animalChoicesForStep(step):step.choices || []);
  const chips=Object.entries(fields).flatMap(([key,label])=>{

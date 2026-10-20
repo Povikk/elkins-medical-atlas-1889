@@ -10,6 +10,7 @@ function careProductBlocked(){
  return ['asleep','unresponsive','uncertain','confused'].includes(rpPatientState()) || ['weak','no','unknown'].includes(breathing) || bleeding==='major' || animalIncomplete;
 }
 function careUrgency(base){
+ if(currentObstetric()&&obstetricDanger())return 'critical';
  if(currentFlow==='strangulation'&&strangulationDanger())return 'critical';
  if(currentFlow==='hoof'&&answers.hoofSigns==='danger')return 'critical';
  if(currentFlow==='animal'&&animalIsVenom()&&answers.animalVenomSigns==='danger')return 'critical';
@@ -48,6 +49,7 @@ function careStepExtras(step){
  if(answers.latestBreathing==='no' || answers.conscious==='not_breathing')links.push(['unknown','Réévaluation prioritaire']);
  let html=links.length?`<details class="route-links"><summary>Réorienter si la scène le justifie</summary>${links.map(([id,label])=>`<button class="secondary" onclick="redirectCare('${id}')">${label}</button>`).join('')}</details>`:'';
  if(answers.consultEvolution==='worse')html+='<div class="route-note">Un signe s’aggrave : réévaluer conscience, respiration et saignement avant une simple conclusion de consultation.</div>';
+ if(step.dynamicObCare)html+=obReferencesMarkup();
  if(rpContext.resources==='limited')html+='<div class="route-note">Moyens limités : identifier ce qui manque, demander du renfort et organiser le transport. Ne pas inventer une substitution de produit ou rendre une opération réalisable avec du matériel absent.</div>';
  const current=step.care || {};
  if(current.assistant && rpContext.team==='assistant')html+=`<div class="assistant-note"><b>À l’assistant :</b> ${current.assistant}</div>`;
@@ -216,7 +218,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('click',event=>{
   const button=event.target.closest('[onclick]');if(!button)return;
   const code=button.getAttribute('onclick');
-  const leaving=/^(goHome|showCases|showSurgery|showStories|showAtlas|showLexique|start|openSurgery)\(/.test(code) || code==='prev()'&&!flowHistory.length || code==='prevSurgery()'&&surgeryStepIndex===0;
+  const leaving=/^(goHome|showCases|returnToCareCatalog|showObstetrics|showObstetricFollowup|showSurgery|showStories|showAtlas|showLexique|start|openSurgery)\(/.test(code) || code==='prev()'&&!flowHistory.length || code==='prevSurgery()'&&surgeryStepIndex===0;
   const running=(!document.getElementById('flow').classList.contains('hidden')&&!interventionEnded)||(!document.getElementById('surgeryFlow').classList.contains('hidden')&&!surgeryEnded);
   if(leaving&&running&&!confirm('Quitter ce parcours ? Ses réponses temporaires seront effacées.')){event.preventDefault();event.stopImmediatePropagation();}
  },true);

@@ -2,8 +2,33 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const element=()=>({innerHTML:'',textContent:'',dataset:{},classList:{add(){},remove(){},contains(){return false;}},querySelectorAll(){return [];},querySelector(){return null;},setAttribute(){},addEventListener(){},append(){}});
 const context={console,document:{addEventListener(){},querySelectorAll(){return [];},querySelector(){return null;},getElementById(){return element();},createElement:element,documentElement:element()},localStorage:{getItem(){return null;},setItem(){}},hooks:[],caseEmoji:{},window:{addEventListener(){}},matchMedia:()=>({matches:false,addEventListener(){}}),innerWidth:1920,emojiIcon:()=>'',urgencyBadge:()=>'',normalize:s=>String(s).toLowerCase(),escapeHTML:s=>String(s)};
 context.document.body=element();context.sleepingSurgery=()=>false;vm.createContext(context);
-for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','strangulation','recovery','route-ledger','followup','consultation-products','route-layout','route-catalog'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
+for(const file of ['data','surgery-extra','pharmacy','atlas-labels','lexicon-extra','icons','scene','rp-ui','care','app','condensed','care-memo','report','confirmations','animal','zones','hoof','route-products','zone-parts','fluid-loss','strangulation','obstetrics','recovery','route-ledger','followup','consultation-products','route-layout','route-catalog'])vm.runInContext(fs.readFileSync(`dist/${file}.js`,'utf8'),context,{filename:file});
 const run=source=>vm.runInContext(source,context);
+assert.equal(run('Object.keys(obstetricRoutes).length'),12);
+for(const [id,route]of Object.entries(run('obstetricRoutes'))){
+ assert(fs.existsSync(`dist/assets/emoji/${route.icon}.svg`));
+ assert(run(`followupMenuKeys.includes('${id}')`));
+ assert.equal(run(`followupTypes['${id}'].group`),'obstetrics');
+ for(const profile of route.profiles){
+  run(`activeRouteKind='flow';currentFlow='${id}';answers={conscious:'awake',obProfile:'${profile.id}',${route.birth?"obBaby:'unborn'":''}};stepIndex=flows[currentFlow].steps.length-1`);
+  assert(!/undefined|NaN/.test(run('render(true)')));
+  run(`completeRoutineStep('flow')`);
+  assert.match(run("reportFindings('flow')"),new RegExp(profile.label.slice(0,6).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+  assert.doesNotMatch(run('reportActualCare()'),/Ergot.*utilisé|Sels odorants|Césarienne effectuée|forceps effectuée/);
+  assert(run('routeScreenGroups().length')<=4);
+  if(profile.urgent)assert.equal(run("careUrgency('serious')"),'critical');
+ }
+}
+run(`currentFlow='ob_birth';answers={conscious:'awake',obProfile:'progress',obBaby:'unborn'};activeRouteKind='flow';stepIndex=flows.ob_birth.steps.length-1;completeRoutineStep('flow')`);
+assert.match(run("reportFindings('flow')"),/pas encore né/);assert.doesNotMatch(run('reportActualCare()'),/chaleur douce/);
+run(`answers={conscious:'awake',obProfile:'progress',obBaby:'breathing'};completeRoutineStep('flow')`);assert.match(run('reportActualCare()'),/surveillance du nouveau-né/);
+run(`answers={conscious:'awake',obProfile:'progress',obBaby:'no'};completeRoutineStep('flow')`);assert.match(run('reportActualCare()'),/urgente du nouveau-né/);assert.doesNotMatch(run('reportActualCare()'),/chaleur douce/);
+assert.equal(run("careUrgency('serious')"),'critical');
+run(`currentFlow='ob_difficult';answers={conscious:'awake',obProfile:'forceps'};stepIndex=flows.ob_difficult.steps.length-1;completeRoutineStep('flow');careConfirm('act:Assistance au forceps effectuée','done')`);assert.match(run('reportActualCare()'),/forceps effectuée/);
+run(`careInvalidateFrom(stepIndex)`);assert.doesNotMatch(run('reportActualCare()'),/forceps effectuée/);
+run(`currentFlow='ob_haemorrhage';answers={conscious:'unconscious_breathing'};stepIndex=1;completeRoutineStep('flow')`);assert.doesNotMatch(run('reportActualCare()'),/Sels odorants|morphine|ergot/i);
+assert.doesNotMatch(run('render(true)'),/Silvester|ammoniaque/);
+run(`currentFlow='ob_pregnancy';answers={conscious:'awake',obProfile:'routine'};stepIndex=flows.ob_pregnancy.steps.length-1`);assert.match(run("endingMarkup('flow')"),/Autre parcours obstétrical/);
 const sortedFollowups=run('orderedFollowupKeys()');assert.equal(new Set(sortedFollowups).size,run('followupMenuKeys.length'));
 for(let i=1;i<sortedFollowups.length;i++)assert(run(`routeTitleCompare(followupTypes['${sortedFollowups[i-1]}'].title,followupTypes['${sortedFollowups[i]}'].title)`)<=0);
 assert.equal(run("routeAccent('gunshot')"),'gunshot');assert.equal(run("routeAccent('hoof')"),'hoof');assert.equal(run("routeAccent('animal')"),'animal');assert.equal(run("routeAccent('strangulation')"),'');

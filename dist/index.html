@@ -28,6 +28,7 @@
     <nav class="side-nav">
       <button type="button" class="side-nav-item active" data-shell-view="home" data-mobile-label="Accueil" onclick="goHome()"><span aria-hidden="true">⌂</span>Vue d’ensemble</button>
       <button type="button" class="side-nav-item" data-shell-view="cases" data-mobile-label="Soins" onclick="showCases()" aria-label="Ouvrir les soins guidés"><span aria-hidden="true">✚</span>Intervention</button>
+      <button type="button" class="side-nav-item" data-shell-view="obstetrics" data-mobile-label="Obstétrique" onclick="showObstetrics()"><span aria-hidden="true"><img src="assets/emoji/1f476.svg" width="18" height="18" alt=""></span>Obstétrique</button>
       <button type="button" class="side-nav-item" data-shell-view="followup" data-mobile-label="Suivi" onclick="showFollowup()"><span aria-hidden="true">↻</span>Suivi</button>
       <button type="button" class="side-nav-item" data-shell-view="lexique" data-mobile-label="Lexique" onclick="showLexique()" aria-label="Ouvrir les références médicales"><span aria-hidden="true">≡</span>Lexique</button>
       <button type="button" class="side-nav-item" data-shell-view="surgery" data-mobile-label="Chirurgie" onclick="showSurgery()"><span aria-hidden="true">✦</span>Chirurgie lourde</button>
@@ -242,6 +243,7 @@
     </section>
 
     <section id="surgeryFlow" class="hidden"></section>
+    <section id="obstetrics" class="hidden" aria-label="Parcours obstétricaux"></section>
     <section id="stories" class="hidden">
       <div class="topbar"><div><h2>Accroches</h2><p class="muted">Une phrase du médecin pour tendre une perche. Le joueur choisit s’il rebondit ; tu ne lui inventes ni passé ni problème.</p></div><button class="secondary" onclick="goHome()">Accueil</button></div>
       <div class="story-filters"><label>Rechercher<input id="storySearch" type="search" placeholder="Artisan, visite, pharmacien, lettre…" oninput="renderStories()"></label><label>Thème<select id="storyCategory" onchange="renderStories()"><option value="">Tous les thèmes</option></select></label><label>Pendant quel soin ?<select id="hookRoute" onchange="renderStories()"><option value="">Tous les soins</option></select></label></div>
@@ -332,6 +334,7 @@
 <script src="zone-parts.js"></script>
 <script src="fluid-loss.js"></script>
 <script src="strangulation.js"></script>
+<script src="obstetrics.js"></script>
 <script src="recovery.js"></script>
 <script src="route-ledger.js"></script>
 <script src="followup.js"></script>

@@ -61,12 +61,13 @@ for(const [id,route]of Object.entries(surgeries)){
 for(const [key,type]of Object.entries(followupTypes)){
  flows['followup_'+key]={title:'Suivi : '+type.title,urgency:'light',followup:key,steps:[{title:'Évolution constatée',dynamicFollowup:'findings'},{title:'Soins effectués et consignes',dynamicFollowup:'care'}]};
 }
+registerObstetricFollowups();
 function showFollowup(){
  show('followup');
- document.getElementById('followup').innerHTML=`<div class="topbar"><h2>Suivi du patient</h2></div><p class="muted">Reprendre le motif de l’intervention ou de la consultation. Deux étapes courtes, sans recommencer les soins initiaux.</p><div class="followup-filters" role="group" aria-label="Catégories de suivi">${[['trauma','Blessures / accidents'],['consult','Consultations'],['surgery','Après chirurgie']].map(([key,label])=>`<button type="button" class="secondary" data-followup-group="${key}" aria-pressed="${key==='trauma'}" onclick="filterFollowup('${key}')">${label}</button>`).join('')}</div><div class="followup-categories">${orderedFollowupKeys().map(key=>{const type=followupTypes[key];return `<button type="button" class="card" data-followup-category="${type.group}" ${routeAccent(key)?`data-route-accent="${routeAccent(key)}"`:''} ${type.group==='trauma'?'':'hidden'} onclick="startFollowup('${key}')"><h3>${reportEscape(type.title)}</h3><p>${reportEscape(type.intro)}</p></button>`;}).join('')}</div>`;
+ document.getElementById('followup').innerHTML=`<div class="topbar"><h2>Suivi du patient</h2></div><p class="muted">Reprendre le motif de l’intervention ou de la consultation. Deux étapes courtes, sans recommencer les soins initiaux.</p><div class="followup-filters" role="group" aria-label="Catégories de suivi">${[['trauma','Blessures / accidents'],['consult','Consultations'],['obstetrics','Obstétrique'],['surgery','Après chirurgie']].map(([key,label])=>`<button type="button" class="secondary" data-followup-group="${key}" aria-pressed="${key==='trauma'}" onclick="filterFollowup('${key}')">${label}</button>`).join('')}</div><div class="followup-categories">${orderedFollowupKeys().map(key=>{const type=followupTypes[key];return `<button type="button" class="card" data-followup-category="${type.group}" ${routeAccent(key)?`data-route-accent="${routeAccent(key)}"`:''} ${type.group==='trauma'?'':'hidden'} onclick="startFollowup('${key}')"><h3>${reportEscape(type.title)}</h3><p>${reportEscape(type.intro)}</p></button>`;}).join('')}</div>`;
 }
 function filterFollowup(group){
- if(!['trauma','consult','surgery'].includes(group))return;
+ if(!['trauma','consult','obstetrics','surgery'].includes(group))return;
  document.querySelectorAll('[data-followup-group]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.followupGroup===group)));
  document.querySelectorAll('[data-followup-category]').forEach(button=>{button.hidden=button.dataset.followupCategory!==group;});
 }
@@ -118,6 +119,7 @@ function toggleFollowupChoice(field,index){
  // Do not allow mutually exclusive observations or point decisions together.
  const exclusive=field==='findings'?[followupCommonSigns,['Gonflement diminué','Gonflement persistant'],['Peau intacte','Plaie constatée'],['Réactions habituelles','Confusion rapportée','Somnolence inhabituelle'],['Souffle sans gêne rapportée','Gêne respiratoire'],['Fièvre diminuée','Fièvre persistante','Fièvre aggravée'],['Toux diminuée','Toux persistante','Toux aggravée'],['Énergie améliorée','Fatigue persistante','Faiblesse aggravée'],['Amélioration rapportée','Aggravation rapportée'],['Appétit amélioré','Appétit diminué'],['Diarrhée persistante','Constipation persistante']]:[['Points conservés','Points retirés','Retrait partiel des points']];
  if(field==='findings'&&followupType()?.sourceFlow==='strangulation')exclusive.push(['Voix habituelle','Voix changée'],['Déglutition sans gêne rapportée','Gêne pour avaler']);
+ if(field==='findings'&&followupType()?.group==='obstetrics')exclusive.push(['Pertes diminuées','Saignement repris']);
  if(selected.has(label))for(const group of exclusive)if(group.includes(label))for(const item of group)if(item!==label)selected.delete(item);
  if(field==='care'&&label.includes('arnica')&&selected.has(label)&&!(answers.followupFindings||[]).includes('Peau intacte'))return;
  const medication=field==='care'?answers.consultMedication:null;
