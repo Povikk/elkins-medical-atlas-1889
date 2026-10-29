@@ -1,36 +1,76 @@
 # Elkins & Elkins Medical Atlas
 
-Application statique et autonome pour des scènes RP médicales en 1889.
+Un aide-mémoire médical pour les scènes de jeu de rôle sur RedM, dans un univers western situé en 1889. L’application rassemble des parcours de soin et des références à consulter rapidement sur un second écran.
 
-Ouvrir `index.html` pour accéder directement à la version actuelle. La version monolithique fournie est conservée dans `index.legacy.html` uniquement comme référence.
+[Accéder à l’application](https://elkins-medical-atlas-1889.povik.chatgpt.site/) : l’accès est réservé aux utilisateurs autorisés.
 
-## Structure
+Les contenus servent à la fiction et s’appuient sur des pratiques historiques. Ils ne constituent pas des conseils médicaux et ne doivent pas être utilisés pour des soins réels.
 
-- `dist/index.html` contient la structure de l'interface.
-- `dist/styles.css` contient le thème et les règles responsive.
-- `dist/data.js` contient le Lexique, les parcours et le matériel.
-- `dist/app.js` contient la navigation et le rendu interactif.
-- `dist/lex-quick.js` ajoute l’onglet Essentiels, ouvert par défaut dans le Lexique : six cellules regroupant 22 repères RP du catalogue existant, avec fiches près de la souris. Clic pour fixer une fiche, Échap / fermeture / clic extérieur pour la quitter ; ouverture au toucher sur mobile. Aucun dosage, nouvelle recette ou stockage ajouté.
-- `dist/care.js` contient les consultations, métadonnées de matériel, réévaluation et aides de soin.
-- `dist/condensed.js` affiche le parcours complet sans dialogue RP, en réutilisant les actions et règles de branchement du rendu détaillé. Les observations ultérieures sont invalidées quand une réponse antérieure change ; les dernières observations vitales restent conservées.
-- `dist/care-memo.js` fournit le pense-bête d’Effie, accessible depuis le condensé : quatre cellules Observer / Agir / Produits facultatifs / Danger, seules ou au-dessus des étapes. Les choix restent accessibles en vue seule. Présentation inspirée des pages 2 et 3 du PDF fourni ; les consultations et chirurgies sont adaptées aux parcours existants. Les autres chapitres du PDF ne deviennent pas de nouveaux diagnostics ou prescriptions. Aucun protocole ou dosage ajouté.
-- `dist/report.js` affiche automatiquement deux lignes en fin de soin : constatations tirées des choix (zone et côté compris) ; soins suggérés selon le cas. Les dernières observations vitales remplacent l’état initial dans ce récapitulatif. Pas de formulaire, prompt ou appel distant. Le nombre de points reste à préciser et les suggestions ne sont pas des soins confirmés. Les deux lignes sont copiables ; rien n’est enregistré.
+## Fonctionnalités
 
-Le pense-bête est affiché par défaut dans les parcours détaillés et condensés. Les boutons de matériel en haut et de changement de chirurgie sont retirés ; le matériel indiqué dans les étapes reste disponible.
-- `dist/hooks.js` contient les 60 accroches et leurs filtres, uniquement dans la catégorie Accroches. Aucune suggestion de perche dans les interventions.
-- `dist/rp-ui.js` contient les formulations, le contexte temporaire et la taille du texte.
-- `dist/scene.js` contient les références rapides, incidents et conclusions.
-- `dist/atlas-labels.js` contient les 45 zones nommées des trois planches.
-- `dist/pharmacy.js` et `dist/lexicon-extra.js` complètent les références historiques.
+- Suivre des interventions adaptées aux réponses choisies : blessures par balle, attaques d’animaux, coups de sabot, chutes, brûlures et autres traumatismes.
+- Accéder à des parcours de consultations simples, de suivi, de chirurgie lourde et d’obstétrique.
+- Sélectionner plusieurs zones blessées, préciser un emplacement et indiquer le type et le nombre de projectiles par zone.
+- Retrouver les actions, produits et matériels utiles, avec un pense-bête et une vue condensée du parcours.
+- Consulter, modifier et copier le récapitulatif des constatations et des soins retenus.
+- Gérer plusieurs patients pendant une session, les renommer et passer de l’un à l’autre.
+- Rechercher des médicaments, techniques, matériels et symptômes dans le lexique, avec une vue des essentiels et des fiches au survol.
+- Explorer trois planches anatomiques interactives et consulter des accroches pour prolonger une scène.
+- S’entraîner avec des séries aléatoires de dix questions, leurs corrections et des anecdotes historiques.
+- Compter les kits et seringues utilisés et calculer le montant à reverser au cabinet, avec des tarifs partagés modifiables par un administrateur.
 
-Pour modifier un parcours original, commencer par son entrée dans `dist/data.js`, puis vérifier les métadonnées correspondantes de `dist/care.js`. Les six consultations sont définies dans `careConsultations`.
-Pour ajouter une accroche, ajouter une ligne à une catégorie de `hookGroups` dans `dist/hooks.js` : titre, identifiants de parcours séparés par une virgule, moment, phrase du médecin, relance et scène possible. Ne pas imposer de passé, de réaction ou de nouvelle maladie au joueur. La relance est repliée ; la suggestion pendant le soin est facultative.
-L'application ne possède ni backend, ni base de données, ni sauvegarde automatique.
+L’interface propose un thème sombre ou clair, une taille de texte réglable et une présentation adaptée aux ordinateurs et aux mobiles.
 
-Seuls le thème et la taille de texte peuvent être mémorisés localement. Les choix du parcours, observations, contexte et formulations sont temporaires. Le mode en scène reste supprimé.
+## Fonctionnement et données
 
-Le bouton « Condensé » remplace « Compact ». Sur PC, le parcours est présenté en colonnes ; sur mobile ou avec un texte fortement agrandi, la lisibilité prime et le défilement reste possible. `tests/condensed.cjs` vérifie les 17 parcours et six chirurgies, les branches, le retour au détail et les deux thèmes.
+Les patients et les réponses aux parcours restent en mémoire pendant la session. Un rechargement de la page les efface : aucun dossier patient n’est enregistré automatiquement.
 
-## Vérification
+Les préférences d’affichage, les compteurs d’objets et le montant dû sont conservés localement dans le navigateur. Seuls les tarifs partagés sont stockés côté serveur ; les données des patients et les compteurs personnels ne sont pas envoyés au serveur.
 
-Servir `dist` sur `http://127.0.0.1:4173/`, puis exécuter les fichiers `tests/*.cjs` avec Node et Playwright disponibles. `tests/care-stories.cjs` couvre les 17 interventions, les 60 accroches et leurs filtres, la réévaluation, les gardes de produit, les recherches et l’affichage de 320 à 2560 pixels. Les sept autres tests couvrent les fonctions préexistantes, dont les six chirurgies et les 45 zones anatomiques.
+## Technologies utilisées
+
+- HTML, CSS et JavaScript natif, sans framework front-end.
+- Node.js pour la construction, la prévisualisation locale et les tests.
+- Cloudflare Workers pour servir l’application et gérer les tarifs, avec Cloudflare R2 pour leur stockage. La publication passe par Sites.
+- Twemoji pour les illustrations des emojis.
+- Tests avec les modules natifs de Node.js et Playwright pour les parcours dans le navigateur.
+
+## Installation et utilisation en local
+
+Depuis la racine du dépôt, avec Node.js 24, lancer les commandes suivantes. La construction et la prévisualisation ne nécessitent aucune installation de dépendances.
+
+```sh
+node scripts/build-worker.mjs
+node scripts/preview-worker.mjs
+```
+
+Ouvrir ensuite [http://127.0.0.1:4173/](http://127.0.0.1:4173/). Garder le serveur lancé pendant l’utilisation.
+
+La prévisualisation simule un accès administrateur. Ses tarifs restent en mémoire et ne modifient pas ceux du site en ligne. Après une modification des sources, relancer la construction puis redémarrer le serveur.
+
+### Vérifications
+
+Après la construction, ces tests peuvent être exécutés directement avec Node.js :
+
+```sh
+node tests/route-ledger.cjs
+node tests/route-catalog.cjs
+node tests/shared-rates.mjs
+```
+
+Les tests de navigation présents dans `tests/` nécessitent également Playwright et, pour ceux qui utilisent la prévisualisation, un serveur local actif.
+
+## Organisation du dépôt
+
+- `dist/` contient les sources de l’interface, les parcours, les références et les ressources visuelles. Malgré son nom, ce dossier contient des fichiers à modifier directement.
+- `worker/` contient le serveur Cloudflare et la gestion des tarifs partagés.
+- `scripts/` contient les outils de construction et de prévisualisation.
+- `tests/` contient les vérifications de logique et de navigation.
+- `sources/` et `docs/` regroupent le manuel fourni et les notes documentaires.
+
+Le fichier `index.html` à la racine redirige vers l’interface. `index.legacy.html` conserve l’ancienne version monolithique comme référence.
+
+## Auteur
+
+**Jonathan Ragot**\
+GitHub : [Povikk](https://github.com/Povikk)
